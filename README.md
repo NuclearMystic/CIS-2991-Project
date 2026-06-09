@@ -1,34 +1,34 @@
-# DefaultGameTemplate
+# AfterAsh
 
-A 3D game by Liminal Arcane Studio.
+A 2D game for CIS 2991.
 
 ## Project Info
 
 | Field | Value |
 |---|---|
-| Game Name | DefaultGameTemplate |
-| Type | 3D |
+| Game Name | AfterAsh |
+| Type | 2D |
 | Render Pipeline | URP |
-| Unity Version | [check Unity Hub for current LTS] |
-| Studio | Liminal Arcane Studio |
+| Unity Version | [6000.41f1 |
+| Studio | Student Project |
 
 ## Getting Started
 
 1. Clone this repository
 2. Open Unity Hub
 3. Click **Add project from disk** and select this folder
-4. Select the correct Unity version and open
+4. Select the correct Unity version (6000.41f1) and open
 5. Run the following to enable git hooks:
-   ```bash
-   git config core.hooksPath hooks
-   ```
+   if you are using github desktop, click repository at the top, then open in command line/prompt, then just copy and paste:
+   "git config core.hooksPath hooks"
+   
 
 ## Project Structure
 
 ```
 Assets/
   Art/
-    3D/         # 3D models, animations, textures
+    3D/         # 2D models, animations, textures
     2D/         # Sprites, tilemaps
     UI/         # UI graphics, icons, buttons
     Fonts/
