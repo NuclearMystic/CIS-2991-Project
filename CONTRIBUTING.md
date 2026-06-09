@@ -1,6 +1,4 @@
-# Contributing to DefaultGameTemplate
-
-Thank you for contributing to a Liminal Arcane Studio project!
+# Contributing to AfterAsh
 
 ## Getting Started
 
