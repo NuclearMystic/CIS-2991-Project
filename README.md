@@ -9,7 +9,7 @@ A 2D game for CIS 2991.
 | Game Name | AfterAsh |
 | Type | 2D |
 | Render Pipeline | URP |
-| Unity Version | [6000.41f1 |
+| Unity Version | [6000.41f1] |
 | Studio | Student Project |
 
 ## Getting Started
