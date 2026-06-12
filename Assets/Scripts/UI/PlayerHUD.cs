@@ -17,7 +17,7 @@ namespace CIS2991Project.UI
 
             if (playerHealth == null)
             {
-                playerHealth = Object.FindObjectOfType<PlayerHealth>();
+                playerHealth = Object.FindAnyObjectByType<PlayerHealth>();
             }
 
             if (playerInventory == null)
@@ -27,7 +27,7 @@ namespace CIS2991Project.UI
 
             if (playerInventory == null)
             {
-                playerInventory = Object.FindObjectOfType<PlayerInventory>();
+                playerInventory = Object.FindAnyObjectByType<PlayerInventory>();
             }
 
             EnsureHud();
