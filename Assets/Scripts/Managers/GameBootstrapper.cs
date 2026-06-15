@@ -92,10 +92,12 @@ namespace CIS2991Project.Managers
 
             var spriteRenderer = playerObject.AddComponent<SpriteRenderer>();
             spriteRenderer.sprite = CreatePlaceholderSprite();
+            spriteRenderer.sortingOrder = 1;
 
             playerObject.AddComponent<PlayerMovement>();
             playerObject.AddComponent<PlayerHealth>();
             playerObject.AddComponent<PlayerInventory>();
+            playerObject.AddComponent<PlayerShoot>();
 
             var hudObject = new GameObject("PlayerHUD");
             hudObject.AddComponent<PlayerHUD>();
@@ -104,6 +106,16 @@ namespace CIS2991Project.Managers
             var pauseMenuObject = new GameObject("PauseMenu");
             pauseMenuObject.AddComponent<PauseMenuController>();
             pauseMenuObject.transform.SetParent(playerObject.transform, false);
+
+            var gameOverObject = new GameObject("GameOver");
+            gameOverObject.AddComponent<GameOverController>();
+            gameOverObject.transform.SetParent(playerObject.transform, false);
+
+            if (Camera.main != null)
+            {
+                Camera.main.transform.SetParent(playerObject.transform);
+                Camera.main.transform.localPosition = new Vector3(0f, 0f, -10f);
+            }
         }
     }
 }
