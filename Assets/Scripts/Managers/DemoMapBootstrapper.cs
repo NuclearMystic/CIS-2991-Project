@@ -1,10 +1,14 @@
+using CIS2991Project.Enemies;
 using CIS2991Project.Player;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace CIS2991Project.Managers
 {
     public class DemoMapBootstrapper : MonoBehaviour
     {
+        private const string PrototypeSceneName = "PrototypeLevel";
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
@@ -15,13 +19,44 @@ namespace CIS2991Project.Managers
 
             var bootstrapperObject = new GameObject("DemoMapBootstrapper");
             DontDestroyOnLoad(bootstrapperObject);
-            bootstrapperObject.AddComponent<DemoMapBootstrapper>().Initialize();
+            bootstrapperObject.AddComponent<DemoMapBootstrapper>().Setup();
+        }
+
+        private bool _initialized;
+
+        private void Setup()
+        {
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+
+            if (SceneManager.GetActiveScene().name == PrototypeSceneName)
+            {
+                Initialize();
+            }
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+        }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode _)
+        {
+            if (scene.name != PrototypeSceneName)
+            {
+                _initialized = false;
+                return;
+            }
+            if (!_initialized)
+                Initialize();
         }
 
         private void Initialize()
         {
+            _initialized = true;
             CreateMap();
             CreateNpc();
+            DemoEnemy.Spawn(new Vector2(9f, 8f), new Vector2(12f, 8f));
+            DemoEnemy.Spawn(new Vector2(-9f, -8f), new Vector2(-12f, -8f));
         }
 
         private void CreateMap()
@@ -32,16 +67,16 @@ namespace CIS2991Project.Managers
             }
 
             CreateGround();
-            CreateRoad();
-            CreateBoundary("North Wall", new Vector2(0f, 5.75f), new Vector2(14f, 1f));
-            CreateBoundary("South Wall", new Vector2(0f, -5.75f), new Vector2(14f, 1f));
-            CreateBoundary("West Wall", new Vector2(-6.75f, 0f), new Vector2(1f, 12f));
-            CreateBoundary("East Wall", new Vector2(6.75f, 0f), new Vector2(1f, 12f));
-            CreateBuilding("Shack A", new Vector2(-3.25f, 2f), new Vector2(2.2f, 1.8f));
-            CreateBuilding("Shack B", new Vector2(3f, 1.25f), new Vector2(2.6f, 2f));
-            CreateBuilding("Container", new Vector2(1.5f, -2.25f), new Vector2(1.8f, 1.2f));
-            CreateDecor("Crate 1", new Vector2(-0.75f, -1.1f), new Vector2(0.8f, 0.8f), new Color(0.52f, 0.38f, 0.24f));
-            CreateDecor("Crate 2", new Vector2(4.2f, -1.4f), new Vector2(0.9f, 0.9f), new Color(0.52f, 0.38f, 0.24f));
+            //CreateRoad();
+            CreateBoundary("North Wall", new Vector2(0f, 11.5f), new Vector2(28f, 1f));
+            CreateBoundary("South Wall", new Vector2(0f, -11.5f), new Vector2(28f, 1f));
+            CreateBoundary("West Wall", new Vector2(-13.5f, 0f), new Vector2(1f, 24f));
+            CreateBoundary("East Wall", new Vector2(13.5f, 0f), new Vector2(1f, 24f));
+            CreateBuilding("Shack A", new Vector2(-6.5f, 4f), new Vector2(4.4f, 3.6f));
+            CreateBuilding("Shack B", new Vector2(6f, 2.5f), new Vector2(5.2f, 4f));
+            CreateBuilding("Container", new Vector2(3f, -4.5f), new Vector2(3.6f, 2.4f));
+            CreateDecor("Crate 1", new Vector2(-1.5f, -2.2f), new Vector2(1.6f, 1.6f), new Color(0.52f, 0.38f, 0.24f));
+            CreateDecor("Crate 2", new Vector2(8.4f, -2.8f), new Vector2(1.8f, 1.8f), new Color(0.52f, 0.38f, 0.24f));
         }
 
         private void CreateGround()
@@ -51,7 +86,8 @@ namespace CIS2991Project.Managers
 
             var spriteRenderer = ground.AddComponent<SpriteRenderer>();
             spriteRenderer.sprite = CreateSolidSprite(new Color(0.24f, 0.25f, 0.22f));
-            ground.transform.localScale = new Vector3(13f, 11f, 1f);
+            spriteRenderer.sortingOrder = -1;
+            ground.transform.localScale = new Vector3(26f, 22f, 1f);
         }
 
         private void CreateRoad()
@@ -96,15 +132,15 @@ namespace CIS2991Project.Managers
         private void CreateNpc()
         {
             var npc = new GameObject("Placeholder NPC");
-            npc.transform.position = new Vector3(-3.25f, -1.75f, 0f);
+            npc.tag = "NPC";
+            npc.transform.position = new Vector3(-6.5f, -3.5f, 0f);
 
             var spriteRenderer = npc.AddComponent<SpriteRenderer>();
-            spriteRenderer.sprite = CreateSolidSprite(new Color(0.7f, 0.56f, 0.4f));
+            spriteRenderer.sprite = CreateSolidSprite(Color.yellow);
             npc.transform.localScale = new Vector3(0.8f, 1.2f, 1f);
 
             var body = npc.AddComponent<BoxCollider2D>();
-            body.size = Vector2.one;
-            body.offset = Vector2.zero;
+            body.isTrigger = true;
 
             var dialogue = npc.AddComponent<DemoNpcDialogue>();
             dialogue.Configure(
