@@ -10,7 +10,7 @@ namespace CIS2991Project.Managers
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            if (Object.FindObjectOfType<GameBootstrapper>() != null)
+            if (Object.FindAnyObjectByType<GameBootstrapper>() != null)
             {
                 return;
             }
@@ -54,7 +54,7 @@ namespace CIS2991Project.Managers
 
         private void EnsurePlayer()
         {
-            if (Object.FindObjectOfType<PlayerHealth>() != null)
+            if (Object.FindAnyObjectByType<PlayerHealth>() != null)
             {
                 return;
             }
