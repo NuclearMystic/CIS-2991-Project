@@ -52,8 +52,28 @@ namespace CIS2991Project.Managers
             cameraObject.transform.position = new Vector3(0f, 0f, -10f);
         }
 
+        private const string MainMenuSceneName = "MainMenu";
+
+        private static Sprite CreatePlaceholderSprite()
+        {
+            var texture = new Texture2D(32, 32);
+            var pixels = new Color[32 * 32];
+            for (var i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = Color.green;
+            }
+            texture.SetPixels(pixels);
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0f, 0f, 32f, 32f), new Vector2(0.5f, 0.5f), 32f);
+        }
+
         private void EnsurePlayer()
         {
+            if (SceneManager.GetActiveScene().name == MainMenuSceneName)
+            {
+                return;
+            }
+
             if (Object.FindAnyObjectByType<PlayerHealth>() != null)
             {
                 return;
@@ -70,13 +90,20 @@ namespace CIS2991Project.Managers
             var collider = playerObject.AddComponent<CircleCollider2D>();
             collider.radius = 0.45f;
 
+            var spriteRenderer = playerObject.AddComponent<SpriteRenderer>();
+            spriteRenderer.sprite = CreatePlaceholderSprite();
+
             playerObject.AddComponent<PlayerMovement>();
             playerObject.AddComponent<PlayerHealth>();
             playerObject.AddComponent<PlayerInventory>();
 
             var hudObject = new GameObject("PlayerHUD");
-            var hud = hudObject.AddComponent<PlayerHUD>();
+            hudObject.AddComponent<PlayerHUD>();
             hudObject.transform.SetParent(playerObject.transform, false);
+
+            var pauseMenuObject = new GameObject("PauseMenu");
+            pauseMenuObject.AddComponent<PauseMenuController>();
+            pauseMenuObject.transform.SetParent(playerObject.transform, false);
         }
     }
 }
