@@ -80,9 +80,7 @@ public class Item : ScriptableObject
     public int healthRestore;
 
     // --- Stat modifiers (optional, hooks into the stat model) ---------------
-    //  ANDREW: this plugs into the stat system you're writing. Leave empty for
-    //  sprint-1 items; it's here so equipment that grants +Perception etc.
-    //  doesn't force a contract change down the line.
+
     [Header("Stat Modifiers (optional)")]
     [Tooltip("Bonuses granted while equipped. Leave empty unless the item buffs a stat.")]
     public List<StatModifier> statModifiers = new List<StatModifier>();
@@ -90,11 +88,6 @@ public class Item : ScriptableObject
 
 // ============================================================================
 //  Supporting types
-// ----------------------------------------------------------------------------
-//  ANDREW OWNS THIS. This is the canonical stat set - every system that touches
-//  stats uses these names and nothing else. Lock it before anyone references
-//  stats in code. (Fine to move to its own Stats.cs once the stat model grows.)
-// ============================================================================
 
 public enum StatType
 {
