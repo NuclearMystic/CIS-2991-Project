@@ -1,77 +1,62 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace CIS2991Project.UI
 {
     public class MainMenuController : MonoBehaviour
     {
-        [SerializeField] private string gameplaySceneName = "Level1";
+        [SerializeField]
+        private UIDocument uiDocument;
 
-        private const float ButtonWidth = 220f;
-        private const float ButtonHeight = 50f;
-        private const float ButtonSpacing = 12f;
-        private const float PanelWidth = 260f;
-        private const float PanelHeight = 340f;
+        [SerializeField]
+        private string gameplaySceneName = "PrototypeLevel";
 
-        private GUIStyle _titleStyle;
+        private Button playButton;
+        private Button loadButton;
+        private Button settingsButton;
+        private Button quitButton;
 
-        private GUIStyle TitleStyle
+        private void Awake()
         {
-            get
-            {
-                if (_titleStyle == null)
-                {
-                    _titleStyle = new GUIStyle(GUI.skin.label)
-                    {
-                        fontSize = 36,
-                        fontStyle = FontStyle.Bold,
-                        alignment = TextAnchor.MiddleCenter
-                    };
-                }
-                return _titleStyle;
-            }
+            if (uiDocument == null)
+                uiDocument = GetComponent<UIDocument>();
+
+            var root = uiDocument.rootVisualElement;
+
+            playButton = root.Q<Button>("Play");
+            loadButton = root.Q<Button>("Load");
+            settingsButton = root.Q<Button>("Settings");
+            quitButton = root.Q<Button>("Quit");
+
+            playButton.clicked += PlayGame;
+            loadButton.clicked += OpenLoad;
+            settingsButton.clicked += OpenSettings;
+            quitButton.clicked += QuitGame;
         }
 
-        private void OnGUI()
+        private void PlayGame()
         {
-            var panelX = (Screen.width - PanelWidth) / 2f;
-            var panelY = (Screen.height - PanelHeight) / 2f;
-            var buttonX = panelX + (PanelWidth - ButtonWidth) / 2f;
+            SceneManager.LoadScene(gameplaySceneName);
+        }
 
-            GUI.Box(new Rect(panelX, panelY, PanelWidth, PanelHeight), string.Empty);
-            GUI.Label(new Rect(panelX, panelY + 10f, PanelWidth, 70f), "AfterAsh", TitleStyle);
+        private void OpenLoad()
+        {
+            Debug.Log("Open Load Menu");
+        }
 
-            var currentY = panelY + 90f;
+        private void OpenSettings()
+        {
+            Debug.Log("Open Settings");
+        }
 
-            if (GUI.Button(new Rect(buttonX, currentY, ButtonWidth, ButtonHeight), "Play"))
-            {
-                SceneManager.LoadScene(gameplaySceneName);
-            }
-
-            currentY += ButtonHeight + ButtonSpacing;
-
-            if (GUI.Button(new Rect(buttonX, currentY, ButtonWidth, ButtonHeight), "Load"))
-            {
-                Debug.Log("Load: not yet implemented.");
-            }
-
-            currentY += ButtonHeight + ButtonSpacing;
-
-            if (GUI.Button(new Rect(buttonX, currentY, ButtonWidth, ButtonHeight), "Options"))
-            {
-                Debug.Log("Options: not yet implemented.");
-            }
-
-            currentY += ButtonHeight + ButtonSpacing;
-
-            if (GUI.Button(new Rect(buttonX, currentY, ButtonWidth, ButtonHeight), "Exit"))
-            {
+        private void QuitGame()
+        {
 #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
+            UnityEditor.EditorApplication.isPlaying = false;
 #else
-                Application.Quit();
+            Application.Quit();
 #endif
-            }
         }
     }
 }
