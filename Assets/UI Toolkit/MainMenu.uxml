@@ -1,7 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI%20Toolkit/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=b54b8724bf7edd34e94d2c37c6293cf9&amp;type=3#MainMenuStyle"/>
     <ui:VisualElement name="GameBg" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Art/UI/Backgrounds/Background.png?fileID=2800000&amp;guid=ce44368a6043aa9419b29bca9ce0bb05&amp;type=3#Background&quot;); justify-content: flex-end; align-items: center;">
-        <ui:VisualElement name="MainMenuContainer" style="flex-grow: 0; width: 800px; height: 600px; background-color: rgba(0, 0, 0, 0.341); border-left-color: rgba(255, 255, 255, 0.333); border-right-color: rgba(255, 255, 255, 0.333); border-top-color: rgba(255, 255, 255, 0.333); border-bottom-color: rgba(255, 255, 255, 0.333); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; justify-content: flex-start; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; margin-top: 0; margin-right: 0; margin-bottom: 50px; margin-left: 0;">
+        <ui:VisualElement name="MainMenuContainer" style="flex-grow: 0; width: 800px; height: 600px; background-color: rgba(55, 55, 55, 0.349); border-left-color: rgba(255, 255, 255, 0.333); border-right-color: rgba(255, 255, 255, 0.333); border-top-color: rgba(255, 255, 255, 0.333); border-bottom-color: rgba(255, 255, 255, 0.333); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; justify-content: flex-start; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; margin-top: 0; margin-right: 0; margin-bottom: 50px; margin-left: 0;">
             <ui:Label text="Main Menu" name="MainMenuHeaderLabel" style="font-size: 70px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: upper-center;"/>
             <ui:VisualElement style="flex-grow: 0; height: 2px; color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); margin-top: 5px;"/>
             <ui:VisualElement name="ButtonContainer" style="flex-grow: 1; justify-content: center; align-items: center;">
@@ -11,6 +11,44 @@
                 <ui:Button text="Quit&#10;" name="Quit" class="main-menu-button quit-button"/>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="SettingsContainer" style="flex-grow: 0; width: 800px; height: 600px; background-color: rgba(0, 0, 0, 0.82); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px; align-self: center; justify-content: center; position: absolute; top: 432px; left: 557px; align-content: auto; margin-bottom: 50px; display: flex;"/>
+        <ui:VisualElement name="SettingsContainer" style="flex-grow: 0; width: 800px; height: 650px; background-color: rgba(0, 0, 0, 0.471); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; padding-top: 20px; padding-right: 20px; padding-bottom: 70px; padding-left: 20px; align-self: auto; justify-content: center; position: absolute; top: auto; left: auto; align-content: flex-start; margin-bottom: 0; display: flex; align-items: center;">
+            <ui:VisualElement name="SettingsWindow" style="flex-grow: 1; width: 700px; height: 480px; background-color: rgba(20, 20, 20, 0.941); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); padding-top: 25px; padding-right: 25px; padding-bottom: 25px; padding-left: 25px;">
+                <ui:Label text="SETTINGS" name="SettingsTitle" style="font-size: 42px; -unity-text-align: upper-center; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
+                <ui:VisualElement name="Divider" style="flex-grow: 0; height: 2px; background-color: rgb(255, 255, 255); margin-bottom: 20px;"/>
+                <ui:VisualElement name="MasterRow" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: space-between; height: 50px; margin-top: 15px; width: 100%;">
+                    <ui:Label text="Master" name="MasterLabel" style="font-size: 24px; color: rgb(255, 255, 255); width: 150px; opacity: 1; -unity-font-style: normal;"/>
+                    <ui:Slider label="" value="63" high-value="100" name="MasterSlider" fill="true" low-value="0" show-input-field="true" direction="Horizontal" page-size="0" inverted="false" style="flex-grow: 1; width: auto; align-items: stretch; justify-content: flex-start; align-self: auto; align-content: flex-start; -unity-font-style: normal; font-size: 14px; -unity-text-align: upper-left;"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="MusicRow" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: space-between; height: 50px; margin-top: 15px; width: 100%;">
+                    <ui:Label text="Music" name="MusicLabel" style="font-size: 24px; color: rgb(255, 255, 255); width: 150px; opacity: 1; -unity-font-style: normal;"/>
+                    <ui:Slider label="" value="89" high-value="100" name="MusicSlider" fill="true" low-value="0" show-input-field="true" direction="Horizontal" page-size="0" inverted="false" style="flex-grow: 1; width: auto; align-items: stretch; justify-content: flex-start; align-self: auto; align-content: flex-start; -unity-font-style: normal; font-size: 14px; -unity-text-align: upper-left;"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="AmbienceRow" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: space-between; height: 50px; margin-top: 15px; width: 100%;">
+                    <ui:Label text="Ambience" name="AmbianceLabel" style="font-size: 24px; color: rgb(255, 255, 255); width: 150px; opacity: 1; -unity-font-style: normal;"/>
+                    <ui:Slider label="" value="35" high-value="100" name="AmbianceSlider" fill="true" low-value="0" show-input-field="true" direction="Horizontal" page-size="0" inverted="false" style="flex-grow: 1; width: auto; align-items: stretch; justify-content: flex-start; align-self: auto; align-content: flex-start; -unity-font-style: normal; font-size: 14px; -unity-text-align: upper-left;"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="SFXRow" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: space-between; height: 50px; margin-top: 15px; width: 100%;">
+                    <ui:Label text="SFX" name="SFXLabel" style="font-size: 24px; color: rgb(255, 255, 255); width: 150px; opacity: 1; -unity-font-style: normal;"/>
+                    <ui:Slider label="" value="80" high-value="100" name="SFXSlider" fill="true" low-value="0" show-input-field="true" direction="Horizontal" page-size="0" inverted="false" style="flex-grow: 1; width: auto; align-items: stretch; justify-content: flex-start; align-self: auto; align-content: flex-start; -unity-font-style: normal; font-size: 14px; -unity-text-align: upper-left;"/>
+                </ui:VisualElement>
+                <ui:Button text="Back" name="BackButton" class="back-button"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="LoadContainer" style="flex-grow: 0; width: 800px; height: 650px; background-color: rgba(0, 0, 0, 0.471); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; padding-top: 20px; padding-right: 20px; padding-bottom: 70px; padding-left: 20px; align-self: auto; justify-content: center; position: absolute; top: auto; left: auto; align-content: flex-start; margin-bottom: 0; display: flex; align-items: center;">
+            <ui:VisualElement name="LoadWindow" style="flex-grow: 1; width: 700px; height: 480px; background-color: rgba(20, 20, 20, 0.941); border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); padding-top: 25px; padding-right: 25px; padding-bottom: 25px; padding-left: 25px;">
+                <ui:Label text="LOAD GAME" name="LoadTitle" style="font-size: 42px; -unity-text-align: upper-center; color: rgb(255, 255, 255); -unity-font-style: bold;"/>
+                <ui:VisualElement name="Divider" style="flex-grow: 0; height: 2px; background-color: rgb(255, 255, 255); margin-bottom: 20px;"/>
+                <ui:VisualElement name="Slot1" class="load-slot" style="flex-grow: 1;">
+                    <ui:Label text="Label" name="EmptySaveSlot1"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="Slot2" class="load-slot" style="flex-grow: 1;">
+                    <ui:Label text="Label" name="EmptySaveSlot2"/>
+                </ui:VisualElement>
+                <ui:VisualElement name="Slot3" class="load-slot" style="flex-grow: 1;">
+                    <ui:Label text="Label" name="EmptySaveSlot3"/>
+                </ui:VisualElement>
+                <ui:Button text="Back" name="LoadBackButton" class="back-button"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

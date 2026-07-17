@@ -57,3 +57,132 @@
 .quit-button:hover {
     background-color: rgb(171, 155, 2);
 }
+
+/* ========================= */
+/* SETTINGS POPUP            */
+/* ========================= */
+
+.settings-container
+{
+    position: relative;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(0,0,0,0.55);
+
+    display: none;
+}
+
+.settings-window
+{
+    width: 700px;
+    height: 500px;
+
+    background-color: rgba(20,20,20,0.95);
+
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+
+    border-left-color: white;
+    border-right-color: white;
+    border-top-color: white;
+    border-bottom-color: white;
+
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-top: 25px;
+    padding-bottom: 25px;
+
+    flex-direction: column;
+}
+
+.settings-title
+{
+    color: white;
+
+    font-size: 40px;
+
+    -unity-font-style: bold;
+
+    -unity-text-align: middle-center;
+
+    margin-bottom: 10px;
+}
+
+.settings-divider
+{
+    height: 5px;
+
+    background-color: white;
+
+    margin-bottom: 20px;
+}
+
+.settings-row
+{
+    flex-direction: row;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    height: 50px;
+
+    margin-bottom: 12px;
+}
+
+.settings-label
+{
+    width: 150px;
+
+    color: white;
+
+    font-size: 20px;
+}
+
+.settings-slider
+{
+    flex-grow: 1;
+
+    margin-left: 15px;
+}
+
+.back-button
+{
+    width: 220px;
+
+    height: 50px;
+
+    margin-top: 30px;
+
+    align-self: center;
+
+    font-size: 20px;
+}
+
+.load-slot
+{
+    height: 70px;
+
+    margin-bottom: 15px;
+
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    border-bottom-width: 2px;
+
+    border-left-color: rgb(180,180,180);
+    border-right-color: rgb(180,180,180);
+    border-top-color: rgb(180,180,180);
+    border-bottom-color: rgb(180,180,180);
+
+    justify-content: center;
+    padding-left: 20px;
+}
