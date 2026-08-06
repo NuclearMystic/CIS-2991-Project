@@ -5,8 +5,14 @@ namespace CIS2991Project.UI
 {
     public class PlayerHUD : MonoBehaviour
     {
+        private const int InventoryColumns = 5;
+
         [SerializeField] private PlayerHealth playerHealth;
         [SerializeField] private PlayerInventory playerInventory;
+        [SerializeField] private KeyCode inventoryToggleKey = KeyCode.I;
+
+        private bool inventoryVisible;
+        private int selectedInventorySlot = -1;
 
         private void Awake()
         {
@@ -38,10 +44,23 @@ namespace CIS2991Project.UI
             // IMGUI HUD needs no scene setup; OnGUI draws it every frame.
         }
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(inventoryToggleKey))
+            {
+                inventoryVisible = !inventoryVisible;
+            }
+        }
+
         private void OnGUI()
         {
             DrawHealthHud();
-            DrawInventoryHud();
+            DrawInventoryToggleButton();
+
+            if (inventoryVisible)
+            {
+                DrawInventoryHud();
+            }
         }
 
         private void DrawHealthHud()
@@ -55,6 +74,14 @@ namespace CIS2991Project.UI
             GUI.Label(new Rect(28f, 28f, 160f, 24f), $"HP: {playerHealth.CurrentHealth} / {playerHealth.MaxHealth}");
         }
 
+        private void DrawInventoryToggleButton()
+        {
+            if (GUI.Button(new Rect(208f, 16f, 90f, 50f), "Bag"))
+            {
+                inventoryVisible = !inventoryVisible;
+            }
+        }
+
         private void DrawInventoryHud()
         {
             if (playerInventory == null)
@@ -64,32 +91,115 @@ namespace CIS2991Project.UI
 
             const float startX = 16f;
             const float startY = 82f;
-            const float width = 240f;
-            const float rowHeight = 28f;
+            const float width = 430f;
+            const float height = 360f;
+            const float slotWidth = 78f;
+            const float slotHeight = 36f;
+            const float slotGap = 4f;
+            const float gridStartX = startX + 12f;
+            const float gridStartY = startY + 34f;
 
-            GUI.Box(new Rect(startX, startY, width, 120f), "Inventory");
+            GUI.Box(new Rect(startX, startY, width, height), string.Empty);
 
-            var stacks = playerInventory.Consumables;
-            if (stacks.Count == 0)
+            var slots = playerInventory.Slots;
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
             {
-                GUI.Label(new Rect(startX + 12f, startY + 34f, width - 24f, 20f), "No consumables yet.");
+                var row = slotIndex / InventoryColumns;
+                var column = slotIndex % InventoryColumns;
+                var slotX = gridStartX + column * (slotWidth + slotGap);
+                var slotY = gridStartY + row * (slotHeight + slotGap);
+                var slotLabel = BuildSlotLabel(slots[slotIndex]);
+
+                if (GUI.Button(new Rect(slotX, slotY, slotWidth, slotHeight), slotLabel))
+                {
+                    selectedInventorySlot = slotIndex;
+                }
+            }
+
+            DrawSelectedItemPanel(startX + 12f, startY + 242f, width - 24f);
+
+            if (!string.IsNullOrWhiteSpace(playerInventory.LastMessage))
+            {
+                GUI.Label(new Rect(startX + 12f, startY + height - 26f, width - 24f, 20f), playerInventory.LastMessage);
+            }
+        }
+
+        private void DrawSelectedItemPanel(float startX, float startY, float width)
+        {
+            if (!playerInventory.IsValidSlot(selectedInventorySlot))
+            {
+                GUI.Label(new Rect(startX, startY, width, 20f), "Select an item.");
                 return;
             }
 
-            var currentY = startY + 32f;
-            for (var index = 0; index < stacks.Count && index < 3; index++)
+            var selectedSlot = playerInventory.Slots[selectedInventorySlot];
+            if (selectedSlot.IsEmpty)
             {
-                var stack = stacks[index];
-                var label = $"{stack.item.DisplayName} x{stack.amount}";
-                GUI.Label(new Rect(startX + 12f, currentY, 150f, 20f), label);
+                GUI.Label(new Rect(startX, startY, width, 20f), "Empty");
+                return;
+            }
 
-                if (GUI.Button(new Rect(startX + 160f, currentY - 2f, 68f, 22f), "Use"))
+            var selectedItem = selectedSlot.Item;
+            var itemName = GetItemName(selectedItem);
+            var countText = selectedSlot.Amount > 1 ? $" x{selectedSlot.Amount}" : string.Empty;
+
+            GUI.Label(new Rect(startX, startY, width, 20f), $"{itemName}{countText} ({selectedItem.itemType})");
+            GUI.Label(new Rect(startX, startY + 20f, width, 20f), selectedItem.description);
+
+            var buttonX = startX;
+            var buttonY = startY + 44f;
+            if (playerInventory.CanUseAt(selectedInventorySlot))
+            {
+                if (GUI.Button(new Rect(buttonX, buttonY, 64f, 24f), "Use"))
                 {
-                    playerInventory.TryConsume(stack.item, playerHealth);
+                    playerInventory.TryUseAt(selectedInventorySlot, playerHealth);
                 }
 
-                currentY += rowHeight;
+                buttonX += 70f;
             }
+
+            if (playerInventory.CanEquipAt(selectedInventorySlot))
+            {
+                if (GUI.Button(new Rect(buttonX, buttonY, 64f, 24f), "Equip"))
+                {
+                    playerInventory.TryEquipAt(selectedInventorySlot);
+                }
+
+                buttonX += 70f;
+            }
+
+            if (GUI.Button(new Rect(buttonX, buttonY, 64f, 24f), "Drop"))
+            {
+                if (playerInventory.TryDropAt(selectedInventorySlot))
+                {
+                    var slotStillValid = playerInventory.IsValidSlot(selectedInventorySlot);
+                    if (!slotStillValid || playerInventory.Slots[selectedInventorySlot].IsEmpty)
+                    {
+                        selectedInventorySlot = -1;
+                    }
+                }
+            }
+        }
+
+        private static string BuildSlotLabel(PlayerInventory.InventorySlot slot)
+        {
+            if (slot.IsEmpty)
+            {
+                return string.Empty;
+            }
+
+            var amountText = slot.Amount > 1 ? $" x{slot.Amount}" : string.Empty;
+            return $"{GetItemName(slot.Item)}{amountText}";
+        }
+
+        private static string GetItemName(global::Item item)
+        {
+            if (item == null)
+            {
+                return "Empty";
+            }
+
+            return string.IsNullOrWhiteSpace(item.displayName) ? item.name : item.displayName;
         }
     }
 }
