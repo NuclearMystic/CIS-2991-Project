@@ -1,4 +1,3 @@
-using CIS2991Project.Data;
 using CIS2991Project.Player;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ namespace CIS2991Project.Items
     [RequireComponent(typeof(Collider2D))]
     public class ConsumablePickup : MonoBehaviour
     {
-        [SerializeField] private ConsumableItemDefinition item;
+        [SerializeField] private global::Item item;
         [SerializeField, Min(1)] private int amount = 1;
 
         private void Reset()
@@ -28,8 +27,13 @@ namespace CIS2991Project.Items
                 return;
             }
 
-            inventory.Add(item, amount);
-            Destroy(gameObject);
+            if (inventory.TryAdd(item, amount))
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Debug.Log($"Inventory full. Could not pick up {item.displayName}.", this);
         }
     }
 }
