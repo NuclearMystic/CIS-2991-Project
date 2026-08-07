@@ -215,22 +215,51 @@ namespace CIS2991Project.Managers
 
             private void OnGUI()
             {
-                if (!playerInRange)
+                if (!playerInRange || Camera.main == null)
                 {
                     return;
                 }
 
-                GUI.Box(new Rect(16f, 150f, 280f, 70f), string.Empty);
-                GUI.Label(new Rect(28f, 162f, 240f, 20f), $"Press E to talk to {npcName}");
+                // Anchor UI to the NPC's position on screen so it floats above their head
+                // instead of sitting in a fixed screen corner (where it overlapped the inventory HUD).
+                var screenPoint = Camera.main.WorldToScreenPoint(transform.position);
+                if (screenPoint.z < 0f)
+                {
+                    return;
+                }
+
+                var anchorX = screenPoint.x;
+                var anchorY = Screen.height - screenPoint.y;
+                const float headClearance = 60f;
+
+                const float promptWidth = 280f;
+                const float promptHeight = 70f;
+                var promptRect = new Rect(
+                    Mathf.Clamp(anchorX - promptWidth / 2f, 0f, Screen.width - promptWidth),
+                    anchorY - headClearance - promptHeight,
+                    promptWidth,
+                    promptHeight);
+
+                GUI.Box(promptRect, string.Empty);
+                GUI.Label(new Rect(promptRect.x + 12f, promptRect.y + 12f, promptRect.width - 24f, 20f), $"Press E to talk to {npcName}");
 
                 if (!dialogueOpen)
                 {
                     return;
                 }
 
-                GUI.Box(new Rect(16f, 232f, 360f, 110f), npcName);
-                GUI.Label(new Rect(28f, 260f, 320f, 60f), dialogueLine);
-                GUI.Label(new Rect(28f, 316f, 260f, 20f), "Press Esc to close");
+                const float dialogueWidth = 360f;
+                const float dialogueHeight = 110f;
+                const float gapAbovePrompt = 8f;
+                var dialogueRect = new Rect(
+                    Mathf.Clamp(anchorX - dialogueWidth / 2f, 0f, Screen.width - dialogueWidth),
+                    promptRect.y - gapAbovePrompt - dialogueHeight,
+                    dialogueWidth,
+                    dialogueHeight);
+
+                GUI.Box(dialogueRect, npcName);
+                GUI.Label(new Rect(dialogueRect.x + 12f, dialogueRect.y + 28f, dialogueRect.width - 24f, 60f), dialogueLine);
+                GUI.Label(new Rect(dialogueRect.x + 12f, dialogueRect.y + 84f, dialogueRect.width - 24f, 20f), "Press Esc to close");
             }
         }
     }

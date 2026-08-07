@@ -16,11 +16,11 @@ MonoBehaviour:
   displayName: Bandage
   description: A clean bandage used to stop bleeding and treat small wounds.
   icon: {fileID: 0}
-  itemType: 3
+  itemType: 2
   stackable: 0
   maxStackSize: 1
   value: 0
   damage: 0
   defense: 0
-  healthRestore: 0
+  healthRestore: 10
   statModifiers: []
