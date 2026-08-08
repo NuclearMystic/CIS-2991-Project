@@ -204,7 +204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.UI.MainMenuController
   uiDocument: {fileID: 717706526}
-  gameplaySceneName: PrototypeLevel
+  gameplaySceneName: Settlement
 --- !u!4 &1349103798
 Transform:
   m_ObjectHideFlags: 0

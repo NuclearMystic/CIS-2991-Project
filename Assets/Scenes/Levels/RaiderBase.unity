@@ -110,3 +110,8 @@ MonoBehaviour:
   ammoCrate: {fileID: 21300000, guid: a9f05ea4ac2694648bfd7e65fc31f089, type: 3}
   pistol: {fileID: 21300000, guid: 291a9dd1c0d24794cb604f4c3454f167, type: 3}
   bandage: {fileID: 21300000, guid: 9fc1b37b4fc8553409c2ceb72e779fa7, type: 3}
+  playerSprite: {fileID: 21300000, guid: 8103f7e03a25b9c48801c630478c7710, type: 3}
+  raiderSprite: {fileID: 21300000, guid: d8362e2c8e8a6734c9853e991098d0c9, type: 3}
+  bandageItem: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+  ammoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+  pistolItem: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}

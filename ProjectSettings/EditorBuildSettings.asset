@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu/MainMenu.unity
     guid: 9d74191a79f324940b5a737d17c282d2
   - enabled: 1
-    path: Assets/Scenes/Levels/PrototypeLevel.unity
-    guid: a5caea429e311c0429a063cb8274d065
+    path: Assets/Scenes/Levels/Settlement.unity
+    guid: c0ebdf5d3d7646999d522ee323a61f30
+  - enabled: 1
+    path: Assets/Scenes/Levels/RaiderBase.unity
+    guid: 8d12a163af01482ca16dcb2ea605c0c4
   m_configObjects: {}

@@ -1,5 +1,6 @@
 using System.Collections;
 using CIS2991Project.Player;
+using CIS2991Project.Items;
 using UnityEngine;
 
 namespace CIS2991Project.Enemies
@@ -11,6 +12,10 @@ namespace CIS2991Project.Enemies
         private PlayerHealth _player;
 
         private int _hp = 3;
+        private float _patrolSpeed = 2.0f;
+        private float _chaseSpeed = 3.2f;
+        private global::Item[] _drops;
+        private Sprite _dropSprite;
         private bool _isDead;
         private bool _isKnockedBack;
         private float _damageCooldown;
@@ -19,8 +24,8 @@ namespace CIS2991Project.Enemies
         private Vector2 _patrolEnd;
         private Vector2 _patrolTarget;
 
-        private const float PatrolSpeed = 24f;
-        private const float ChaseSpeed = 48f;
+        private const float PatrolSpeed = 2f;
+        private const float ChaseSpeed = 3.2f;
         private const float ChaseRange = 10f;
         private const float ContactRange = 1.1f;
         private const float DamageCooldown = 0.5f;
@@ -44,6 +49,24 @@ namespace CIS2991Project.Enemies
             go.AddComponent<DemoEnemy>().Init(patrolStart, patrolEnd);
         }
 
+        public static void Spawn(Vector2 patrolStart, Vector2 patrolEnd, Sprite visual, Sprite dropVisual, global::Item[] drops, int hitPoints, float speedMultiplier)
+        {
+            var go = new GameObject("Raider");
+            go.transform.position = patrolStart;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = visual != null ? visual : CreateSprite(Color.red);
+            sr.sortingOrder = 4;
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            rb.freezeRotation = true;
+            rb.isKinematic = true;
+            go.AddComponent<BoxCollider2D>();
+
+            go.AddComponent<DemoEnemy>().Init(patrolStart, patrolEnd, hitPoints, speedMultiplier, drops, dropVisual);
+        }
+
         private void Awake()
         {
             _sr = GetComponent<SpriteRenderer>();
@@ -60,6 +83,16 @@ namespace CIS2991Project.Enemies
             _patrolStart = patrolStart;
             _patrolEnd = patrolEnd;
             _patrolTarget = patrolEnd;
+        }
+
+        public void Init(Vector2 patrolStart, Vector2 patrolEnd, int hitPoints, float speedMultiplier, global::Item[] drops, Sprite dropVisual)
+        {
+            Init(patrolStart, patrolEnd);
+            _hp = Mathf.Max(1, hitPoints);
+            _patrolSpeed = PatrolSpeed * Mathf.Max(.5f, speedMultiplier);
+            _chaseSpeed = ChaseSpeed * Mathf.Max(.5f, speedMultiplier);
+            _drops = drops;
+            _dropSprite = dropVisual;
         }
 
         private void Update()
@@ -79,7 +112,7 @@ namespace CIS2991Project.Enemies
             if (distToPlayer <= ChaseRange)
             {
                 moveDir = (playerPos - pos).normalized;
-                speed = ChaseSpeed;
+                speed = _chaseSpeed;
 
                 if (distToPlayer <= ContactRange && _damageCooldown <= 0f)
                 {
@@ -93,7 +126,7 @@ namespace CIS2991Project.Enemies
                 if (toTarget.magnitude < 0.1f)
                     _patrolTarget = _patrolTarget == _patrolEnd ? _patrolStart : _patrolEnd;
                 moveDir = toTarget.normalized;
-                speed = PatrolSpeed;
+                speed = _patrolSpeed;
             }
 
             _rb.MovePosition(pos + moveDir * speed * Time.deltaTime);
@@ -106,10 +139,33 @@ namespace CIS2991Project.Enemies
             if (_hp <= 0)
             {
                 _isDead = true;
+                DropLoot();
                 Destroy(gameObject);
                 return;
             }
             StartCoroutine(HitRoutine(hitDirection));
+        }
+
+        private void DropLoot()
+        {
+            if (_drops == null || _drops.Length == 0)
+            {
+                return;
+            }
+
+            var item = _drops[Random.Range(0, _drops.Length)];
+            if (item == null)
+            {
+                return;
+            }
+
+            var loot = new GameObject($"Loot_{item.displayName}");
+            loot.transform.position = transform.position;
+            var renderer = loot.AddComponent<SpriteRenderer>();
+            renderer.sprite = _dropSprite != null ? _dropSprite : CreateSprite(Color.yellow);
+            renderer.sortingOrder = 5;
+            loot.AddComponent<CircleCollider2D>().isTrigger = true;
+            loot.AddComponent<ConsumablePickup>().Configure(item, 1);
         }
 
         private IEnumerator HitRoutine(Vector2 hitDirection)

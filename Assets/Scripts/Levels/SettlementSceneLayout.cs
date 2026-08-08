@@ -1,4 +1,5 @@
 using UnityEngine;
+using CIS2991Project.Items;
 
 namespace CIS2991Project.Levels
 {
@@ -15,6 +16,9 @@ namespace CIS2991Project.Levels
         [SerializeField] private Sprite barrel;
         [SerializeField] private Sprite bandage;
         [SerializeField] private Sprite ammo;
+        [SerializeField] private Sprite playerSprite;
+        [SerializeField] private global::Item bandageItem;
+        [SerializeField] private global::Item ammoItem;
 
         private void Awake()
         {
@@ -38,11 +42,21 @@ namespace CIS2991Project.Levels
             Prop("Barrel Fire", barrel, new Vector2(-2.4f, 2.3f), 2);
             Prop("Bandage Display", bandage, new Vector2(-7.2f, -4.7f), 5);
             Prop("Ammo Display", ammo, new Vector2(7.7f, -4.6f), 5);
+            Pickup("Clinic Bandage", bandage, bandageItem, new Vector2(-5.8f, -5.6f), 2);
+            Pickup("Supply Ammo", ammo, ammoItem, new Vector2(5.8f, -5.6f), 6);
             Anchor("SettlementSpawn", new Vector2(0f, -0.3f));
             Anchor("ShopCounter_Salvage", new Vector2(7.6f, -4.7f));
             Anchor("ShopCounter_Clinic", new Vector2(-7.4f, -4.7f));
             Anchor("TownLoot_Bandage", new Vector2(-5.8f, -5.6f));
             Anchor("TownLoot_Ammo", new Vector2(5.8f, -5.6f));
+            Portal("Raider Base Gate", new Vector2(12.5f, -1.8f), "RaiderBase", "Press E to enter the raider base");
+        }
+
+        private void Start()
+        {
+            var player = Object.FindAnyObjectByType<CIS2991Project.Player.PlayerHealth>();
+            if (player != null && playerSprite != null)
+                player.GetComponent<SpriteRenderer>().sprite = playerSprite;
         }
 
         private void House(string name, Vector2 center, Vector2 size, bool boarded)
@@ -93,6 +107,26 @@ namespace CIS2991Project.Levels
         {
             var anchor = new GameObject(name);
             anchor.transform.position = position;
+        }
+
+        private static void Portal(string name, Vector2 position, string destination, string prompt)
+        {
+            var portal = new GameObject(name);
+            portal.transform.position = position;
+            portal.AddComponent<CircleCollider2D>().radius = 1.2f;
+            portal.AddComponent<ScenePortal>().Configure(destination, prompt);
+        }
+
+        private static void Pickup(string name, Sprite sprite, global::Item item, Vector2 position, int amount)
+        {
+            if (sprite == null || item == null) return;
+            var pickup = new GameObject(name);
+            pickup.transform.position = position;
+            var renderer = pickup.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sortingOrder = 5;
+            pickup.AddComponent<CircleCollider2D>().isTrigger = true;
+            pickup.AddComponent<ConsumablePickup>().Configure(item, amount);
         }
 
         private static void Prop(string name, Sprite sprite, Vector2 position, int order)

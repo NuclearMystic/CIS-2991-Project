@@ -81,7 +81,7 @@ namespace CIS2991Project.Managers
 
             var playerObject = new GameObject("Player");
             playerObject.tag = "Player";
-            playerObject.transform.position = Vector3.zero;
+            playerObject.transform.position = FindSpawnPoint();
 
             var rigidbody = playerObject.AddComponent<Rigidbody2D>();
             rigidbody.gravityScale = 0f;
@@ -116,6 +116,14 @@ namespace CIS2991Project.Managers
                 Camera.main.transform.SetParent(playerObject.transform);
                 Camera.main.transform.localPosition = new Vector3(0f, 0f, -10f);
             }
+        }
+
+        private static Vector3 FindSpawnPoint()
+        {
+            var sceneName = SceneManager.GetActiveScene().name;
+            var anchorName = sceneName == "Settlement" ? "SettlementSpawn" : "RaiderBaseSpawn";
+            var anchor = GameObject.Find(anchorName);
+            return anchor != null ? anchor.transform.position : Vector3.zero;
         }
     }
 }

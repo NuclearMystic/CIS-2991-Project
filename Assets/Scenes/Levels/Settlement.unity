@@ -111,3 +111,6 @@ MonoBehaviour:
   barrel: {fileID: 21300000, guid: dcdbfdd3455135a478cd712b833b60c8, type: 3}
   bandage: {fileID: 21300000, guid: 9fc1b37b4fc8553409c2ceb72e779fa7, type: 3}
   ammo: {fileID: 21300000, guid: 88ce6f2b4868aef4ba5e04f342333c25, type: 3}
+  playerSprite: {fileID: 21300000, guid: 8103f7e03a25b9c48801c630478c7710, type: 3}
+  bandageItem: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+  ammoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}

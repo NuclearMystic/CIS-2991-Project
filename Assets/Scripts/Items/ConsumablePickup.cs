@@ -14,6 +14,17 @@ namespace CIS2991Project.Items
             GetComponent<Collider2D>().isTrigger = true;
         }
 
+        public void Configure(global::Item pickupItem, int pickupAmount = 1)
+        {
+            item = pickupItem;
+            amount = Mathf.Max(1, pickupAmount);
+            var collider = GetComponent<Collider2D>();
+            if (collider != null)
+            {
+                collider.isTrigger = true;
+            }
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (item == null)
