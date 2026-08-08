@@ -1,6 +1,6 @@
 # Settlement and Raider Base Handoff
 
-Both scenes are isolated from `Overworld.unity` and are intended to be loaded from the world map when scene transitions are wired.
+Both scenes are independent level scenes and are intended to be loaded from the world map when scene transitions are wired.
 
 ## Settlement
 
