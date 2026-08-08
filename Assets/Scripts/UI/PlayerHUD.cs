@@ -1,6 +1,7 @@
 using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using CIS2991Project.Enemies;
 
 namespace CIS2991Project.UI
 {
@@ -74,6 +75,8 @@ namespace CIS2991Project.UI
             GUI.Box(new Rect(16f, 16f, 180f, 50f), string.Empty);
             GUI.Label(new Rect(28f, 28f, 160f, 24f), $"HP: {playerHealth.CurrentHealth} / {playerHealth.MaxHealth}");
             GUI.Label(new Rect(16f, 72f, 420f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Inventory: I");
+            if (SceneManager.GetActiveScene().name == "RaiderBase")
+                GUI.Label(new Rect(16f, 94f, 240f, 22f), $"Zombies remaining: {DemoEnemy.ActiveZombieCount}");
         }
 
         private void DrawInventoryToggleButton()

@@ -7,6 +7,7 @@ namespace CIS2991Project.Enemies
 {
     public class DemoEnemy : MonoBehaviour
     {
+        public static int ActiveZombieCount { get; private set; }
         private SpriteRenderer _sr;
         private Rigidbody2D _rb;
         private PlayerHealth _player;
@@ -51,7 +52,7 @@ namespace CIS2991Project.Enemies
 
         public static void Spawn(Vector2 patrolStart, Vector2 patrolEnd, Sprite visual, Sprite dropVisual, global::Item[] drops, int hitPoints, float speedMultiplier)
         {
-            var go = new GameObject("Raider");
+            var go = new GameObject("Zombie");
             go.transform.position = patrolStart;
 
             var sr = go.AddComponent<SpriteRenderer>();
@@ -71,6 +72,12 @@ namespace CIS2991Project.Enemies
         {
             _sr = GetComponent<SpriteRenderer>();
             _rb = GetComponent<Rigidbody2D>();
+            ActiveZombieCount++;
+        }
+
+        private void OnDestroy()
+        {
+            ActiveZombieCount = Mathf.Max(0, ActiveZombieCount - 1);
         }
 
         private void Start()

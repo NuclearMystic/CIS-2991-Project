@@ -115,3 +115,7 @@ MonoBehaviour:
   bandageItem: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
   ammoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
   pistolItem: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
+  tire: {fileID: 21300000, guid: dbd7862e2c1cdfa428780ba46ff33b92, type: 3}
+  vendingMachine: {fileID: 21300000, guid: 3d47f704b9a271a41850a0046a39afc8, type: 3}
+  debris: {fileID: 21300000, guid: 68c44bae66bbcfb469a81bced598a9c5, type: 3}
+  truck: {fileID: 21300000, guid: ba75198c3c00da940b22ed07e006a1d7, type: 3}

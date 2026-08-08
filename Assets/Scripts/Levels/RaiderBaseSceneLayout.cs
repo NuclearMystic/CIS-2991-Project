@@ -21,6 +21,10 @@ namespace CIS2991Project.Levels
         [SerializeField] private global::Item bandageItem;
         [SerializeField] private global::Item ammoItem;
         [SerializeField] private global::Item pistolItem;
+        [SerializeField] private Sprite tire;
+        [SerializeField] private Sprite vendingMachine;
+        [SerializeField] private Sprite debris;
+        [SerializeField] private Sprite truck;
 
         private void Awake() => Build();
 
@@ -31,6 +35,11 @@ namespace CIS2991Project.Levels
             Block("Approach Road", new Vector2(-10f, 0f), new Vector2(9f, 3f), new Color(.18f, .18f, .17f), -19);
             Block("Raiders Yard", new Vector2(4f, 0f), new Vector2(19f, 16f), new Color(.29f, .27f, .21f), -19);
             Fence();
+            Prop("Wrecked Truck", truck, new Vector2(-8.5f, -5.4f), 2);
+            Prop("Abandoned Vending Machine", vendingMachine, new Vector2(-7.2f, 5.7f), 2);
+            Prop("Tire Pile", tire, new Vector2(-9.4f, 4.3f), 2);
+            Prop("Street Debris A", debris, new Vector2(-3.3f, -1.7f), 2);
+            Prop("Street Debris B", debris, new Vector2(5.8f, 1.3f), 2);
             Camp("Level 1 - Lookouts", new Vector2(-4.6f, 4.7f), 1, 2, "slow patrols");
             Camp("Level 2 - Wreckers", new Vector2(2.3f, 5.5f), 2, 3, "mixed patrols");
             Camp("Level 3 - Garage", new Vector2(8.8f, 5.0f), 3, 4, "crossfire lanes");
