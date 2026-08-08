@@ -16,6 +16,7 @@ namespace CIS2991Project.Items
 
         public void Configure(global::Item pickupItem, int pickupAmount = 1)
         {
+            // Runtime scene builders use this to turn PostApocalypse props into inventory loot.
             item = pickupItem;
             amount = Mathf.Max(1, pickupAmount);
             var collider = GetComponent<Collider2D>();
