@@ -537,7 +537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f571478258ee5459db3aa618564a931f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Items.ConsumablePickup
-  item: {fileID: 11400000, guid: 565a5fcbff6bac640946c2d866aed2e8, type: 2}
+  item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
   amount: 1
 --- !u!61 &2039169008
 BoxCollider2D:
