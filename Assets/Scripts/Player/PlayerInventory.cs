@@ -335,6 +335,43 @@ namespace CIS2991Project.Player
             return true;
         }
 
+        public bool TryEquip(global::Item item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                var slot = slots[slotIndex];
+                if (!slot.IsEmpty && ItemsMatch(slot.Item, item))
+                {
+                    return TryEquipAt(slotIndex);
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasItem(global::Item item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                if (!slots[slotIndex].IsEmpty && ItemsMatch(slots[slotIndex].Item, item))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public bool CanUseAt(int slotIndex)
         {
             return IsValidSlot(slotIndex) &&

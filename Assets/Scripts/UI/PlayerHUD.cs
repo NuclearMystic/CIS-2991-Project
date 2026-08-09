@@ -2,6 +2,7 @@ using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using CIS2991Project.Enemies;
+using CIS2991Project.Levels;
 
 namespace CIS2991Project.UI
 {
@@ -76,7 +77,21 @@ namespace CIS2991Project.UI
             GUI.Label(new Rect(28f, 28f, 160f, 24f), $"HP: {playerHealth.CurrentHealth} / {playerHealth.MaxHealth}");
             GUI.Label(new Rect(16f, 72f, 420f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Inventory: I");
             if (SceneManager.GetActiveScene().name == "RaiderBase")
-                GUI.Label(new Rect(16f, 94f, 240f, 22f), $"Zombies remaining: {DemoEnemy.ActiveZombieCount}");
+                DrawRaiderBaseProgress();
+        }
+
+        private static void DrawRaiderBaseProgress()
+        {
+            var raid = Object.FindAnyObjectByType<RaiderBaseSceneLayout>();
+            if (raid == null)
+                return;
+
+            var progress = raid.IsComplete
+                ? "Raider base cleared!"
+                : raid.CurrentLevel == 0
+                    ? "Choose a survivor to begin the raid."
+                    : $"Level {raid.CurrentLevel}/5  |  Zombie kills: {raid.KillsThisLevel}/{raid.KillsRequiredThisLevel}  |  Remaining: {DemoEnemy.ActiveZombieCount}";
+            GUI.Label(new Rect(16f, 94f, 500f, 22f), progress);
         }
 
         private void DrawInventoryToggleButton()

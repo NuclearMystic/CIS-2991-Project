@@ -1,6 +1,7 @@
 using System.Collections;
 using CIS2991Project.Player;
 using CIS2991Project.Items;
+using CIS2991Project.UI;
 using UnityEngine;
 
 namespace CIS2991Project.Enemies
@@ -8,6 +9,7 @@ namespace CIS2991Project.Enemies
     public class DemoEnemy : MonoBehaviour
     {
         public static int ActiveZombieCount { get; private set; }
+        public static event System.Action ZombieKilled;
         private SpriteRenderer _sr;
         private Rigidbody2D _rb;
         private PlayerHealth _player;
@@ -17,6 +19,9 @@ namespace CIS2991Project.Enemies
         private float _chaseSpeed = 3.2f;
         private global::Item[] _drops;
         private Sprite _dropSprite;
+        private Sprite _attackSheet;
+        private Sprite _impactOneSheet;
+        private Sprite _impactTwoSheet;
         private bool _isDead;
         private bool _isKnockedBack;
         private float _damageCooldown;
@@ -43,14 +48,15 @@ namespace CIS2991Project.Enemies
             var rb = go.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f;
             rb.freezeRotation = true;
-            rb.isKinematic = true;
+            rb.bodyType = RigidbodyType2D.Kinematic;
 
             go.AddComponent<BoxCollider2D>();
 
             go.AddComponent<DemoEnemy>().Init(patrolStart, patrolEnd);
         }
 
-        public static void Spawn(Vector2 patrolStart, Vector2 patrolEnd, Sprite visual, Sprite dropVisual, global::Item[] drops, int hitPoints, float speedMultiplier)
+        public static void Spawn(Vector2 patrolStart, Vector2 patrolEnd, Sprite visual, Sprite dropVisual, global::Item[] drops, int hitPoints, float speedMultiplier,
+            Sprite attackSheet = null, Sprite impactOneSheet = null, Sprite impactTwoSheet = null)
         {
             var go = new GameObject("Zombie");
             go.transform.position = patrolStart;
@@ -62,10 +68,10 @@ namespace CIS2991Project.Enemies
             var rb = go.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f;
             rb.freezeRotation = true;
-            rb.isKinematic = true;
+            rb.bodyType = RigidbodyType2D.Kinematic;
             go.AddComponent<BoxCollider2D>();
 
-            go.AddComponent<DemoEnemy>().Init(patrolStart, patrolEnd, hitPoints, speedMultiplier, drops, dropVisual);
+            go.AddComponent<DemoEnemy>().Init(patrolStart, patrolEnd, hitPoints, speedMultiplier, drops, dropVisual, attackSheet, impactOneSheet, impactTwoSheet);
         }
 
         private void Awake()
@@ -92,7 +98,8 @@ namespace CIS2991Project.Enemies
             _patrolTarget = patrolEnd;
         }
 
-        public void Init(Vector2 patrolStart, Vector2 patrolEnd, int hitPoints, float speedMultiplier, global::Item[] drops, Sprite dropVisual)
+        public void Init(Vector2 patrolStart, Vector2 patrolEnd, int hitPoints, float speedMultiplier, global::Item[] drops, Sprite dropVisual,
+            Sprite attackSheet = null, Sprite impactOneSheet = null, Sprite impactTwoSheet = null)
         {
             Init(patrolStart, patrolEnd);
             _hp = Mathf.Max(1, hitPoints);
@@ -100,6 +107,9 @@ namespace CIS2991Project.Enemies
             _chaseSpeed = ChaseSpeed * Mathf.Max(.5f, speedMultiplier);
             _drops = drops;
             _dropSprite = dropVisual;
+            _attackSheet = attackSheet;
+            _impactOneSheet = impactOneSheet;
+            _impactTwoSheet = impactTwoSheet;
         }
 
         private void Update()
@@ -124,6 +134,7 @@ namespace CIS2991Project.Enemies
                 if (distToPlayer <= ContactRange && _damageCooldown <= 0f)
                 {
                     _player.TakeDamage(1);
+                    PlayAttackFeedback();
                     _damageCooldown = DamageCooldown;
                 }
             }
@@ -139,14 +150,15 @@ namespace CIS2991Project.Enemies
             _rb.MovePosition(pos + moveDir * speed * Time.deltaTime);
         }
 
-        public void TakeHit(Vector2 hitDirection)
+        public void TakeHit(Vector2 hitDirection, int damage = 1)
         {
             if (_isDead) return;
-            _hp--;
+            _hp -= Mathf.Max(1, damage);
             if (_hp <= 0)
             {
                 _isDead = true;
                 DropLoot();
+                ZombieKilled?.Invoke();
                 Destroy(gameObject);
                 return;
             }
@@ -173,6 +185,28 @@ namespace CIS2991Project.Enemies
             renderer.sortingOrder = 5;
             loot.AddComponent<CircleCollider2D>().isTrigger = true;
             loot.AddComponent<ConsumablePickup>().Configure(item, 1);
+        }
+
+        private void PlayAttackFeedback()
+        {
+            if (_attackSheet != null)
+            {
+                var animator = GetComponent<SpriteStripAnimator>() ?? gameObject.AddComponent<SpriteStripAnimator>();
+                animator.Play(_attackSheet, 7, 14f, false);
+            }
+
+            var impactSheet = Random.value < .5f ? _impactOneSheet : _impactTwoSheet;
+            if (impactSheet == null || _player == null)
+                return;
+
+            var effect = new GameObject("Zombie Hit Effect");
+            effect.transform.position = _player.transform.position;
+            effect.transform.localScale = Vector3.one * 1.5f;
+            var renderer = effect.AddComponent<SpriteRenderer>();
+            renderer.sortingOrder = 8;
+            var animatorEffect = effect.AddComponent<SpriteStripAnimator>();
+            animatorEffect.Play(impactSheet, 3, 18f, false);
+            Destroy(effect, .2f);
         }
 
         private IEnumerator HitRoutine(Vector2 hitDirection)
