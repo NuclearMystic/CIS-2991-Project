@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 10
+  m_Fog: 0
+  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
+  m_LightingDataAsset: {fileID: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 3
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    buildHeightMesh: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1 &2000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2001}
+  - component: {fileID: 2002}
+  m_Layer: 0
+  m_Name: Raider Base Scene Layout
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c123cb802e4d4071ac2fc45dc74f1c6b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  wall: {fileID: 21300000, guid: f8eac2d6fb6ee8d4989a35dfb8b91e0b, type: 3}
+  container: {fileID: 21300000, guid: fade93f35b4237e4fabdc5dd03fb2495, type: 3}
+  barrel: {fileID: 21300000, guid: dcdbfdd3455135a478cd712b833b60c8, type: 3}
+  ammoCrate: {fileID: 21300000, guid: a9f05ea4ac2694648bfd7e65fc31f089, type: 3}
+  pistol: {fileID: 21300000, guid: 291a9dd1c0d24794cb604f4c3454f167, type: 3}
+  bandage: {fileID: 21300000, guid: 9fc1b37b4fc8553409c2ceb72e779fa7, type: 3}
+  playerSprite: {fileID: 21300000, guid: 8103f7e03a25b9c48801c630478c7710, type: 3}
+  raiderSprite: {fileID: 21300000, guid: d8362e2c8e8a6734c9853e991098d0c9, type: 3}
+  bulletSprite: {fileID: 21300000, guid: 67781bbe6c39c264882bc9e623fd264b, type: 3}
+  bandageItem: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+  ammoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+  pistolItem: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
+  tire: {fileID: 21300000, guid: dbd7862e2c1cdfa428780ba46ff33b92, type: 3}
+  vendingMachine: {fileID: 21300000, guid: 3d47f704b9a271a41850a0046a39afc8, type: 3}
+  debris: {fileID: 21300000, guid: 68c44bae66bbcfb469a81bced598a9c5, type: 3}
+  truck: {fileID: 21300000, guid: ba75198c3c00da940b22ed07e006a1d7, type: 3}
+  backgroundTileSet: {fileID: 21300000, guid: 5349a6cd8e288b440a34e918f2644228, type: 3}
+  buildingTileSet: {fileID: 21300000, guid: aa9fd6cf91632c544990a2f99ed8a571, type: 3}
+  zombieAttackSheet: {fileID: 21300000, guid: c9db4bda6f1ea674e84773d87d12632d, type: 3}
+  enemyShotOneSheet: {fileID: 21300000, guid: b670bb30551203c489351052e7c993f7, type: 3}
+  enemyShotTwoSheet: {fileID: 21300000, guid: 1d595aee14c7b3145a5bbf436596bf2f, type: 3}
+  gunIdleSheet: {fileID: 21300000, guid: d0766b0478f5e6c4582df09afa8e5a64, type: 3}
+  gunLeftIdleSheet: {fileID: 21300000, guid: 36d7f311a0de8314caec2afe911243c8, type: 3}
+  gunShootSheet: {fileID: 21300000, guid: 0f84736fb9e8b2541b9f36cc5192aac8, type: 3}
+  gunDownShootSheet: {fileID: 21300000, guid: 92fb3b05b86fb9d4a85f9060f0ba4e9a, type: 3}
+  shotgunIdleSheet: {fileID: 21300000, guid: 493cc480eb584b94cb9b70d4b26014d6, type: 3}
+  pistolReloadSheet: {fileID: 21300000, guid: 0e721e8dcb37d3740a6261381d3d3914, type: 3}
+  shotgunReloadSheet: {fileID: 21300000, guid: 56cf32fd51f4e8d4294f1f1a35647d34, type: 3}
+  gunDeathSheet: {fileID: 21300000, guid: 336eecb73ccac45409def93fab30a085, type: 3}
+  gunLeftDeathSheet: {fileID: 21300000, guid: 2f047f1e117900e47a77b6149aa3a8a4, type: 3}
