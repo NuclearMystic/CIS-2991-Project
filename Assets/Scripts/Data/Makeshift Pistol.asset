@@ -26,4 +26,8 @@ MonoBehaviour:
   damage: 2
   defense: 0
   healthRestore: 0
+  equippedSpriteDown: {fileID: -133123934, guid: 645dd95ad9bb7854c943e3750931a3c5, type: 3}
+  equippedSpriteUp: {fileID: 1422615300, guid: bd4a3563684d5f04f86a23b070aa66d1, type: 3}
+  equippedSpriteLeft: {fileID: -318414574, guid: 48dc963523d982e40b082da18436902e, type: 3}
+  equippedSpriteRight: {fileID: 955125371, guid: 4eb1075edb6283c47a29a21219dd202f, type: 3}
   statModifiers: []
