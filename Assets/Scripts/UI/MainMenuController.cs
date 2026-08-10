@@ -10,7 +10,7 @@ namespace CIS2991Project.UI
         [SerializeField] private UIDocument uiDocument;
 
         [Header("Scene Settings")]
-        [SerializeField] private string gameplaySceneName = "PrototypeLevel";
+        [SerializeField] private string gameplaySceneName = "Settlement";
 
         // Main Menu Buttons
         private Button playButton;

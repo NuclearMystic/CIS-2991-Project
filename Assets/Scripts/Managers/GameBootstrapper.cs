@@ -53,19 +53,7 @@ namespace CIS2991Project.Managers
         }
 
         private const string MainMenuSceneName = "MainMenu";
-
-        private static Sprite CreatePlaceholderSprite()
-        {
-            var texture = new Texture2D(32, 32);
-            var pixels = new Color[32 * 32];
-            for (var i = 0; i < pixels.Length; i++)
-            {
-                pixels[i] = Color.green;
-            }
-            texture.SetPixels(pixels);
-            texture.Apply();
-            return Sprite.Create(texture, new Rect(0f, 0f, 32f, 32f), new Vector2(0.5f, 0.5f), 32f);
-        }
+        private const string PlayerPrefabResourcePath = "Prefabs/Characters/Player/Player";
 
         private void EnsurePlayer()
         {
@@ -79,25 +67,15 @@ namespace CIS2991Project.Managers
                 return;
             }
 
-            var playerObject = new GameObject("Player");
-            playerObject.tag = "Player";
-            playerObject.transform.position = Vector3.zero;
+            var prefab = Resources.Load<GameObject>(PlayerPrefabResourcePath);
+            if (prefab == null)
+            {
+                Debug.LogError($"GameBootstrapper: no player prefab found at Resources/{PlayerPrefabResourcePath}.prefab");
+                return;
+            }
 
-            var rigidbody = playerObject.AddComponent<Rigidbody2D>();
-            rigidbody.gravityScale = 0f;
-            rigidbody.freezeRotation = true;
-
-            var collider = playerObject.AddComponent<CircleCollider2D>();
-            collider.radius = 0.45f;
-
-            var spriteRenderer = playerObject.AddComponent<SpriteRenderer>();
-            spriteRenderer.sprite = CreatePlaceholderSprite();
-            spriteRenderer.sortingOrder = 1;
-
-            playerObject.AddComponent<PlayerMovement>();
-            playerObject.AddComponent<PlayerHealth>();
-            playerObject.AddComponent<PlayerInventory>();
-            playerObject.AddComponent<PlayerShoot>();
+            var playerObject = Instantiate(prefab, FindSpawnPoint(), Quaternion.identity);
+            playerObject.name = "Player";
 
             var hudObject = new GameObject("PlayerHUD");
             hudObject.AddComponent<PlayerHUD>();
@@ -116,6 +94,14 @@ namespace CIS2991Project.Managers
                 Camera.main.transform.SetParent(playerObject.transform);
                 Camera.main.transform.localPosition = new Vector3(0f, 0f, -10f);
             }
+        }
+
+        private static Vector3 FindSpawnPoint()
+        {
+            var sceneName = SceneManager.GetActiveScene().name;
+            var anchorName = sceneName == "Settlement" ? "SettlementSpawn" : "RaiderBaseSpawn";
+            var anchor = GameObject.Find(anchorName);
+            return anchor != null ? anchor.transform.position : Vector3.zero;
         }
     }
 }

@@ -7,7 +7,15 @@ namespace CIS2991Project.Player
     {
         private Vector2 _lastDirection = Vector2.right;
         private float _cooldown;
+        private Sprite _projectileVisual;
         private const float FireCooldown = 0.2f;
+
+        public event System.Action<Vector2> Fired;
+
+        public void ConfigureProjectileVisual(Sprite visual)
+        {
+            _projectileVisual = visual;
+        }
 
         private void Update()
         {
@@ -31,9 +39,9 @@ namespace CIS2991Project.Player
             go.transform.position = (Vector2)transform.position + _lastDirection * 0.6f;
 
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = CreateCircleSprite(Color.white);
+            sr.sprite = _projectileVisual != null ? _projectileVisual : CreateCircleSprite(Color.white);
             sr.sortingOrder = 2;
-            go.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
+            go.transform.localScale = _projectileVisual != null ? Vector3.one : new Vector3(0.3f, 0.3f, 1f);
 
             var rb = go.AddComponent<Rigidbody2D>();
             rb.gravityScale = 0f;
@@ -42,7 +50,12 @@ namespace CIS2991Project.Player
             var col = go.AddComponent<CircleCollider2D>();
             col.isTrigger = true;
 
-            go.AddComponent<Projectile>().Initialize(_lastDirection);
+            var inventory = GetComponent<PlayerInventory>();
+            var weaponDamage = inventory != null && inventory.EquippedWeapon != null
+                ? Mathf.Max(1, inventory.EquippedWeapon.damage)
+                : 1;
+            go.AddComponent<Projectile>().Initialize(_lastDirection, weaponDamage);
+            Fired?.Invoke(_lastDirection);
         }
 
         private static Sprite CreateCircleSprite(Color color)
@@ -73,10 +86,12 @@ namespace CIS2991Project.Player
             private const float Lifetime = 4f;
 
             private float _remaining;
+            private int _damage;
 
-            public void Initialize(Vector2 direction)
+            public void Initialize(Vector2 direction, int damage)
             {
                 _remaining = Lifetime;
+                _damage = Mathf.Max(1, damage);
                 GetComponent<Rigidbody2D>().linearVelocity = direction * Speed;
             }
 
@@ -92,7 +107,7 @@ namespace CIS2991Project.Player
                 var enemy = other.GetComponent<DemoEnemy>();
                 if (enemy != null)
                 {
-                    enemy.TakeHit(GetComponent<Rigidbody2D>().linearVelocity.normalized);
+                    enemy.TakeHit(GetComponent<Rigidbody2D>().linearVelocity.normalized, _damage);
                     Destroy(gameObject);
                     return;
                 }
