@@ -79,6 +79,18 @@ public class Item : ScriptableObject
              "(hunger/thirst/radiation restores can be added here later.)")]
     public int healthRestore;
 
+    [Tooltip("Weapons: sprite drawn over the player when this weapon is equipped, facing down.")]
+    public Sprite equippedSpriteDown;
+
+    [Tooltip("Weapons: sprite drawn over the player when this weapon is equipped, facing up.")]
+    public Sprite equippedSpriteUp;
+
+    [Tooltip("Weapons: sprite drawn over the player when this weapon is equipped, facing left.")]
+    public Sprite equippedSpriteLeft;
+
+    [Tooltip("Weapons: sprite drawn over the player when this weapon is equipped, facing right.")]
+    public Sprite equippedSpriteRight;
+
     // --- Stat modifiers (optional, hooks into the stat model) ---------------
 
     [Header("Stat Modifiers (optional)")]

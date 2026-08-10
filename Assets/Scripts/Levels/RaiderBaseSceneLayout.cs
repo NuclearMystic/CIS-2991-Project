@@ -32,15 +32,6 @@ namespace CIS2991Project.Levels
         [SerializeField] private Sprite zombieAttackSheet;
         [SerializeField] private Sprite enemyShotOneSheet;
         [SerializeField] private Sprite enemyShotTwoSheet;
-        [SerializeField] private Sprite gunIdleSheet;
-        [SerializeField] private Sprite gunLeftIdleSheet;
-        [SerializeField] private Sprite gunShootSheet;
-        [SerializeField] private Sprite gunDownShootSheet;
-        [SerializeField] private Sprite shotgunIdleSheet;
-        [SerializeField] private Sprite pistolReloadSheet;
-        [SerializeField] private Sprite shotgunReloadSheet;
-        [SerializeField] private Sprite gunDeathSheet;
-        [SerializeField] private Sprite gunLeftDeathSheet;
 
         private const int LevelCount = 5;
         private const int FirstLevelKills = 5;
@@ -62,7 +53,6 @@ namespace CIS2991Project.Levels
         public int KillsRequiredThisLevel => CurrentLevel == 0 ? 0 : KillsForLevel(CurrentLevel);
         public bool IsComplete { get; private set; }
         private bool _awaitingCharacterChoice;
-        private CIS2991Project.Player.PlayerSheetVisuals _playerVisuals;
 
         private void Awake()
         {
@@ -110,12 +100,6 @@ namespace CIS2991Project.Levels
                 var shooter = player.GetComponent<CIS2991Project.Player.PlayerShoot>();
                 if (shooter != null)
                     shooter.ConfigureProjectileVisual(bulletSprite);
-
-                _playerVisuals = player.GetComponent<CIS2991Project.Player.PlayerSheetVisuals>();
-                if (_playerVisuals == null)
-                    _playerVisuals = player.gameObject.AddComponent<CIS2991Project.Player.PlayerSheetVisuals>();
-                _playerVisuals.Configure(gunIdleSheet, gunLeftIdleSheet, gunShootSheet, gunDownShootSheet,
-                    shotgunIdleSheet, pistolReloadSheet, shotgunReloadSheet, gunDeathSheet, gunLeftDeathSheet);
 
                 GiveStarterLoadout(player.GetComponent<CIS2991Project.Player.PlayerInventory>());
             }
@@ -170,7 +154,6 @@ namespace CIS2991Project.Levels
 
         private void ChooseCharacter(bool shotgunStance)
         {
-            _playerVisuals?.SelectShotgunStance(shotgunStance);
             _awaitingCharacterChoice = false;
             StartLevel(1);
         }

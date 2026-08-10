@@ -125,12 +125,3 @@ MonoBehaviour:
   zombieAttackSheet: {fileID: 21300000, guid: c9db4bda6f1ea674e84773d87d12632d, type: 3}
   enemyShotOneSheet: {fileID: 21300000, guid: b670bb30551203c489351052e7c993f7, type: 3}
   enemyShotTwoSheet: {fileID: 21300000, guid: 1d595aee14c7b3145a5bbf436596bf2f, type: 3}
-  gunIdleSheet: {fileID: 21300000, guid: d0766b0478f5e6c4582df09afa8e5a64, type: 3}
-  gunLeftIdleSheet: {fileID: 21300000, guid: 36d7f311a0de8314caec2afe911243c8, type: 3}
-  gunShootSheet: {fileID: 21300000, guid: 0f84736fb9e8b2541b9f36cc5192aac8, type: 3}
-  gunDownShootSheet: {fileID: 21300000, guid: 92fb3b05b86fb9d4a85f9060f0ba4e9a, type: 3}
-  shotgunIdleSheet: {fileID: 21300000, guid: 493cc480eb584b94cb9b70d4b26014d6, type: 3}
-  pistolReloadSheet: {fileID: 21300000, guid: 0e721e8dcb37d3740a6261381d3d3914, type: 3}
-  shotgunReloadSheet: {fileID: 21300000, guid: 56cf32fd51f4e8d4294f1f1a35647d34, type: 3}
-  gunDeathSheet: {fileID: 21300000, guid: 336eecb73ccac45409def93fab30a085, type: 3}
-  gunLeftDeathSheet: {fileID: 21300000, guid: 2f047f1e117900e47a77b6149aa3a8a4, type: 3}
