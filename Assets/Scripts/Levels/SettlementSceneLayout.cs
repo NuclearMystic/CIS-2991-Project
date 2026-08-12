@@ -27,7 +27,6 @@ namespace CIS2991Project.Levels
 
         private void Build()
         {
-            EnsureCamera(new Color(0.20f, 0.24f, 0.20f));
             Block("Settlement Ground", Vector2.zero, new Vector2(28f, 19f), new Color(0.29f, 0.34f, 0.25f), -20);
             Block("Main Street", new Vector2(0f, -1.8f), new Vector2(28f, 3.1f), new Color(0.23f, 0.23f, 0.21f), -19);
             Block("Market Square", new Vector2(-1f, 3.9f), new Vector2(8f, 3.5f), new Color(0.32f, 0.30f, 0.24f), -18);
@@ -49,7 +48,7 @@ namespace CIS2991Project.Levels
             Anchor("ShopCounter_Clinic", new Vector2(-7.4f, -4.7f));
             Anchor("TownLoot_Bandage", new Vector2(-5.8f, -5.6f));
             Anchor("TownLoot_Ammo", new Vector2(5.8f, -5.6f));
-            Portal("Raider Base Gate", new Vector2(12.5f, -1.8f), "RaiderBase", "Press E to enter the raider base");
+            Exit("Overworld Exit", new Vector2(12.5f, -1.8f), "Overworld");
         }
 
         private void Start()
@@ -80,19 +79,6 @@ namespace CIS2991Project.Levels
             Prop(name + " Stock", barrel, new Vector2(center.x + 2.25f, center.y - .8f), 2);
         }
 
-        private static void EnsureCamera(Color background)
-        {
-            if (Camera.main != null) return;
-            var cameraObject = new GameObject("Main Camera");
-            cameraObject.tag = "MainCamera";
-            var camera = cameraObject.AddComponent<Camera>();
-            camera.orthographic = true;
-            camera.orthographicSize = 10.5f;
-            camera.backgroundColor = background;
-            cameraObject.transform.position = new Vector3(0f, 0f, -10f);
-            cameraObject.AddComponent<AudioListener>();
-        }
-
         private static void Block(string name, Vector2 position, Vector2 size, Color color, int order)
         {
             var block = new GameObject(name);
@@ -109,12 +95,12 @@ namespace CIS2991Project.Levels
             anchor.transform.position = position;
         }
 
-        private static void Portal(string name, Vector2 position, string destination, string prompt)
+        private static void Exit(string name, Vector2 position, string destination)
         {
-            var portal = new GameObject(name);
-            portal.transform.position = position;
-            portal.AddComponent<CircleCollider2D>().radius = 1.2f;
-            portal.AddComponent<ScenePortal>().Configure(destination, prompt);
+            var exit = new GameObject(name);
+            exit.transform.position = position;
+            exit.AddComponent<CircleCollider2D>().radius = 1.2f;
+            exit.AddComponent<TeleportPoint>().Configure(destination);
         }
 
         private static void Pickup(string name, Sprite sprite, global::Item item, Vector2 position, int amount)

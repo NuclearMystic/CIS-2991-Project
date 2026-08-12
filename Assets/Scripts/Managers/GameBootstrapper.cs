@@ -22,7 +22,6 @@ namespace CIS2991Project.Managers
 
         private void Initialize()
         {
-            EnsureCamera();
             EnsurePlayer();
             SceneManager.sceneLoaded += HandleSceneLoaded;
         }
@@ -34,22 +33,7 @@ namespace CIS2991Project.Managers
 
         private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            EnsureCamera();
             EnsurePlayer();
-        }
-
-        private void EnsureCamera()
-        {
-            if (Camera.main != null)
-            {
-                return;
-            }
-
-            var cameraObject = new GameObject("Main Camera");
-            cameraObject.tag = "MainCamera";
-            cameraObject.AddComponent<Camera>();
-            cameraObject.AddComponent<AudioListener>();
-            cameraObject.transform.position = new Vector3(0f, 0f, -10f);
         }
 
         private const string MainMenuSceneName = "MainMenu";
@@ -62,8 +46,13 @@ namespace CIS2991Project.Managers
                 return;
             }
 
-            if (Object.FindAnyObjectByType<PlayerHealth>() != null)
+            var existingPlayer = Object.FindAnyObjectByType<PlayerHealth>();
+            if (existingPlayer != null)
             {
+                // Player carried over from the previous scene via CharacterSheet's DontDestroyOnLoad -
+                // keep its inventory/stats and just drop it at the new scene's spawn point.
+                var characterSheet = existingPlayer.GetComponent<CharacterSheet>();
+                existingPlayer.transform.position = FindSpawnPoint(characterSheet);
                 return;
             }
 
@@ -74,7 +63,7 @@ namespace CIS2991Project.Managers
                 return;
             }
 
-            var playerObject = Instantiate(prefab, FindSpawnPoint(), Quaternion.identity);
+            var playerObject = Instantiate(prefab, FindSpawnPoint(null), Quaternion.identity);
             playerObject.name = "Player";
 
             var hudObject = new GameObject("PlayerHUD");
@@ -88,20 +77,24 @@ namespace CIS2991Project.Managers
             var gameOverObject = new GameObject("GameOver");
             gameOverObject.AddComponent<GameOverController>();
             gameOverObject.transform.SetParent(playerObject.transform, false);
-
-            if (Camera.main != null)
-            {
-                Camera.main.transform.SetParent(playerObject.transform);
-                Camera.main.transform.localPosition = new Vector3(0f, 0f, -10f);
-            }
         }
 
-        private static Vector3 FindSpawnPoint()
+        private static Vector3 FindSpawnPoint(CharacterSheet characterSheet)
         {
             var sceneName = SceneManager.GetActiveScene().name;
-            var anchorName = sceneName == "Settlement" ? "SettlementSpawn" : "RaiderBaseSpawn";
-            var anchor = GameObject.Find(anchorName);
-            return anchor != null ? anchor.transform.position : Vector3.zero;
+
+            if (sceneName == "Overworld")
+            {
+                var previousScene = characterSheet != null ? characterSheet.PreviousScene : null;
+                var returnAnchor = string.IsNullOrEmpty(previousScene)
+                    ? null
+                    : GameObject.Find("Overworld_" + previousScene);
+                var anchor = returnAnchor != null ? returnAnchor : GameObject.Find("OverworldSpawn");
+                return anchor != null ? anchor.transform.position : Vector3.zero;
+            }
+
+            var sceneAnchor = GameObject.Find(sceneName + "Spawn");
+            return sceneAnchor != null ? sceneAnchor.transform.position : Vector3.zero;
         }
     }
 }

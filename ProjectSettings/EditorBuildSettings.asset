@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/RaiderBase.unity
     guid: 8d12a163af01482ca16dcb2ea605c0c4
+  - enabled: 1
+    path: Assets/Scenes/Levels/Overworld.unity
+    guid: c0c603d121e920e4a8db45e3beae9020
+  - enabled: 1
+    path: Assets/Scenes/Levels/CaveDungeon.unity
+    guid: 8f7cca457c8e478183b3bfd35bb36289
   m_configObjects: {}
