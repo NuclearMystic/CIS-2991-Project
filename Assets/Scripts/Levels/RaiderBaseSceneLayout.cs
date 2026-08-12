@@ -67,7 +67,6 @@ namespace CIS2991Project.Levels
 
         private void Build()
         {
-            EnsureCamera();
             TiledGround();
             Block("Approach Road", new Vector2(-10f, 0f), new Vector2(9f, 3f), new Color(.18f, .18f, .17f, .38f), -19);
             Block("Raiders Yard", new Vector2(4f, 0f), new Vector2(19f, 16f), new Color(.29f, .27f, .21f, .30f), -19);
@@ -86,7 +85,7 @@ namespace CIS2991Project.Levels
             TileSetFeature("Damaged Building B", new Vector2(10.8f, 3.6f), new Vector2(1.7f, 1.7f));
             Anchor("RaiderBaseSpawn", new Vector2(-12.2f, 0f));
             Anchor("RaiderBaseExit", new Vector2(13.8f, -7f));
-            Portal("Settlement Return Gate", new Vector2(-12.4f, -2.1f), "Settlement", "Press E to return to settlement");
+            Exit("Overworld Exit", new Vector2(-12.4f, -2.1f), "Overworld");
         }
 
         private void Start()
@@ -265,25 +264,6 @@ namespace CIS2991Project.Levels
             Anchor($"RaiderTier{tier}_LootAmmo", center + new Vector2(1.55f, -.9f));
         }
 
-        private static void EnsureCamera()
-        {
-            if (Camera.main != null)
-            {
-                Camera.main.orthographic = true;
-                Camera.main.orthographicSize = 10.5f;
-                Camera.main.backgroundColor = new Color(.12f, .13f, .12f);
-                return;
-            }
-            var cameraObject = new GameObject("Main Camera");
-            cameraObject.tag = "MainCamera";
-            var camera = cameraObject.AddComponent<Camera>();
-            camera.orthographic = true;
-            camera.orthographicSize = 10.5f;
-            camera.backgroundColor = new Color(.12f, .13f, .12f);
-            cameraObject.transform.position = new Vector3(0f, 0f, -10f);
-            cameraObject.AddComponent<AudioListener>();
-        }
-
         private static void Block(string name, Vector2 position, Vector2 size, Color color, int order)
         {
             var block = new GameObject(name);
@@ -300,12 +280,12 @@ namespace CIS2991Project.Levels
             anchor.transform.position = position;
         }
 
-        private static void Portal(string name, Vector2 position, string destination, string prompt)
+        private static void Exit(string name, Vector2 position, string destination)
         {
-            var portal = new GameObject(name);
-            portal.transform.position = position;
-            portal.AddComponent<CircleCollider2D>().radius = 1.2f;
-            portal.AddComponent<ScenePortal>().Configure(destination, prompt);
+            var exit = new GameObject(name);
+            exit.transform.position = position;
+            exit.AddComponent<CircleCollider2D>().radius = 1.2f;
+            exit.AddComponent<TeleportPoint>().Configure(destination);
         }
 
         private static void Pickup(string name, Sprite sprite, global::Item item, Vector2 position, int amount)
