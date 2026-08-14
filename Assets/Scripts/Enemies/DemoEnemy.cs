@@ -26,6 +26,7 @@ namespace CIS2991Project.Enemies
         private bool _isKnockedBack;
         private float _damageCooldown;
         private int _expReward = 15;
+        [SerializeField, Min(0)] private int capsReward = 10;
         private CharacterSheet _characterSheet;
 
         private Vector2 _patrolStart;
@@ -163,6 +164,7 @@ namespace CIS2991Project.Enemies
                 _isDead = true;
                 DropLoot();
                 _characterSheet?.AddExperience(_expReward);
+                _player?.GetComponent<PlayerInventory>()?.AddCurrency(capsReward);
                 ZombieKilled?.Invoke();
                 Destroy(gameObject);
                 return;

@@ -20,6 +20,8 @@ namespace CIS2991Project.Enemies
         [Header("Health & Reward")]
         [Min(1)] public int maxHealth = 10;
         [Min(0)] public int expReward = 15;
+        [Tooltip("Caps awarded directly to the player when this enemy is defeated.")]
+        [Min(0)] public int capsReward = 15;
 
         [Header("Movement")]
         [Min(0f)] public float patrolSpeed = 1.5f;

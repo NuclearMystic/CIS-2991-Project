@@ -205,6 +205,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.UI.MainMenuController
   uiDocument: {fileID: 717706526}
   gameplaySceneName: Settlement
+  preGameShopCaps: 60
+  preGameShopStock:
+  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+    amountPerPurchase: 1
+    quantity: 0
+    price: 12
+    graphic: {fileID: 0}
+  - item: {fileID: 11400000, guid: 6e6e301f45e063b4c8ae804b6c321acb, type: 2}
+    amountPerPurchase: 1
+    quantity: 0
+    price: 8
+    graphic: {fileID: 0}
+  - item: {fileID: 11400000, guid: 44dcd2a2c6db01242b242d9a81896ca1, type: 2}
+    amountPerPurchase: 1
+    quantity: 0
+    price: 8
+    graphic: {fileID: 0}
+  - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+    amountPerPurchase: 12
+    quantity: 0
+    price: 15
+    graphic: {fileID: 0}
+  - item: {fileID: 11400000, guid: b2604b72b3a806a4197b064542430bd4, type: 2}
+    amountPerPurchase: 8
+    quantity: 0
+    price: 18
+    graphic: {fileID: 0}
+  - item: {fileID: 11400000, guid: 8c7064863d7307f4389a362488ec27f1, type: 2}
+    amountPerPurchase: 1
+    quantity: 0
+    price: 120
+    graphic: {fileID: 0}
 --- !u!4 &1349103798
 Transform:
   m_ObjectHideFlags: 0
