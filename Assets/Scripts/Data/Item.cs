@@ -25,6 +25,14 @@ public enum ItemType
     Misc
 }
 
+public enum WeaponAmmoType
+{
+    None,   // melee or anything that doesn't use the ammo HUD
+    Pistol,
+    Shotgun,
+    Rifle
+}
+
 [CreateAssetMenu(fileName = "NewItem", menuName = "Afterfall/Item")]
 public class Item : ScriptableObject
 {
@@ -71,6 +79,12 @@ public class Item : ScriptableObject
     [Header("Combat / Equipment")]
     [Tooltip("Weapons: damage per hit.")]
     public int damage;
+
+    [Tooltip("Weapons: which ammo icon set the HUD shows while this weapon is equipped. Leave None for melee weapons.")]
+    public WeaponAmmoType ammoType;
+
+    [Tooltip("Weapons: magazine size — how many ammo icons the HUD draws for this weapon.")]
+    public int ammoCapacity = 6;
 
     [Tooltip("Armor: damage reduction.")]
     public int defense;

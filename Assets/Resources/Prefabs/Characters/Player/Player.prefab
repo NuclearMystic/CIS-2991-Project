@@ -19,6 +19,9 @@ GameObject:
   - component: {fileID: 7110417629392717382}
   - component: {fileID: 5337185273854832097}
   - component: {fileID: 5036190077612624874}
+  - component: {fileID: 1543250420521020714}
+  - component: {fileID: 7885066162786256011}
+  - component: {fileID: 2599761279921479484}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -36,7 +39,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 1}
+  m_LocalScale: {x: 7, y: 7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4172279766624705219}
@@ -104,7 +107,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.000000007450581, y: -0.0012050457}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -114,7 +117,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.13, y: 0.16}
+  m_Size: {x: 0.111924514, y: 0.13710445}
   m_EdgeRadius: 0
 --- !u!95 &5075845716957075536
 Animator:
@@ -210,6 +213,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.PlayerMovement
   moveSpeed: 5
+  sprintKey: 304
+  sprintMultiplier: 2
 --- !u!114 &4512431806465389348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,6 +261,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.PlayerHealth
   maxHealth: 100
   currentHealth: 100
+  healthPerHeart: 10
 --- !u!114 &7110417629392717382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -310,7 +316,29 @@ MonoBehaviour:
   - item: {fileID: 0}
     amount: 0
   equippedWeapon: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
-  equippedArmor: {fileID: 0}
+  equippedArmor: {fileID: 11400000, guid: 41f37e771dc20fc4e8a71066b6d0b7e7, type: 2}
+  hotbarItems:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  startingItems:
+  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 8c7064863d7307f4389a362488ec27f1, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: b2604b72b3a806a4197b064542430bd4, type: 2}
+    amount: 99
 --- !u!114 &5337185273854832097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -323,6 +351,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5067160549a433e40b07900a2a910a16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.PlayerShoot
+  pistolAmmoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+  shotgunAmmoItem: {fileID: 11400000, guid: b2604b72b3a806a4197b064542430bd4, type: 2}
+  rifleAmmoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+  pistolProjectileSprite: {fileID: 21300000, guid: 726569dee2ad4334681b1910784cd3ae, type: 3}
+  shotgunProjectileSprite: {fileID: 21300000, guid: 726569dee2ad4334681b1910784cd3ae, type: 3}
+  rifleProjectileSprite: {fileID: 21300000, guid: 726569dee2ad4334681b1910784cd3ae, type: 3}
+  pistolReloadSeconds: 2
+  shotgunReloadSeconds: 4
+  rifleReloadSecondsPerBullet: 0.02
+  shotgunSpreadDegrees: 8
+  pistolProjectileLifetime: 4
+  shotgunProjectileLifetime: 0.5
+  rifleProjectileLifetime: 4
+  pistolFireCooldown: 0.4
+  shotgunFireCooldown: 0.8
+  rifleFireCooldown: 0.1
+  pistolFireSound: {fileID: 8300000, guid: e943e40ea419f874bbe4d4602a8cb529, type: 3}
+  shotgunFireSound: {fileID: 8300000, guid: 642b384c2143c0d4390a2b29c41f1707, type: 3}
+  rifleFireSound: {fileID: 8300000, guid: e943e40ea419f874bbe4d4602a8cb529, type: 3}
+  dryFireSound: {fileID: 8300000, guid: 463769be4b0d5d24e8074275d7421ca8, type: 3}
+  reloadCompleteSound: {fileID: 8300000, guid: 1f3b2e5e5670a484382f594f699db924, type: 3}
+  sfxMixerGroup: {fileID: 6680898872448560023, guid: a0188cd2ad9196b43b2acf491bf5a31a, type: 2}
 --- !u!114 &5036190077612624874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,6 +385,113 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfbf74bae2a54f85b2d8f171fccb9895, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.CharacterSheet
+  startingSkills:
+  - skill: 3
+    level: 10
+  endurancePerHeart: 5
+  athleticsSpeedPerLevel: 0.01
+  weaponDamagePerLevel: 0.005
+  weaponReloadSpeedPerLevel: 0.005
+  minReloadMultiplier: 0.1
+  skillPointsPerLevel: 3
+  baseExperienceToLevel: 25
+  experienceIncreasePerLevel: 5
+  characterLevel: 1
+  experience: 0
+  unspentSkillPoints: 0
+--- !u!114 &1543250420521020714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3050831987221406192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c2af26f63a10444383f6a752e991289, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.UI.PlayerHUD
+  playerHealth: {fileID: 4284911958658163803}
+  playerInventory: {fileID: 7110417629392717382}
+  playerShoot: {fileID: 5337185273854832097}
+  characterSheet: {fileID: 5036190077612624874}
+  inventoryToggleKey: 105
+  skillsToggleKey: 107
+  fullHeartTexture: {fileID: 2800000, guid: 2cd519fe145b0394983ac378a41a4b09, type: 3}
+  halfHeartTexture: {fileID: 2800000, guid: 4a2a0ff91784fed45b93cf9d3ac04057, type: 3}
+  emptyHeartTexture: {fileID: 2800000, guid: d733213917965e44cac7b6e6732a3d82, type: 3}
+  heartCount: 20
+  heartsPerRow: 10
+  heartSize: 50
+  heartSpacing: 2
+  pistolAmmoFullTexture: {fileID: 2800000, guid: c456d6f379ab6c341a3d872d7488777e, type: 3}
+  pistolAmmoEmptyTexture: {fileID: 2800000, guid: c64b1d844c6fbb34eaedefde1287ada8, type: 3}
+  shotgunAmmoFullTexture: {fileID: 2800000, guid: c87c2609cc25f1341b70e949d5558a40, type: 3}
+  shotgunAmmoEmptyTexture: {fileID: 2800000, guid: 80e651f5843353e4881d55e2040a52b5, type: 3}
+  rifleAmmoFullTexture: {fileID: 2800000, guid: 51c8e9556e7eaff45b70cc27090bd2fd, type: 3}
+  rifleAmmoEmptyTexture: {fileID: 2800000, guid: 371460709d7075749ad2311f18f1dc29, type: 3}
+  ammoPerRow: 6
+  ammoIconSize: 50
+  ammoIconSpacing: 2
+  reloadBarBackgroundTexture: {fileID: 0}
+  reloadBarFillTexture: {fileID: 0}
+  reloadBarWidth: 200
+  reloadBarHeight: 18
+  equipmentBoxSize: 100
+  equipmentBoxGap: 8
+  bagIconTexture: {fileID: 2800000, guid: da69cbf9a7230c147a2346d01b9a6cfe, type: 3}
+  inventoryBorderTexture: {fileID: 2800000, guid: 380a69f091ed5eb44ab87f9c6da2164c, type: 3}
+  inventorySlotBackgroundTexture: {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  bagButtonWidth: 90
+  bagButtonHeight: 50
+  inventoryPanelWidth: 430
+  inventoryPanelHeight: 360
+  inventorySlotWidth: 78
+  inventorySlotHeight: 36
+  inventorySlotGap: 4
+  inventoryGridTopPadding: 60
+  moneyTexture: {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  moneyWidth: 150
+  moneyHeight: 32
+  hotbarSlotTextures:
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
+  hotbarSlotSize: 64
+  hotbarSlotGap: 8
+  skillsPanelBackgroundTexture: {fileID: 2800000, guid: 380a69f091ed5eb44ab87f9c6da2164c, type: 3}
+  skillsPanelWidth: 320
+  skillRowHeight: 26
+--- !u!114 &7885066162786256011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3050831987221406192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb36b6272f3cf904282e3578dd2b136c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.UI.GameOverController
+--- !u!114 &2599761279921479484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3050831987221406192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11b32071312af8c4fa4a65ba0dd26971, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.UI.PauseMenuController
+  mainMenuSceneName: MainMenu
 --- !u!1 &4336243778001066693
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,6 +615,7 @@ GameObject:
   - component: {fileID: 7499542023804754746}
   - component: {fileID: 8561408217827895009}
   - component: {fileID: 402648938421326416}
+  - component: {fileID: 5322809211356992047}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -539,3 +697,18 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5928096001933469802}
   m_Enabled: 1
+--- !u!114 &5322809211356992047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5928096001933469802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a186f58e84b2e3b48976bfe1c3ab0e78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.CameraController
+  minZoom: 3
+  maxZoom: 8
+  zoomSpeed: 5

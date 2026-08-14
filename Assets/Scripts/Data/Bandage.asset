@@ -12,15 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
   m_Name: Bandage
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 
+  id: 2
   displayName: Bandage
   description: A clean bandage used to stop bleeding and treat small wounds.
   icon: {fileID: 0}
   itemType: 2
-  stackable: 0
-  maxStackSize: 1
+  stackable: 1
+  maxStackSize: 99
   value: 0
   damage: 0
+  ammoType: 0
+  ammoCapacity: 6
   defense: 0
   healthRestore: 10
+  equippedSpriteDown: {fileID: 0}
+  equippedSpriteUp: {fileID: 0}
+  equippedSpriteLeft: {fileID: 0}
+  equippedSpriteRight: {fileID: 0}
   statModifiers: []

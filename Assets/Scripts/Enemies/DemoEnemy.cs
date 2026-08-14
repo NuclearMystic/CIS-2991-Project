@@ -25,6 +25,8 @@ namespace CIS2991Project.Enemies
         private bool _isDead;
         private bool _isKnockedBack;
         private float _damageCooldown;
+        private int _expReward = 15;
+        private CharacterSheet _characterSheet;
 
         private Vector2 _patrolStart;
         private Vector2 _patrolEnd;
@@ -89,6 +91,7 @@ namespace CIS2991Project.Enemies
         private void Start()
         {
             _player = Object.FindAnyObjectByType<PlayerHealth>();
+            _characterSheet = _player != null ? _player.GetComponent<CharacterSheet>() : null;
         }
 
         public void Init(Vector2 patrolStart, Vector2 patrolEnd)
@@ -105,6 +108,7 @@ namespace CIS2991Project.Enemies
             _hp = Mathf.Max(1, hitPoints);
             _patrolSpeed = PatrolSpeed * Mathf.Max(.5f, speedMultiplier);
             _chaseSpeed = ChaseSpeed * Mathf.Max(.5f, speedMultiplier);
+            _expReward = Mathf.Max(5, _hp * 5);
             _drops = drops;
             _dropSprite = dropVisual;
             _attackSheet = attackSheet;
@@ -158,6 +162,7 @@ namespace CIS2991Project.Enemies
             {
                 _isDead = true;
                 DropLoot();
+                _characterSheet?.AddExperience(_expReward);
                 ZombieKilled?.Invoke();
                 Destroy(gameObject);
                 return;
