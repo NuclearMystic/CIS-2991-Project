@@ -25,6 +25,7 @@ namespace CIS2991Project.Enemies
         private const string DirectionParam = "Direction";
         private const string IsMovingParam = "IsMoving";
         private const string IsRunningParam = "IsRunning";
+        private const string IsAttackingParam = "IsAttacking";
         private const string AttackTrigger = "Attack";
         private const string IsDeadParam = "IsDead";
         private const string DiedTrigger = "Died";
@@ -199,6 +200,7 @@ namespace CIS2991Project.Enemies
             var isMoving = (_state == State.Patrol || _state == State.Chase) && _facingDirection != Vector2.zero;
             _animator.SetBool(IsMovingParam, isMoving);
             _animator.SetBool(IsRunningParam, _state == State.Chase);
+            _animator.SetBool(IsAttackingParam, _state == State.Attack);
 
             if (_facingDirection != Vector2.zero)
             {
@@ -236,7 +238,7 @@ namespace CIS2991Project.Enemies
                 _animator.SetTrigger(DiedTrigger);
             }
 
-            DropLoot();
+            Invoke(nameof(DropLoot), deathAnimationSeconds);
             _playerCharacterSheet?.AddExperience(definition.expReward);
 
             Destroy(gameObject, deathAnimationSeconds);
@@ -263,7 +265,7 @@ namespace CIS2991Project.Enemies
             renderer.sortingOrder = 5;
 
             loot.AddComponent<CircleCollider2D>().isTrigger = true;
-            loot.AddComponent<ConsumablePickup>().Configure(item, 1);
+            loot.AddComponent<ConsumablePickup>().Configure(item, 1, definition.lootDropSound);
         }
 
         private static int DetermineFacing(Vector2 direction)

@@ -86,6 +86,7 @@ namespace CIS2991Project.Player
         public event Action InventoryChanged;
         public event Action EquipmentChanged;
         public event Action<global::Item, int> ItemDropped;
+        public event Action<global::Item, int> ItemPickedUp;
         public event Action<string> InventoryMessageChanged;
         public event Action HotbarChanged;
 
@@ -188,6 +189,14 @@ namespace CIS2991Project.Player
             SetMessage(string.Empty);
             InventoryChanged?.Invoke();
             return true;
+        }
+
+        // World pickups (ConsumablePickup) call this after a successful TryAdd so the HUD can
+        // show a "what did I just grab" popup, without every internal TryAdd caller (starting
+        // items, unequip-to-inventory, etc.) triggering that same popup.
+        public void NotifyItemPickedUp(global::Item item, int amount)
+        {
+            ItemPickedUp?.Invoke(item, amount);
         }
 
         public bool CanAdd(global::Item item, int amount = 1)

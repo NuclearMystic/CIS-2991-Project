@@ -423,14 +423,6 @@ namespace CIS2991Project.Player
                 if (other.GetComponent<Projectile>() != null)
                     return;
 
-                var demoEnemy = other.GetComponent<DemoEnemy>();
-                if (demoEnemy != null)
-                {
-                    demoEnemy.TakeHit(GetComponent<Rigidbody2D>().linearVelocity.normalized, _damage);
-                    Destroy(gameObject);
-                    return;
-                }
-
                 var enemy = other.GetComponent<Enemy>();
                 if (enemy != null)
                 {

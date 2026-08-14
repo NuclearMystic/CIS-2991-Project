@@ -45,5 +45,6 @@ namespace CIS2991Project.Enemies
         [Header("Loot — one random item from this list drops on death (leave empty for no loot)")]
         public global::Item[] lootTable;
         public Sprite lootSprite;
+        public AudioClip lootDropSound;
     }
 }

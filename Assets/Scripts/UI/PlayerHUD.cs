@@ -43,6 +43,12 @@ namespace CIS2991Project.UI
         [SerializeField, Min(4f)] private float reloadBarHeight = 14f;
         [SerializeField] private float reloadBarWorldOffset = 1.2f;
 
+        [Header("Pickup Popup — floats above the player for a moment when an item is picked up")]
+        [SerializeField] private float pickupPopupWorldOffset = 1.6f;
+        [SerializeField, Min(0f)] private float pickupPopupRiseDistance = 1f;
+        [SerializeField, Min(0.1f)] private float pickupPopupDuration = 2.5f;
+        [SerializeField, Min(6)] private int pickupPopupFontSize = 18;
+
         [Header("Equipment Slots (Weapon / Outfit boxes, bottom-left)")]
         [SerializeField, Min(4f)] private float equipmentBoxSize = 56f;
         [SerializeField, Min(0f)] private float equipmentBoxGap = 8f;
@@ -83,7 +89,10 @@ namespace CIS2991Project.UI
         private int _lastClickId = int.MinValue;
         private double _lastClickTime = -1d;
         private GUIStyle _centeredLabelStyle;
+        private GUIStyle _pickupPopupStyle;
         private int _draggedInventorySlot = -1;
+        private string _pickupPopupText;
+        private float _pickupPopupTimeRemaining;
 
         // Plain GUI.Label has no background box, unlike GUI.Button, so it's safe to draw
         // on top of a slot's background texture without covering it back up.
@@ -97,6 +106,25 @@ namespace CIS2991Project.UI
                 }
 
                 return _centeredLabelStyle;
+            }
+        }
+
+        private GUIStyle PickupPopupStyle
+        {
+            get
+            {
+                if (_pickupPopupStyle == null)
+                {
+                    _pickupPopupStyle = new GUIStyle(GUI.skin.label)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontStyle = FontStyle.Bold,
+                        fontSize = pickupPopupFontSize
+                    };
+                    _pickupPopupStyle.normal.textColor = Color.green;
+                }
+
+                return _pickupPopupStyle;
             }
         }
 
@@ -143,6 +171,19 @@ namespace CIS2991Project.UI
             }
 
             EnsureHud();
+
+            if (playerInventory != null)
+            {
+                playerInventory.ItemPickedUp += HandleItemPickedUp;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (playerInventory != null)
+            {
+                playerInventory.ItemPickedUp -= HandleItemPickedUp;
+            }
         }
 
         private int HeartCount => characterSheet != null ? characterSheet.GetHeartCount() : heartCount;
@@ -150,6 +191,13 @@ namespace CIS2991Project.UI
         private void EnsureHud()
         {
             // IMGUI HUD needs no scene setup; OnGUI draws it every frame.
+        }
+
+        private void HandleItemPickedUp(global::Item item, int amount)
+        {
+            var itemName = GetItemName(item).ToUpperInvariant();
+            _pickupPopupText = $"{itemName} X{amount}";
+            _pickupPopupTimeRemaining = pickupPopupDuration;
         }
 
         private void Update()
@@ -162,6 +210,11 @@ namespace CIS2991Project.UI
             if (Input.GetKeyDown(skillsToggleKey))
             {
                 skillsVisible = !skillsVisible;
+            }
+
+            if (_pickupPopupTimeRemaining > 0f)
+            {
+                _pickupPopupTimeRemaining -= Time.deltaTime;
             }
         }
 
@@ -180,6 +233,7 @@ namespace CIS2991Project.UI
             DrawHotbar();
             DrawEquipmentSlots();
             DrawReloadBar();
+            DrawPickupPopup();
 
             if (inventoryVisible)
             {
@@ -313,6 +367,55 @@ namespace CIS2991Project.UI
 
             GUI.Label(rect, "Reloading", CenteredLabelStyle);
         }
+
+        private void DrawPickupPopup()
+        {
+            if (_pickupPopupTimeRemaining <= 0f || string.IsNullOrEmpty(_pickupPopupText) || playerInventory == null)
+            {
+                return;
+            }
+
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                return;
+            }
+
+            var progress = 1f - Mathf.Clamp01(_pickupPopupTimeRemaining / pickupPopupDuration);
+            var worldPosition = playerInventory.transform.position + Vector3.up * (pickupPopupWorldOffset + progress * pickupPopupRiseDistance);
+            var screenPoint = camera.WorldToScreenPoint(worldPosition);
+            if (screenPoint.z <= 0f)
+            {
+                return;
+            }
+
+            const float width = 320f;
+            const float height = 28f;
+            var rect = new Rect(screenPoint.x - width / 2f, Screen.height - screenPoint.y - height / 2f, width, height);
+
+            // Plain GUI.Label has no outline, so fake one by stamping the text in black a
+            // couple pixels off-center before drawing the green label on top — keeps it
+            // readable over bright backgrounds instead of just relying on the bold green.
+            var shadowStyle = new GUIStyle(PickupPopupStyle);
+            shadowStyle.normal.textColor = Color.black;
+
+            var previousColor = GUI.color;
+            GUI.color = new Color(1f, 1f, 1f, 1f - progress);
+
+            foreach (var offset in ShadowOffsets)
+            {
+                GUI.Label(new Rect(rect.x + offset.x, rect.y + offset.y, rect.width, rect.height), _pickupPopupText, shadowStyle);
+            }
+
+            GUI.Label(rect, _pickupPopupText, PickupPopupStyle);
+
+            GUI.color = previousColor;
+        }
+
+        private static readonly Vector2[] ShadowOffsets =
+        {
+            new(-1f, -1f), new(1f, -1f), new(-1f, 1f), new(1f, 1f)
+        };
 
         private (Texture2D full, Texture2D empty) GetAmmoTextures(global::WeaponAmmoType ammoType)
         {

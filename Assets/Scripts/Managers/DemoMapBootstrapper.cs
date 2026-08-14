@@ -1,4 +1,3 @@
-using CIS2991Project.Enemies;
 using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -55,8 +54,6 @@ namespace CIS2991Project.Managers
             _initialized = true;
             CreateMap();
             CreateNpc();
-            DemoEnemy.Spawn(new Vector2(9f, 8f), new Vector2(12f, 8f));
-            DemoEnemy.Spawn(new Vector2(-9f, -8f), new Vector2(-12f, -8f));
         }
 
         private void CreateMap()
