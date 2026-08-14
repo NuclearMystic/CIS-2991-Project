@@ -1,5 +1,4 @@
 using CIS2991Project.Player;
-using CIS2991Project.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -65,18 +64,6 @@ namespace CIS2991Project.Managers
 
             var playerObject = Instantiate(prefab, FindSpawnPoint(null), Quaternion.identity);
             playerObject.name = "Player";
-
-            var hudObject = new GameObject("PlayerHUD");
-            hudObject.AddComponent<PlayerHUD>();
-            hudObject.transform.SetParent(playerObject.transform, false);
-
-            var pauseMenuObject = new GameObject("PauseMenu");
-            pauseMenuObject.AddComponent<PauseMenuController>();
-            pauseMenuObject.transform.SetParent(playerObject.transform, false);
-
-            var gameOverObject = new GameObject("GameOver");
-            gameOverObject.AddComponent<GameOverController>();
-            gameOverObject.transform.SetParent(playerObject.transform, false);
         }
 
         private static Vector3 FindSpawnPoint(CharacterSheet characterSheet)

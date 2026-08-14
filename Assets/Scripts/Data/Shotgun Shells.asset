@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
+  m_Name: Shotgun Shells
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  id: 8
+  displayName: Shotgun Shells
+  description: Ammo for the shotgun.
+  icon: {fileID: 21300000, guid: c87c2609cc25f1341b70e949d5558a40, type: 3}
+  itemType: 4
+  stackable: 1
+  maxStackSize: 99
+  value: 0
+  damage: 0
+  ammoType: 0
+  ammoCapacity: 6
+  defense: 0
+  healthRestore: 0
+  equippedSpriteDown: {fileID: 0}
+  equippedSpriteUp: {fileID: 0}
+  equippedSpriteLeft: {fileID: 0}
+  equippedSpriteRight: {fileID: 0}
+  statModifiers: []

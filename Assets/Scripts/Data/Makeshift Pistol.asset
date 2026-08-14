@@ -12,18 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
   m_Name: Makeshift Pistol
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 
+  id: 5
   displayName: Makeshift Pistol
   description: 'A homemade pistol assembled from scavenged parts.
 
     Poor accuracy
     but functional.'
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: c456d6f379ab6c341a3d872d7488777e, type: 3}
   itemType: 0
   stackable: 0
   maxStackSize: 1
   value: 0
   damage: 2
+  ammoType: 1
+  ammoCapacity: 6
   defense: 0
   healthRestore: 0
   equippedSpriteDown: {fileID: -133123934, guid: 645dd95ad9bb7854c943e3750931a3c5, type: 3}

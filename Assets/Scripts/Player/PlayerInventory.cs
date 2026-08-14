@@ -7,6 +7,7 @@ namespace CIS2991Project.Player
     public class PlayerInventory : MonoBehaviour
     {
         public const int DefaultSlotCount = 20;
+        public const int HotbarSlotCount = 8;
 
         [Serializable]
         public class InventorySlot
@@ -63,9 +64,21 @@ namespace CIS2991Project.Player
             }
         }
 
+        [Serializable]
+        public struct StarterItem
+        {
+            public global::Item item;
+            [Min(1)] public int amount;
+        }
+
         [SerializeField] private List<InventorySlot> slots = new List<InventorySlot>(DefaultSlotCount);
         [SerializeField] private global::Item equippedWeapon;
         [SerializeField] private global::Item equippedArmor;
+        [SerializeField] private global::Item[] hotbarItems = new global::Item[HotbarSlotCount];
+
+        [Header("Testing")]
+        [Tooltip("Granted once, the first time this inventory spawns. Handy for dropping in test items.")]
+        [SerializeField] private List<StarterItem> startingItems = new();
 
         private PlayerHealth playerHealth;
         private string lastMessage;
@@ -74,6 +87,7 @@ namespace CIS2991Project.Player
         public event Action EquipmentChanged;
         public event Action<global::Item, int> ItemDropped;
         public event Action<string> InventoryMessageChanged;
+        public event Action HotbarChanged;
 
         public IReadOnlyList<InventorySlot> Slots => slots;
         public int SlotCount => DefaultSlotCount;
@@ -86,12 +100,37 @@ namespace CIS2991Project.Player
         private void Awake()
         {
             EnsureSlotCount();
+            EnsureHotbarCount();
             playerHealth = GetComponent<PlayerHealth>();
+            GrantStartingItems();
+        }
+
+        private void Update()
+        {
+            for (var hotbarIndex = 0; hotbarIndex < HotbarSlotCount; hotbarIndex++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha1 + hotbarIndex))
+                {
+                    TryUseHotbarSlot(hotbarIndex);
+                }
+            }
+        }
+
+        private void GrantStartingItems()
+        {
+            foreach (var starterItem in startingItems)
+            {
+                if (starterItem.item != null)
+                {
+                    TryAdd(starterItem.item, Mathf.Max(1, starterItem.amount));
+                }
+            }
         }
 
         private void OnValidate()
         {
             EnsureSlotCount();
+            EnsureHotbarCount();
         }
 
         public bool Add(global::Item item, int amount = 1)
@@ -321,17 +360,59 @@ namespace CIS2991Project.Player
                 return false;
             }
 
-            if (slot.Item.itemType == global::ItemType.Weapon)
+            var newItem = slot.Item;
+            var isWeapon = newItem.itemType == global::ItemType.Weapon;
+            var previousItem = isWeapon ? equippedWeapon : equippedArmor;
+
+            // Pull the new item out of the bag, then hand the old one back to the bag.
+            slot.Remove(1);
+            if (previousItem != null)
             {
-                equippedWeapon = slot.Item;
+                TryAdd(previousItem, 1);
             }
-            else if (slot.Item.itemType == global::ItemType.Armor)
+
+            if (isWeapon)
             {
-                equippedArmor = slot.Item;
+                equippedWeapon = newItem;
+            }
+            else
+            {
+                equippedArmor = newItem;
             }
 
             EquipmentChanged?.Invoke();
             InventoryChanged?.Invoke();
+            return true;
+        }
+
+        public bool TryUnequipWeapon()
+        {
+            return TryUnequip(isWeapon: true);
+        }
+
+        public bool TryUnequipArmor()
+        {
+            return TryUnequip(isWeapon: false);
+        }
+
+        private bool TryUnequip(bool isWeapon)
+        {
+            var item = isWeapon ? equippedWeapon : equippedArmor;
+            if (item == null || !TryAdd(item, 1))
+            {
+                return false;
+            }
+
+            if (isWeapon)
+            {
+                equippedWeapon = null;
+            }
+            else
+            {
+                equippedArmor = null;
+            }
+
+            EquipmentChanged?.Invoke();
             return true;
         }
 
@@ -352,6 +433,81 @@ namespace CIS2991Project.Player
             }
 
             return false;
+        }
+
+        public bool IsValidHotbarSlot(int hotbarIndex)
+        {
+            return hotbarIndex >= 0 && hotbarIndex < HotbarSlotCount;
+        }
+
+        public global::Item GetHotbarItem(int hotbarIndex)
+        {
+            return IsValidHotbarSlot(hotbarIndex) ? hotbarItems[hotbarIndex] : null;
+        }
+
+        public bool SetHotbarItem(int hotbarIndex, global::Item item)
+        {
+            if (!IsValidHotbarSlot(hotbarIndex))
+            {
+                return false;
+            }
+
+            if (item != null && !IsEquipment(item) && item.itemType != global::ItemType.Consumable)
+            {
+                return false;
+            }
+
+            hotbarItems[hotbarIndex] = item;
+            HotbarChanged?.Invoke();
+            return true;
+        }
+
+        public bool TryUseHotbarSlot(int hotbarIndex)
+        {
+            var item = GetHotbarItem(hotbarIndex);
+            if (item == null)
+            {
+                return false;
+            }
+
+            if (IsEquipment(item))
+            {
+                return TryEquip(item);
+            }
+
+            if (item.itemType != global::ItemType.Consumable)
+            {
+                return false;
+            }
+
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                if (!slots[slotIndex].IsEmpty && ItemsMatch(slots[slotIndex].Item, item))
+                {
+                    return TryUseAt(slotIndex);
+                }
+            }
+
+            return false;
+        }
+
+        public int GetItemCount(global::Item item)
+        {
+            if (item == null)
+            {
+                return 0;
+            }
+
+            var count = 0;
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                if (!slots[slotIndex].IsEmpty && ItemsMatch(slots[slotIndex].Item, item))
+                {
+                    count += slots[slotIndex].Amount;
+                }
+            }
+
+            return count;
         }
 
         public bool HasItem(global::Item item)
@@ -473,6 +629,20 @@ namespace CIS2991Project.Player
             while (slots.Count > DefaultSlotCount)
             {
                 slots.RemoveAt(slots.Count - 1);
+            }
+        }
+
+        private void EnsureHotbarCount()
+        {
+            if (hotbarItems == null)
+            {
+                hotbarItems = new global::Item[HotbarSlotCount];
+                return;
+            }
+
+            if (hotbarItems.Length != HotbarSlotCount)
+            {
+                Array.Resize(ref hotbarItems, HotbarSlotCount);
             }
         }
 

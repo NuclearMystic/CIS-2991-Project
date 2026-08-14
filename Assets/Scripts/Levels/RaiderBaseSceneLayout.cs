@@ -1,13 +1,9 @@
 using UnityEngine;
-using CIS2991Project.Enemies;
 using CIS2991Project.Items;
 
 namespace CIS2991Project.Levels
 {
-    /// <summary>
-    /// Five zombie encounters which unlock one at a time. Each level requires five more
-    /// kills than the previous one, giving the player a gentle ramp into the final wave.
-    /// </summary>
+    // Placeholder raider base layout, generated in code until the scene gets hand-placed scenery.
     public sealed class RaiderBaseSceneLayout : MonoBehaviour
     {
         [SerializeField] private Sprite wall;
@@ -17,8 +13,6 @@ namespace CIS2991Project.Levels
         [SerializeField] private Sprite pistol;
         [SerializeField] private Sprite bandage;
         [SerializeField] private Sprite playerSprite;
-        [SerializeField] private Sprite raiderSprite;
-        [SerializeField] private Sprite bulletSprite;
         [SerializeField] private global::Item bandageItem;
         [SerializeField] private global::Item ammoItem;
         [SerializeField] private global::Item pistolItem;
@@ -26,20 +20,11 @@ namespace CIS2991Project.Levels
         [SerializeField] private Sprite vendingMachine;
         [SerializeField] private Sprite debris;
         [SerializeField] private Sprite truck;
-        [Header("PostApocalypse Tiles and Combat Sheets")]
+        [Header("PostApocalypse Tiles")]
         [SerializeField] private Sprite backgroundTileSet;
         [SerializeField] private Sprite buildingTileSet;
-        [SerializeField] private Sprite zombieAttackSheet;
-        [SerializeField] private Sprite enemyShotOneSheet;
-        [SerializeField] private Sprite enemyShotTwoSheet;
 
-        private const int LevelCount = 5;
-        private const int FirstLevelKills = 5;
-        private const int KillIncreasePerLevel = 5;
-        private const float MinimumSpawnDistanceFromPlayer = 4f;
-        private const float SpawnRadius = 2.25f;
-
-        private static readonly Vector2[] LevelCenters =
+        private static readonly Vector2[] CampCenters =
         {
             new Vector2(-4.6f, 4.7f),
             new Vector2(2.3f, 5.5f),
@@ -48,21 +33,9 @@ namespace CIS2991Project.Levels
             new Vector2(9.3f, -5.1f)
         };
 
-        public int CurrentLevel { get; private set; }
-        public int KillsThisLevel { get; private set; }
-        public int KillsRequiredThisLevel => CurrentLevel == 0 ? 0 : KillsForLevel(CurrentLevel);
-        public bool IsComplete { get; private set; }
-        private bool _awaitingCharacterChoice;
-
         private void Awake()
         {
             Build();
-            DemoEnemy.ZombieKilled += RegisterZombieKill;
-        }
-
-        private void OnDestroy()
-        {
-            DemoEnemy.ZombieKilled -= RegisterZombieKill;
         }
 
         private void Build()
@@ -76,11 +49,11 @@ namespace CIS2991Project.Levels
             Prop("Tire Pile", tire, new Vector2(-9.4f, 4.3f), 2);
             Prop("Street Debris A", debris, new Vector2(-3.3f, -1.7f), 2);
             Prop("Street Debris B", debris, new Vector2(5.8f, 1.3f), 2);
-            Camp("Level 1 - Lookouts", LevelCenters[0], 1, KillsForLevel(1), "slow patrols");
-            Camp("Level 2 - Wreckers", LevelCenters[1], 2, KillsForLevel(2), "mixed patrols");
-            Camp("Level 3 - Garage", LevelCenters[2], 3, KillsForLevel(3), "crossfire lanes");
-            Camp("Level 4 - Barracks", LevelCenters[3], 4, KillsForLevel(4), "fast response");
-            Camp("Level 5 - Boss Stash", LevelCenters[4], 5, KillsForLevel(5), "high pressure finale");
+            Camp("Camp 1", CampCenters[0], 1);
+            Camp("Camp 2", CampCenters[1], 2);
+            Camp("Camp 3", CampCenters[2], 3);
+            Camp("Camp 4", CampCenters[3], 4);
+            Camp("Camp 5", CampCenters[4], 5);
             TileSetFeature("Damaged Building A", new Vector2(-8.5f, 5.5f), new Vector2(2.1f, 2.1f));
             TileSetFeature("Damaged Building B", new Vector2(10.8f, 3.6f), new Vector2(1.7f, 1.7f));
             Anchor("RaiderBaseSpawn", new Vector2(-12.2f, 0f));
@@ -96,97 +69,8 @@ namespace CIS2991Project.Levels
 
             if (player != null)
             {
-                var shooter = player.GetComponent<CIS2991Project.Player.PlayerShoot>();
-                if (shooter != null)
-                    shooter.ConfigureProjectileVisual(bulletSprite);
-
                 GiveStarterLoadout(player.GetComponent<CIS2991Project.Player.PlayerInventory>());
             }
-
-            _awaitingCharacterChoice = true;
-        }
-
-        private void Update()
-        {
-            if (_awaitingCharacterChoice || IsComplete || CurrentLevel == 0 || KillsThisLevel < KillsRequiredThisLevel || DemoEnemy.ActiveZombieCount > 0)
-                return;
-
-            if (CurrentLevel == LevelCount)
-            {
-                IsComplete = true;
-                return;
-            }
-
-            StartLevel(CurrentLevel + 1);
-        }
-
-        private void RegisterZombieKill()
-        {
-            if (!IsComplete && CurrentLevel > 0)
-                KillsThisLevel = Mathf.Min(KillsThisLevel + 1, KillsRequiredThisLevel);
-        }
-
-        private void StartLevel(int level)
-        {
-            CurrentLevel = level;
-            KillsThisLevel = 0;
-            SpawnEncounter(LevelCenters[level - 1], level, KillsForLevel(level), .65f + level * .15f);
-        }
-
-        private void OnGUI()
-        {
-            if (!_awaitingCharacterChoice)
-                return;
-
-            const float width = 460f;
-            const float height = 210f;
-            var x = (Screen.width - width) * .5f;
-            var y = (Screen.height - height) * .5f;
-            GUI.Box(new Rect(x, y, width, height), "Choose your survivor");
-            GUI.Label(new Rect(x + 28f, y + 40f, width - 56f, 42f),
-                "Pick a combat style. Your choice changes the character animation and starting stance.");
-            if (GUI.Button(new Rect(x + 28f, y + 105f, 185f, 62f), "1  Gunner\nPistol stance"))
-                ChooseCharacter(false);
-            if (GUI.Button(new Rect(x + 247f, y + 105f, 185f, 62f), "2  Scout\nShotgun stance"))
-                ChooseCharacter(true);
-        }
-
-        private void ChooseCharacter(bool shotgunStance)
-        {
-            _awaitingCharacterChoice = false;
-            StartLevel(1);
-        }
-
-        private void SpawnEncounter(Vector2 center, int tier, int count, float speed)
-        {
-            var drops = tier >= 4
-                ? new[] { bandageItem, ammoItem, pistolItem }
-                : new[] { bandageItem, ammoItem };
-            for (var index = 0; index < count; index++)
-            {
-                var spawnPosition = RandomSpawnPosition(center);
-                var patrolDirection = Random.insideUnitCircle.normalized;
-                if (patrolDirection == Vector2.zero)
-                    patrolDirection = Vector2.right;
-                DemoEnemy.Spawn(spawnPosition, spawnPosition + patrolDirection * 1.2f, raiderSprite, ammoCrate, drops, tier + 1, speed,
-                    zombieAttackSheet, enemyShotOneSheet, enemyShotTwoSheet);
-            }
-        }
-
-        private static Vector2 RandomSpawnPosition(Vector2 center)
-        {
-            var player = Object.FindAnyObjectByType<CIS2991Project.Player.PlayerHealth>();
-            for (var attempt = 0; attempt < 24; attempt++)
-            {
-                var candidate = center + Random.insideUnitCircle * SpawnRadius;
-                if (player == null || Vector2.Distance(candidate, player.transform.position) >= MinimumSpawnDistanceFromPlayer)
-                    return candidate;
-            }
-
-            var safeDirection = player == null
-                ? Vector2.up
-                : (center - (Vector2)player.transform.position).normalized;
-            return center + safeDirection * SpawnRadius;
         }
 
         private void GiveStarterLoadout(CIS2991Project.Player.PlayerInventory inventory)
@@ -202,11 +86,6 @@ namespace CIS2991Project.Levels
                 inventory.TryAdd(bandageItem, 2);
 
             inventory.TryEquip(pistolItem);
-        }
-
-        private static int KillsForLevel(int level)
-        {
-            return FirstLevelKills + (level - 1) * KillIncreasePerLevel;
         }
 
         private void Fence()
@@ -248,7 +127,7 @@ namespace CIS2991Project.Levels
             renderer.sortingOrder = -4;
         }
 
-        private void Camp(string name, Vector2 center, int tier, int enemies, string pacing)
+        private void Camp(string name, Vector2 center, int tier)
         {
             Block(name + " Zone", center, new Vector2(5.3f, 4.1f), new Color(.34f, .29f, .22f, .42f), -5);
             Prop(name + " Barricade", container, center + new Vector2(0f, 1.35f), 1);
@@ -259,9 +138,6 @@ namespace CIS2991Project.Levels
             Pickup(name + " Ammo Pickup", ammoCrate, ammoItem, center + new Vector2(1.55f, -.9f), tier + 1);
             if (tier >= 3) Pickup(name + " Pistol Pickup", pistol, pistolItem, center + new Vector2(.5f, -.75f), 1);
             if (tier == 5) Pickup(name + " Bandage Pickup", bandage, bandageItem, center + new Vector2(-.5f, -.75f), 2);
-            Anchor($"RaiderTier{tier}_Spawn_{pacing.Replace(" ", "_")}", center + new Vector2(0f, .15f));
-            Anchor($"RaiderTier{tier}_EnemyCount_{enemies}", center + new Vector2(-1f, .2f));
-            Anchor($"RaiderTier{tier}_LootAmmo", center + new Vector2(1.55f, -.9f));
         }
 
         private static void Block(string name, Vector2 position, Vector2 size, Color color, int order)

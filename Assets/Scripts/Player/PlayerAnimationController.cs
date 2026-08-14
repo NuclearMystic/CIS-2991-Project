@@ -65,7 +65,7 @@ namespace CIS2991Project.Player
 
             var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             var isMoving = input != Vector2.zero;
-            if (isMoving)
+            if (isMoving && !Input.GetButton("Fire2"))
                 _facing = DetermineFacing(input);
 
             _animator.SetInteger("Direction", (int)_facing);
