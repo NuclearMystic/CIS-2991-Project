@@ -84,6 +84,7 @@ namespace CIS2991Project.UI
         private double _lastClickTime = -1d;
         private GUIStyle _centeredLabelStyle;
         private int _draggedInventorySlot = -1;
+        private SupplyShop sceneSupplyShop;
 
         // Plain GUI.Label has no background box, unlike GUI.Button, so it's safe to draw
         // on top of a slot's background texture without covering it back up.
@@ -177,6 +178,7 @@ namespace CIS2991Project.UI
             nextY = DrawAmmo(nextY);
 
             DrawMoneyHud();
+            DrawSupplyShopShortcut();
             DrawHotbar();
             DrawEquipmentSlots();
             DrawReloadBar();
@@ -337,6 +339,32 @@ namespace CIS2991Project.UI
             if (playerInventory != null)
             {
                 GUI.Label(moneyRect, $"Caps: {playerInventory.Currency}", CenteredLabelStyle);
+            }
+        }
+
+        // Keep the shop reachable even if a level's doorway collider is obstructed by scenery.
+        // The button only appears in scenes that actually contain a SupplyShop.
+        private void DrawSupplyShopShortcut()
+        {
+            if (playerInventory == null || SupplyShop.IsAnyShopOpen)
+            {
+                return;
+            }
+
+            if (sceneSupplyShop == null)
+            {
+                sceneSupplyShop = Object.FindAnyObjectByType<SupplyShop>();
+            }
+
+            if (sceneSupplyShop == null)
+            {
+                return;
+            }
+
+            var buttonRect = new Rect(Screen.width - moneyWidth - 16f, 56f, moneyWidth, 36f);
+            if (GUI.Button(buttonRect, "BUY SUPPLIES"))
+            {
+                sceneSupplyShop.Open(playerInventory);
             }
         }
 

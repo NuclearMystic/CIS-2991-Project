@@ -7,7 +7,7 @@
             <ui:VisualElement name="ButtonContainer" style="flex-grow: 1; justify-content: center; align-items: center;">
                 <ui:Button text="Play&#10;" name="Play" class="main-menu-button play-button"/>
                 <ui:Button text="Load" name="Load" class="main-menu-button load-button"/>
-                <ui:Button text="Supplies Shop" name="SupplyShop" class="main-menu-button shop-button"/>
+                <ui:Button text="BUY SUPPLIES" name="SupplyShop" class="main-menu-button shop-button"/>
                 <ui:Button text="Settings" name="Settings" class="main-menu-button settings-button"/>
                 <ui:Button text="Quit&#10;" name="Quit" class="main-menu-button quit-button"/>
             </ui:VisualElement>
