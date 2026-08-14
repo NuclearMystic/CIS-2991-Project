@@ -1,5 +1,4 @@
 using CIS2991Project.Player;
-using CIS2991Project.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -65,7 +64,6 @@ namespace CIS2991Project.Managers
 
             var playerObject = Instantiate(prefab, FindSpawnPoint(null), Quaternion.identity);
             playerObject.name = "Player";
-            MainMenuShopSession.ApplyPendingPurchases(playerObject.GetComponent<PlayerInventory>());
         }
 
         private static Vector3 FindSpawnPoint(CharacterSheet characterSheet)

@@ -7,7 +7,6 @@
             <ui:VisualElement name="ButtonContainer" style="flex-grow: 1; justify-content: center; align-items: center;">
                 <ui:Button text="Play&#10;" name="Play" class="main-menu-button play-button"/>
                 <ui:Button text="Load" name="Load" class="main-menu-button load-button"/>
-                <ui:Button text="BUY SUPPLIES" name="SupplyShop" class="main-menu-button shop-button"/>
                 <ui:Button text="Settings" name="Settings" class="main-menu-button settings-button"/>
                 <ui:Button text="Quit&#10;" name="Quit" class="main-menu-button quit-button"/>
             </ui:VisualElement>
@@ -49,16 +48,6 @@
                     <ui:Label text="Label" name="EmptySaveSlot3"/>
                 </ui:VisualElement>
                 <ui:Button text="Back" name="LoadBackButton" class="back-button"/>
-            </ui:VisualElement>
-        </ui:VisualElement>
-        <ui:VisualElement name="ShopContainer" class="shop-container">
-            <ui:VisualElement name="ShopWindow" class="shop-window">
-                <ui:Label text="SUPPLIES SHOP" name="ShopTitle" class="shop-title"/>
-                <ui:VisualElement class="shop-divider"/>
-                <ui:Label text="Caps: 0" name="ShopCurrencyLabel" class="shop-currency"/>
-                <ui:Label text="Choose supplies for your starting loadout." name="ShopStatusLabel" class="shop-status"/>
-                <ui:ScrollView name="ShopList" class="shop-list" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Auto"/>
-                <ui:Button text="Back" name="ShopBackButton" class="back-button"/>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

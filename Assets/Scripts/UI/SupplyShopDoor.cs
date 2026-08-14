@@ -4,21 +4,14 @@ using UnityEngine;
 namespace CIS2991Project.UI
 {
     /// <summary>
-    /// Shows a Buy prompt when the player walks through this trigger, then opens the linked
-    /// <see cref="SupplyShop"/> after the prompt is clicked. Place it over a building doorway
-    /// and size its BoxCollider2D to match the door art.
+    /// Opens the linked <see cref="SupplyShop"/> the instant the player walks through this
+    /// trigger. Place it set back inside a building doorway (so the player has to actually
+    /// step through the door to reach it) and size its BoxCollider2D to match the door art.
     /// </summary>
     [RequireComponent(typeof(BoxCollider2D))]
     public sealed class SupplyShopDoor : MonoBehaviour
     {
         [SerializeField] private SupplyShop shop;
-
-        [Header("Optional prompt art")]
-        [Tooltip("Shown on the doorway Buy button. Leave empty to use Unity's standard GUI button.")]
-        [SerializeField] private Texture2D buyButtonGraphic;
-
-        private PlayerInventory playerAtDoor;
-        private GUIStyle buyLabelStyle;
 
         private void Reset()
         {
@@ -40,7 +33,7 @@ namespace CIS2991Project.UI
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (shop == null)
+            if (shop == null || SupplyShop.IsAnyShopOpen)
             {
                 return;
             }
@@ -48,68 +41,7 @@ namespace CIS2991Project.UI
             var playerInventory = other.GetComponentInParent<PlayerInventory>();
             if (playerInventory != null)
             {
-                playerAtDoor = playerInventory;
-            }
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            var playerInventory = other.GetComponentInParent<PlayerInventory>();
-            if (playerInventory != null && playerInventory == playerAtDoor)
-            {
-                playerAtDoor = null;
-            }
-        }
-
-        private void OnGUI()
-        {
-            if (playerAtDoor == null || shop == null || SupplyShop.IsAnyShopOpen)
-            {
-                return;
-            }
-
-            const float panelWidth = 210f;
-            const float panelHeight = 88f;
-            var panelRect = new Rect(
-                (Screen.width - panelWidth) * 0.5f,
-                Screen.height - panelHeight - 36f,
-                panelWidth,
-                panelHeight);
-
-            GUI.Box(panelRect, "Supplies");
-            var buyRect = new Rect(panelRect.x + 18f, panelRect.y + 38f, panelRect.width - 36f, 36f);
-            if (DrawBuyButton(buyRect))
-            {
-                shop.Open(playerAtDoor);
-            }
-        }
-
-        private bool DrawBuyButton(Rect rect)
-        {
-            var clicked = GUI.Button(rect, buyButtonGraphic == null ? "BUY" : string.Empty);
-            if (buyButtonGraphic != null)
-            {
-                GUI.DrawTexture(rect, buyButtonGraphic, ScaleMode.ScaleToFit);
-                GUI.Label(rect, "BUY", BuyLabelStyle);
-            }
-
-            return clicked;
-        }
-
-        private GUIStyle BuyLabelStyle
-        {
-            get
-            {
-                if (buyLabelStyle == null)
-                {
-                    buyLabelStyle = new GUIStyle(GUI.skin.label)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        fontStyle = FontStyle.Bold
-                    };
-                }
-
-                return buyLabelStyle;
+                shop.Open(playerInventory);
             }
         }
     }
