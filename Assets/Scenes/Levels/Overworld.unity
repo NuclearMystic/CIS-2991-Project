@@ -55231,6 +55231,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Enemies.EnemySpawnPoint
   enemyPrefab: {fileID: 2072713600357791851, guid: 3a2d44e1f302905419d94f422cf5411c, type: 3}
+  spawnCount: 5
+  groupRadius: 4
 --- !u!1 &686812656
 GameObject:
   m_ObjectHideFlags: 0

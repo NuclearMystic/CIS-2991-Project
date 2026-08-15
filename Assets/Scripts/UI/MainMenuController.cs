@@ -26,7 +26,9 @@ namespace CIS2991Project.UI
         private VisualElement loadContainer;
         private Button loadBackButton;
 
-        private void Awake()
+        // UIDocument finishes building its visual tree before Start. Initializing here ensures
+        // the menu's shop controls are found and their click callbacks are always registered.
+        private void Start()
         {
             if (uiDocument == null)
                 uiDocument = GetComponent<UIDocument>();

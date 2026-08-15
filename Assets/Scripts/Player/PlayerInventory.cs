@@ -76,6 +76,10 @@ namespace CIS2991Project.Player
         [SerializeField] private global::Item equippedArmor;
         [SerializeField] private global::Item[] hotbarItems = new global::Item[HotbarSlotCount];
 
+        [Header("Currency")]
+        [Tooltip("Currency carried by this player. Shops use this balance when an item is purchased.")]
+        [SerializeField, Min(0)] private int currency = 60;
+
         [Header("Testing")]
         [Tooltip("Granted once, the first time this inventory spawns. Handy for dropping in test items.")]
         [SerializeField] private List<StarterItem> startingItems = new();
@@ -94,6 +98,7 @@ namespace CIS2991Project.Player
         public global::Item EquippedWeapon => equippedWeapon;
         public global::Item EquippedArmor => equippedArmor;
         public string LastMessage => lastMessage;
+        public int Currency => currency;
         public int OccupiedSlotCount => CountOccupiedSlots();
         public int EmptySlotCount => DefaultSlotCount - OccupiedSlotCount;
 
@@ -294,6 +299,44 @@ namespace CIS2991Project.Player
             }
 
             return foundAmount >= amount;
+        }
+
+        /// <summary>
+        /// Attempts to pay the requested amount. A failed payment never changes the balance.
+        /// </summary>
+        public bool TrySpendCurrency(int amount)
+        {
+            if (amount < 0 || currency < amount)
+            {
+                return false;
+            }
+
+            currency -= amount;
+            InventoryChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
+        /// Adds currency earned from future loot, quests, or selling items.
+        /// </summary>
+        public void AddCurrency(int amount)
+        {
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            currency += amount;
+            InventoryChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Sets the current balance. Used when a pre-game shop purchase is carried into gameplay.
+        /// </summary>
+        public void SetCurrency(int amount)
+        {
+            currency = Mathf.Max(0, amount);
+            InventoryChanged?.Invoke();
         }
 
         public bool TryDropAt(int slotIndex, int amount = 1)

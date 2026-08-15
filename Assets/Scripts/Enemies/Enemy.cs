@@ -41,6 +41,7 @@ namespace CIS2991Project.Enemies
         private Animator _animator;
         private PlayerHealth _player;
         private CharacterSheet _playerCharacterSheet;
+        private PlayerInventory _playerInventory;
 
         private State _state = State.Patrol;
         private Vector2 _homePosition;
@@ -71,6 +72,7 @@ namespace CIS2991Project.Enemies
 
             _player = Object.FindAnyObjectByType<PlayerHealth>();
             _playerCharacterSheet = _player != null ? _player.GetComponent<CharacterSheet>() : null;
+            _playerInventory = _player != null ? _player.GetComponent<PlayerInventory>() : null;
         }
 
         private void Update()
@@ -238,6 +240,7 @@ namespace CIS2991Project.Enemies
 
             DropLoot();
             _playerCharacterSheet?.AddExperience(definition.expReward);
+            _playerInventory?.AddCurrency(definition.capsReward);
 
             Destroy(gameObject, deathAnimationSeconds);
         }

@@ -38,6 +38,12 @@ namespace CIS2991Project.UI
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
+                if (SupplyShop.IsAnyShopOpen)
+                {
+                    SupplyShop.CloseActiveShop();
+                    return;
+                }
+
                 SetPaused(!_isPaused);
             }
         }

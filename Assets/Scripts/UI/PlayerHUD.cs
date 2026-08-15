@@ -331,7 +331,13 @@ namespace CIS2991Project.UI
 
         private void DrawMoneyHud()
         {
-            DrawSlot(new Rect(Screen.width - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
+            var moneyRect = new Rect(Screen.width - moneyWidth - 16f, 16f, moneyWidth, moneyHeight);
+            DrawSlot(moneyRect, moneyTexture);
+
+            if (playerInventory != null)
+            {
+                GUI.Label(moneyRect, $"Caps: {playerInventory.Currency}", CenteredLabelStyle);
+            }
         }
 
         private void DrawEquipmentSlots()
