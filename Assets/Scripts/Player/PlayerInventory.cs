@@ -76,6 +76,11 @@ namespace CIS2991Project.Player
         [SerializeField] private global::Item equippedArmor;
         [SerializeField] private global::Item[] hotbarItems = new global::Item[HotbarSlotCount];
 
+        [Tooltip("Automatically equipped as the weapon whenever nothing else is - after unequipping, " +
+                 "dropping/using the equipped weapon away, or at game start. Never enters the bag and " +
+                 "can't be unequipped through the normal unequip action. Leave empty to allow being truly unarmed.")]
+        [SerializeField] private global::Item fistsItem;
+
         [Header("Testing")]
         [Tooltip("Granted once, the first time this inventory spawns. Handy for dropping in test items.")]
         [SerializeField] private List<StarterItem> startingItems = new();
@@ -94,6 +99,7 @@ namespace CIS2991Project.Player
         public int SlotCount => DefaultSlotCount;
         public global::Item EquippedWeapon => equippedWeapon;
         public global::Item EquippedArmor => equippedArmor;
+        public global::Item FistsItem => fistsItem;
         public string LastMessage => lastMessage;
         public int OccupiedSlotCount => CountOccupiedSlots();
         public int EmptySlotCount => DefaultSlotCount - OccupiedSlotCount;
@@ -104,6 +110,7 @@ namespace CIS2991Project.Player
             EnsureHotbarCount();
             playerHealth = GetComponent<PlayerHealth>();
             GrantStartingItems();
+            SetEquippedWeapon(equippedWeapon);
         }
 
         private void Update()
@@ -373,16 +380,17 @@ namespace CIS2991Project.Player
             var isWeapon = newItem.itemType == global::ItemType.Weapon;
             var previousItem = isWeapon ? equippedWeapon : equippedArmor;
 
-            // Pull the new item out of the bag, then hand the old one back to the bag.
+            // Pull the new item out of the bag, then hand the old one back to the bag - unless it's
+            // fists, which never occupies a bag slot to begin with.
             slot.Remove(1);
-            if (previousItem != null)
+            if (previousItem != null && previousItem != fistsItem)
             {
                 TryAdd(previousItem, 1);
             }
 
             if (isWeapon)
             {
-                equippedWeapon = newItem;
+                SetEquippedWeapon(newItem);
             }
             else
             {
@@ -407,14 +415,15 @@ namespace CIS2991Project.Player
         private bool TryUnequip(bool isWeapon)
         {
             var item = isWeapon ? equippedWeapon : equippedArmor;
-            if (item == null || !TryAdd(item, 1))
+            // Fists aren't a bag item and can't be unequipped - there's nothing to hand over to.
+            if (item == null || item == fistsItem || !TryAdd(item, 1))
             {
                 return false;
             }
 
             if (isWeapon)
             {
-                equippedWeapon = null;
+                SetEquippedWeapon(null);
             }
             else
             {
@@ -655,6 +664,13 @@ namespace CIS2991Project.Player
             }
         }
 
+        // Falls back to fistsItem instead of leaving the weapon slot empty - the player should always
+        // have some way to attack.
+        private void SetEquippedWeapon(global::Item item)
+        {
+            equippedWeapon = item != null ? item : fistsItem;
+        }
+
         private void SetMessage(string message)
         {
             if (lastMessage == message)
@@ -672,7 +688,7 @@ namespace CIS2991Project.Player
 
             if (ItemsMatch(equippedWeapon, removedItem) && !CanRemove(equippedWeapon, 1))
             {
-                equippedWeapon = null;
+                SetEquippedWeapon(null);
                 changedEquipment = true;
             }
 

@@ -60,8 +60,10 @@ namespace CIS2991Project.UI
                 return;
             }
 
-            var panelX = (Screen.width - PanelWidth) / 2f;
-            var panelY = (Screen.height - PanelHeight) / 2f;
+            GuiScale.Begin();
+
+            var panelX = (GuiScale.ReferenceWidth - PanelWidth) / 2f;
+            var panelY = (GuiScale.ReferenceHeight - PanelHeight) / 2f;
             var buttonX = panelX + (PanelWidth - ButtonWidth) / 2f;
 
             GUI.Box(new Rect(panelX, panelY, PanelWidth, PanelHeight), string.Empty);

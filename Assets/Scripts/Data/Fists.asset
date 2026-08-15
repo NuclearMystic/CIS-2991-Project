@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
+  m_Name: Fists
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  id: weapon_fists
+  displayName: Fists
+  description: Your own two hands. Not much, but always available.
+  icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  itemType: 0
+  stackable: 0
+  maxStackSize: 1
+  value: 0
+  damage: 2
+  weaponCategory: 1
+  ammoType: 0
+  ammoCapacity: 6
+  meleeRange: 0.9
+  meleeAttackCooldown: 0.4
+  hitSound: {fileID: 8300000, guid: 25af0e197cda9934db0dd238ae087799, type: 3}
+  defense: 0
+  healthRestore: 0
+  equippedSpriteDown: {fileID: 0}
+  equippedSpriteUp: {fileID: 0}
+  equippedSpriteLeft: {fileID: 0}
+  equippedSpriteRight: {fileID: 0}
+  equippedOffsetDown: {x: 0, y: 0}
+  equippedOffsetUp: {x: 0, y: 0}
+  equippedOffsetLeft: {x: 0, y: 0}
+  equippedOffsetRight: {x: 0, y: 0}
+  attackFramesDown:
+  - {fileID: -838234885, guid: de7c097014e3f274a9dd83008db5a9e7, type: 3}
+  - {fileID: -214687773, guid: de7c097014e3f274a9dd83008db5a9e7, type: 3}
+  - {fileID: 103145717, guid: de7c097014e3f274a9dd83008db5a9e7, type: 3}
+  - {fileID: -2043592869, guid: de7c097014e3f274a9dd83008db5a9e7, type: 3}
+  attackFramesUp:
+  - {fileID: 78610352, guid: bf250fa588f3e9f4fa21efd92a5e7aab, type: 3}
+  - {fileID: 64260023, guid: bf250fa588f3e9f4fa21efd92a5e7aab, type: 3}
+  - {fileID: -435577784, guid: bf250fa588f3e9f4fa21efd92a5e7aab, type: 3}
+  - {fileID: -1923180388, guid: bf250fa588f3e9f4fa21efd92a5e7aab, type: 3}
+  attackFramesLeft:
+  - {fileID: -1730046327, guid: d44316a0a2a5748438e5ae79510843c2, type: 3}
+  - {fileID: 1544678370, guid: d44316a0a2a5748438e5ae79510843c2, type: 3}
+  - {fileID: -1308256554, guid: d44316a0a2a5748438e5ae79510843c2, type: 3}
+  - {fileID: 447556465, guid: d44316a0a2a5748438e5ae79510843c2, type: 3}
+  attackFramesRight:
+  - {fileID: 2108659172, guid: 7753df22b44404643abb3e91359cd236, type: 3}
+  - {fileID: -885059257, guid: 7753df22b44404643abb3e91359cd236, type: 3}
+  - {fileID: -1549637712, guid: 7753df22b44404643abb3e91359cd236, type: 3}
+  - {fileID: 266405348, guid: 7753df22b44404643abb3e91359cd236, type: 3}
+  attackFrameRate: 12
+  statModifiers: []

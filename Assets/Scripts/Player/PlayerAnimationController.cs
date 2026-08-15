@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace CIS2991Project.Player
 {
+    // Animator parameters this drives (must exist on the player's own AnimatorController):
+    //   Direction (int)     0=Down, 1=Up, 2=Left, 3=Right - same convention as Enemy.cs.
+    //   IsMoving  (bool)    true while the movement input is non-zero.
+    //   IsDead    (bool)    true once health hits 0.
+    //   Died      (trigger) fired once, at the moment of death.
+    // Attack/swing visuals are handled entirely by PlayerWeaponVisual's per-weapon frame arrays, not
+    // by this Animator - the body itself has no attack state.
     [RequireComponent(typeof(Animator))]
     public sealed class PlayerAnimationController : MonoBehaviour
     {
@@ -30,15 +37,19 @@ namespace CIS2991Project.Player
         private AnimatorOverrideController _overrideController;
         private PlayerHealth _health;
         private PlayerInventory _inventory;
+        private PlayerWeaponVisual _weaponVisual;
         private readonly List<KeyValuePair<AnimationClip, AnimationClip>> _overrideBuffer = new();
         private FacingDirection _facing = FacingDirection.Down;
         private bool _isDead;
+        private bool _equipmentArmed;
+        private bool? _appliedArmedPose;
 
         private void Awake()
         {
             _animator = GetComponent<Animator>();
             _health = GetComponent<PlayerHealth>();
             _inventory = GetComponent<PlayerInventory>();
+            _weaponVisual = GetComponentInChildren<PlayerWeaponVisual>();
 
             _overrideController = _animator.runtimeAnimatorController as AnimatorOverrideController;
             if (_overrideController == null)
@@ -70,6 +81,8 @@ namespace CIS2991Project.Player
 
             _animator.SetInteger("Direction", (int)_facing);
             _animator.SetBool("IsMoving", isMoving);
+
+            RefreshArmedPose();
         }
 
         private void HandleHealthChanged(int currentHealth, int maxHealth)
@@ -82,7 +95,26 @@ namespace CIS2991Project.Player
 
         private void HandleEquipmentChanged()
         {
-            ApplyWeaponClips(_inventory != null && _inventory.EquippedWeapon != null);
+            var weapon = _inventory != null ? _inventory.EquippedWeapon : null;
+            // Fists are always "equipped" as the no-weapon fallback (see PlayerInventory), but the body
+            // should still look unarmed while holding nothing but its own hands - except while they're
+            // mid-swing, handled by RefreshArmedPose below.
+            _equipmentArmed = weapon != null && weapon != _inventory.FistsItem;
+            RefreshArmedPose();
+        }
+
+        private void RefreshArmedPose()
+        {
+            // The unarmed idle/run clips already draw their own idle arms, which doubles up visually
+            // with the fists' punch overlay frames - borrow the armed pose for the duration of the swing.
+            var isSwingingFists = !_equipmentArmed && _weaponVisual != null && _weaponVisual.IsAttacking;
+            var isArmed = _equipmentArmed || isSwingingFists;
+
+            if (isArmed == _appliedArmedPose)
+                return;
+
+            _appliedArmedPose = isArmed;
+            ApplyWeaponClips(isArmed);
         }
 
         private void ApplyWeaponClips(bool isArmed)

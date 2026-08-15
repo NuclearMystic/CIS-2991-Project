@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b00bce80f1690c4091d289e119b7969, type: 3}
+  m_Name: Mutant_Melee
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Enemies.EnemyDefinition
+  displayName: Mutant
+  maxHealth: 25
+  expReward: 50
+  patrolSpeed: 3
+  chaseSpeed: 6
+  sightRange: 8
+  attackRange: 1
+  attackType: 0
+  attackDamage: 1
+  attackCooldown: 1
+  projectileSprite: {fileID: 0}
+  projectileSpeed: 8
+  projectileLifetime: 3
+  lootTable: []
+  lootSprite: {fileID: 0}
+  lootDropSound: {fileID: 0}

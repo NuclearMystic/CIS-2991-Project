@@ -220,6 +220,8 @@ namespace CIS2991Project.UI
 
         private void OnGUI()
         {
+            GuiScale.Begin();
+
             var nextY = DrawHearts();
             DrawInventoryToggleButton();
             DrawSkillsToggleButton();
@@ -360,12 +362,19 @@ namespace CIS2991Project.UI
                 reloadBarWidth,
                 reloadBarHeight);
 
+            // screenPoint is already a real screen-pixel position from WorldToScreenPoint - draw it
+            // outside the reference-resolution scale so it isn't shifted off the player.
+            var previousMatrix = GUI.matrix;
+            GUI.matrix = Matrix4x4.identity;
+
             DrawSlot(rect, reloadBarBackgroundTexture);
 
             var fillRect = new Rect(rect.x, rect.y, rect.width * playerShoot.ReloadFractionRemaining, rect.height);
             DrawSlot(fillRect, reloadBarFillTexture);
 
             GUI.Label(rect, "Reloading", CenteredLabelStyle);
+
+            GUI.matrix = previousMatrix;
         }
 
         private void DrawPickupPopup()
@@ -393,6 +402,11 @@ namespace CIS2991Project.UI
             const float height = 28f;
             var rect = new Rect(screenPoint.x - width / 2f, Screen.height - screenPoint.y - height / 2f, width, height);
 
+            // screenPoint is already a real screen-pixel position from WorldToScreenPoint - draw it
+            // outside the reference-resolution scale so it isn't shifted off the player.
+            var previousMatrix = GUI.matrix;
+            GUI.matrix = Matrix4x4.identity;
+
             // Plain GUI.Label has no outline, so fake one by stamping the text in black a
             // couple pixels off-center before drawing the green label on top — keeps it
             // readable over bright backgrounds instead of just relying on the bold green.
@@ -410,6 +424,7 @@ namespace CIS2991Project.UI
             GUI.Label(rect, _pickupPopupText, PickupPopupStyle);
 
             GUI.color = previousColor;
+            GUI.matrix = previousMatrix;
         }
 
         private static readonly Vector2[] ShadowOffsets =
@@ -434,7 +449,7 @@ namespace CIS2991Project.UI
 
         private void DrawMoneyHud()
         {
-            DrawSlot(new Rect(Screen.width - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
+            DrawSlot(new Rect(GuiScale.ReferenceWidth - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
         }
 
         private void DrawEquipmentSlots()
@@ -446,8 +461,8 @@ namespace CIS2991Project.UI
 
             const float margin = 16f;
 
-            var weaponRect = new Rect(margin, Screen.height - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
-            var outfitRect = new Rect(margin + equipmentBoxSize + equipmentBoxGap, Screen.height - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
+            var weaponRect = new Rect(margin, GuiScale.ReferenceHeight - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
+            var outfitRect = new Rect(margin + equipmentBoxSize + equipmentBoxGap, GuiScale.ReferenceHeight - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
 
             GUI.Label(new Rect(weaponRect.x, weaponRect.y - 18f, equipmentBoxSize, 18f), "Weapon");
             GUI.Label(new Rect(outfitRect.x, outfitRect.y - 18f, equipmentBoxSize, 18f), "Outfit");
@@ -503,8 +518,8 @@ namespace CIS2991Project.UI
         {
             const int slotCount = PlayerInventory.HotbarSlotCount;
             var totalWidth = slotCount * hotbarSlotSize + (slotCount - 1) * hotbarSlotGap;
-            var startX = (Screen.width - totalWidth) / 2f;
-            var y = Screen.height - hotbarSlotSize - 24f;
+            var startX = (GuiScale.ReferenceWidth - totalWidth) / 2f;
+            var y = GuiScale.ReferenceHeight - hotbarSlotSize - 24f;
 
             for (var hotbarIndex = 0; hotbarIndex < slotCount; hotbarIndex++)
             {
@@ -584,7 +599,7 @@ namespace CIS2991Project.UI
             }
 
             var skills = (SkillType[])System.Enum.GetValues(typeof(SkillType));
-            var startX = Screen.width - skillsPanelWidth - 16f;
+            var startX = GuiScale.ReferenceWidth - skillsPanelWidth - 16f;
             var height = 28f + skills.Length * skillRowHeight + 8f;
 
             DrawSlot(new Rect(startX, startY, skillsPanelWidth, height), skillsPanelBackgroundTexture);

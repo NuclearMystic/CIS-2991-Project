@@ -1,4 +1,5 @@
 using System.Collections;
+using CIS2991Project.Managers;
 using CIS2991Project.Player;
 using UnityEngine;
 
@@ -66,6 +67,7 @@ namespace CIS2991Project.Items
 
             var source = go.AddComponent<AudioSource>();
             source.clip = clip;
+            source.outputAudioMixerGroup = AudioManager.SfxGroup;
             source.spatialBlend = 0f;
             source.Play();
 
