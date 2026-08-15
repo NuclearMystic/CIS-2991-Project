@@ -15,16 +15,28 @@ MonoBehaviour:
   displayName: Mutant
   maxHealth: 25
   expReward: 50
-  patrolSpeed: 3
-  chaseSpeed: 6
+  patrolSpeed: 1
+  chaseSpeed: 2
   sightRange: 8
   attackRange: 1
   attackType: 0
-  attackDamage: 1
+  attackDamage: 3
   attackCooldown: 1
-  projectileSprite: {fileID: 0}
+  projectileSprite: {fileID: 21300000, guid: 726569dee2ad4334681b1910784cd3ae, type: 3}
   projectileSpeed: 8
   projectileLifetime: 3
-  lootTable: []
-  lootSprite: {fileID: 0}
-  lootDropSound: {fileID: 0}
+  lootTable:
+  - item: {fileID: 11400000, guid: b2604b72b3a806a4197b064542430bd4, type: 2}
+    minAmount: 3
+    maxAmount: 6
+  - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+    minAmount: 3
+    maxAmount: 6
+  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+    minAmount: 1
+    maxAmount: 2
+  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+    minAmount: 1
+    maxAmount: 2
+  lootSprite: {fileID: 21300000, guid: d0a2c24fa12e4114a86a2eac1f6f820a, type: 3}
+  lootDropSound: {fileID: 8300000, guid: 0fa2865fc65302c468fb959b4eb1ef3f, type: 3}

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b00bce80f1690c4091d289e119b7969, type: 3}
+  m_Name: Raider_Melee
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Enemies.EnemyDefinition
+  displayName: Raider
+  maxHealth: 15
+  expReward: 25
+  patrolSpeed: 1
+  chaseSpeed: 2
+  sightRange: 10
+  attackRange: 1
+  attackType: 0
+  attackDamage: 2
+  attackCooldown: 1
+  projectileSprite: {fileID: 21300000, guid: 726569dee2ad4334681b1910784cd3ae, type: 3}
+  projectileSpeed: 8
+  projectileLifetime: 3
+  lootTable:
+  - item: {fileID: 11400000, guid: b2604b72b3a806a4197b064542430bd4, type: 2}
+    minAmount: 3
+    maxAmount: 6
+  - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+    minAmount: 3
+    maxAmount: 6
+  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+    minAmount: 1
+    maxAmount: 2
+  - item: {fileID: 11400000, guid: 44dcd2a2c6db01242b242d9a81896ca1, type: 2}
+    minAmount: 1
+    maxAmount: 2
+  - item: {fileID: 11400000, guid: 6e6e301f45e063b4c8ae804b6c321acb, type: 2}
+    minAmount: 1
+    maxAmount: 2
+  lootSprite: {fileID: 21300000, guid: d0a2c24fa12e4114a86a2eac1f6f820a, type: 3}
+  lootDropSound: {fileID: 8300000, guid: 0fa2865fc65302c468fb959b4eb1ef3f, type: 3}

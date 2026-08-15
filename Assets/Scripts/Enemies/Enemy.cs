@@ -58,7 +58,6 @@ namespace CIS2991Project.Enemies
             _body = GetComponent<Rigidbody2D>();
             _body.gravityScale = 0f;
             _body.freezeRotation = true;
-            _body.bodyType = RigidbodyType2D.Kinematic;
 
             _animator = GetComponent<Animator>();
             _currentHealth = definition != null ? definition.maxHealth : 1;
@@ -118,6 +117,7 @@ namespace CIS2991Project.Enemies
             if (toTarget.magnitude < 0.15f)
             {
                 _facingDirection = Vector2.zero;
+                _body.linearVelocity = Vector2.zero;
 
                 if (_patrolPauseRemaining > 0f)
                 {
@@ -131,18 +131,19 @@ namespace CIS2991Project.Enemies
             }
 
             _facingDirection = toTarget.normalized;
-            _body.MovePosition(position + _facingDirection * definition.patrolSpeed * Time.deltaTime);
+            _body.linearVelocity = _facingDirection * definition.patrolSpeed;
         }
 
         private void UpdateChase()
         {
             var position = (Vector2)transform.position;
             _facingDirection = ((Vector2)_player.transform.position - position).normalized;
-            _body.MovePosition(position + _facingDirection * definition.chaseSpeed * Time.deltaTime);
+            _body.linearVelocity = _facingDirection * definition.chaseSpeed;
         }
 
         private void UpdateAttack()
         {
+            _body.linearVelocity = Vector2.zero;
             _facingDirection = ((Vector2)_player.transform.position - (Vector2)transform.position).normalized;
 
             if (_attackCooldownRemaining > 0f)
@@ -225,6 +226,7 @@ namespace CIS2991Project.Enemies
         private void Die()
         {
             _state = State.Dead;
+            _body.linearVelocity = Vector2.zero;
 
             var collider = GetComponent<Collider2D>();
             if (collider != null)
@@ -251,13 +253,13 @@ namespace CIS2991Project.Enemies
                 return;
             }
 
-            var item = definition.lootTable[Random.Range(0, definition.lootTable.Length)];
-            if (item == null)
+            var drop = definition.lootTable[Random.Range(0, definition.lootTable.Length)];
+            if (drop.item == null)
             {
                 return;
             }
 
-            var loot = new GameObject($"Loot_{item.displayName}");
+            var loot = new GameObject($"Loot_{drop.item.displayName}");
             loot.transform.position = transform.position;
 
             var renderer = loot.AddComponent<SpriteRenderer>();
@@ -265,7 +267,7 @@ namespace CIS2991Project.Enemies
             renderer.sortingOrder = 5;
 
             loot.AddComponent<CircleCollider2D>().isTrigger = true;
-            loot.AddComponent<ConsumablePickup>().Configure(item, 1, definition.lootDropSound);
+            loot.AddComponent<ConsumablePickup>().Configure(drop.item, drop.RollAmount(), definition.lootDropSound);
         }
 
         private static int DetermineFacing(Vector2 direction)

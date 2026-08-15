@@ -15,11 +15,11 @@ MonoBehaviour:
   displayName: Mutant
   maxHealth: 25
   expReward: 50
-  patrolSpeed: 3
-  chaseSpeed: 6
+  patrolSpeed: 1
+  chaseSpeed: 2
   sightRange: 8
-  attackRange: 1
-  attackType: 0
+  attackRange: 5
+  attackType: 1
   attackDamage: 1
   attackCooldown: 1
   projectileSprite: {fileID: 0}

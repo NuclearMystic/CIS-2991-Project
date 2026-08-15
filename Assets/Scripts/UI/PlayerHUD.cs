@@ -1,3 +1,4 @@
+using CIS2991Project.Items;
 using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -237,9 +238,16 @@ namespace CIS2991Project.UI
             DrawReloadBar();
             DrawPickupPopup();
 
-            if (inventoryVisible)
+            var chestOpen = ChestInventory.ActiveChest != null;
+
+            if (inventoryVisible || chestOpen)
             {
                 DrawInventoryHud(nextY);
+            }
+
+            if (chestOpen)
+            {
+                DrawChestHud(nextY);
             }
 
             if (skillsVisible)
@@ -695,6 +703,68 @@ namespace CIS2991Project.UI
             if (!string.IsNullOrWhiteSpace(playerInventory.LastMessage))
             {
                 GUI.Label(new Rect(startX + 12f, startY + height - 26f, width - 24f, 20f), playerInventory.LastMessage);
+            }
+        }
+
+        // Mirrors DrawInventoryHud's grid rendering, reading from the currently open ChestInventory
+        // instead of the player's own inventory. Click-to-take only (no drag-and-drop) - clicking a
+        // slot hands its whole stack to the player and clears it from the chest.
+        private void DrawChestHud(float startY)
+        {
+            var chest = ChestInventory.ActiveChest;
+            if (chest == null || playerInventory == null)
+            {
+                return;
+            }
+
+            const int chestColumns = 5;
+            const float margin = 16f;
+            var width = inventoryPanelWidth;
+            var startX = GuiScale.ReferenceWidth - width - margin;
+            var gridStartX = startX + 12f;
+            var gridStartY = startY + inventoryGridTopPadding;
+
+            var slots = chest.Slots;
+            var rowCount = Mathf.Max(1, Mathf.CeilToInt(slots.Count / (float)chestColumns));
+            var height = inventoryGridTopPadding + rowCount * (inventorySlotHeight + inventorySlotGap) + 16f;
+
+            DrawSlot(new Rect(startX, startY, width, height), inventoryBorderTexture);
+            GUI.Label(new Rect(startX + 12f, startY + 4f, width - 24f, 20f), "Chest (click to take)");
+
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                var slot = slots[slotIndex];
+                if (slot.IsEmpty)
+                {
+                    continue;
+                }
+
+                var row = slotIndex / chestColumns;
+                var column = slotIndex % chestColumns;
+                var slotX = gridStartX + column * (inventorySlotWidth + inventorySlotGap);
+                var slotY = gridStartY + row * (inventorySlotHeight + inventorySlotGap);
+                var slotRect = new Rect(slotX, slotY, inventorySlotWidth, inventorySlotHeight);
+                var slotLabel = BuildSlotLabel(slot);
+
+                bool clicked;
+                if (inventorySlotBackgroundTexture != null)
+                {
+                    clicked = GUI.Button(slotRect, string.Empty);
+                    GUI.DrawTexture(slotRect, inventorySlotBackgroundTexture, ScaleMode.ScaleToFit);
+                    if (!string.IsNullOrEmpty(slotLabel))
+                    {
+                        GUI.Label(slotRect, slotLabel, CenteredLabelStyle);
+                    }
+                }
+                else
+                {
+                    clicked = GUI.Button(slotRect, slotLabel);
+                }
+
+                if (clicked && playerInventory.TryAdd(slot.Item, slot.Amount))
+                {
+                    chest.ClearSlot(slotIndex);
+                }
             }
         }
 

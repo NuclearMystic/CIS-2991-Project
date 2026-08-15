@@ -183,3 +183,20 @@ public struct StatModifier
     public StatType stat;
     public int amount;
 }
+
+// Shared by anything that hands the player a random quantity of an item - chest contents and
+// enemy loot tables (Assets/Scripts/Items/ChestInventory.cs, Assets/Scripts/Enemies/EnemyDefinition.cs).
+[System.Serializable]
+public struct ItemDrop
+{
+    public Item item;
+    [Min(1)] public int minAmount;
+    [Min(1)] public int maxAmount;
+
+    public int RollAmount()
+    {
+        var min = Mathf.Max(1, minAmount);
+        var max = Mathf.Max(min, maxAmount);
+        return Random.Range(min, max + 1);
+    }
+}
