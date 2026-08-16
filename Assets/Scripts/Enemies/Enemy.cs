@@ -1,3 +1,4 @@
+using CIS2991Project.Core;
 using CIS2991Project.Items;
 using CIS2991Project.Player;
 using UnityEngine;
@@ -299,7 +300,7 @@ namespace CIS2991Project.Enemies
             return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
         }
 
-        private class EnemyProjectile : MonoBehaviour
+        private class EnemyProjectile : MonoBehaviour, IProjectile
         {
             private int _damage;
             private float _remaining;
@@ -321,7 +322,9 @@ namespace CIS2991Project.Enemies
 
             private void OnTriggerEnter2D(Collider2D other)
             {
-                if (other.GetComponent<EnemyProjectile>() != null || other.GetComponent<Enemy>() != null)
+                // Covers both other enemy projectiles and player projectiles (Projectile also
+                // implements IProjectile) - projectiles shouldn't collide with each other.
+                if (other.GetComponent<IProjectile>() != null || other.GetComponent<Enemy>() != null)
                 {
                     return;
                 }

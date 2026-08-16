@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CIS2991Project.Core;
 using CIS2991Project.Enemies;
 using CIS2991Project.Levels;
 using UnityEngine;
@@ -473,7 +474,7 @@ namespace CIS2991Project.Player
             return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
         }
 
-        private class Projectile : MonoBehaviour
+        private class Projectile : MonoBehaviour, IProjectile
         {
             private const float Speed = 24f;
 
@@ -500,7 +501,9 @@ namespace CIS2991Project.Player
 
             private void OnTriggerEnter2D(Collider2D other)
             {
-                if (other.GetComponent<Projectile>() != null)
+                // Covers both other player projectiles and enemy projectiles (EnemyProjectile also
+                // implements IProjectile) - projectiles shouldn't collide with each other.
+                if (other.GetComponent<IProjectile>() != null)
                     return;
 
                 // LevelBounds spans the whole level and the player always stands inside it, so
