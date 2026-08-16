@@ -6,11 +6,12 @@ TagManager:
   tags:
   - NPC
   - Enemy
+  - LevelBounds
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - LevelBounds
   - Water
   - UI
   - 

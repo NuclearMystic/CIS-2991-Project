@@ -13,6 +13,9 @@ namespace CIS2991Project.Managers
         private const string MusicParam = "MusicVolume";
         private const string SfxParam = "SFXVolume";
         private const string AmbienceParam = "AmbienceVolume";
+        private const string MusicGroupName = "Music";
+        private const string SfxGroupName = "SFX";
+        private const string AmbienceGroupName = "Ambience";
         private const float MinDecibels = -80f;
 
         private static AudioMixer _mixer;
@@ -23,6 +26,23 @@ namespace CIS2991Project.Managers
         private static float _ambienceVolume = 1f;
 
         private static AudioMixer Mixer => _mixer != null ? _mixer : _mixer = Resources.Load<AudioMixer>(MixerResourcePath);
+
+        // Lets code that creates AudioSources at runtime (no scene/prefab Inspector slot to wire a
+        // group into, e.g. ConsumablePickup) still route through the right mixer group by name.
+        public static AudioMixerGroup MusicGroup => GetGroup(MusicGroupName);
+        public static AudioMixerGroup SfxGroup => GetGroup(SfxGroupName);
+        public static AudioMixerGroup AmbienceGroup => GetGroup(AmbienceGroupName);
+
+        private static AudioMixerGroup GetGroup(string groupName)
+        {
+            if (Mixer == null)
+            {
+                return null;
+            }
+
+            var groups = Mixer.FindMatchingGroups(groupName);
+            return groups.Length > 0 ? groups[0] : null;
+        }
 
         public static float MasterVolume
         {

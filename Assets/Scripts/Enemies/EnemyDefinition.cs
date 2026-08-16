@@ -42,8 +42,10 @@ namespace CIS2991Project.Enemies
         [Min(0f)] public float projectileSpeed = 8f;
         [Min(0f)] public float projectileLifetime = 3f;
 
-        [Header("Loot — one random item from this list drops on death (leave empty for no loot)")]
-        public global::Item[] lootTable;
+        [Header("Loot — one random entry from this list drops on death, in a rolled amount " +
+                "(leave empty for no loot)")]
+        public global::ItemDrop[] lootTable;
         public Sprite lootSprite;
+        public AudioClip lootDropSound;
     }
 }

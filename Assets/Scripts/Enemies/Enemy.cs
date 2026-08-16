@@ -1,3 +1,4 @@
+using CIS2991Project.Core;
 using CIS2991Project.Items;
 using CIS2991Project.Player;
 using UnityEngine;
@@ -25,6 +26,7 @@ namespace CIS2991Project.Enemies
         private const string DirectionParam = "Direction";
         private const string IsMovingParam = "IsMoving";
         private const string IsRunningParam = "IsRunning";
+        private const string IsAttackingParam = "IsAttacking";
         private const string AttackTrigger = "Attack";
         private const string IsDeadParam = "IsDead";
         private const string DiedTrigger = "Died";
@@ -57,7 +59,6 @@ namespace CIS2991Project.Enemies
             _body = GetComponent<Rigidbody2D>();
             _body.gravityScale = 0f;
             _body.freezeRotation = true;
-            _body.bodyType = RigidbodyType2D.Kinematic;
 
             _animator = GetComponent<Animator>();
             _currentHealth = definition != null ? definition.maxHealth : 1;
@@ -117,6 +118,7 @@ namespace CIS2991Project.Enemies
             if (toTarget.magnitude < 0.15f)
             {
                 _facingDirection = Vector2.zero;
+                _body.linearVelocity = Vector2.zero;
 
                 if (_patrolPauseRemaining > 0f)
                 {
@@ -130,18 +132,19 @@ namespace CIS2991Project.Enemies
             }
 
             _facingDirection = toTarget.normalized;
-            _body.MovePosition(position + _facingDirection * definition.patrolSpeed * Time.deltaTime);
+            _body.linearVelocity = _facingDirection * definition.patrolSpeed;
         }
 
         private void UpdateChase()
         {
             var position = (Vector2)transform.position;
             _facingDirection = ((Vector2)_player.transform.position - position).normalized;
-            _body.MovePosition(position + _facingDirection * definition.chaseSpeed * Time.deltaTime);
+            _body.linearVelocity = _facingDirection * definition.chaseSpeed;
         }
 
         private void UpdateAttack()
         {
+            _body.linearVelocity = Vector2.zero;
             _facingDirection = ((Vector2)_player.transform.position - (Vector2)transform.position).normalized;
 
             if (_attackCooldownRemaining > 0f)
@@ -199,6 +202,7 @@ namespace CIS2991Project.Enemies
             var isMoving = (_state == State.Patrol || _state == State.Chase) && _facingDirection != Vector2.zero;
             _animator.SetBool(IsMovingParam, isMoving);
             _animator.SetBool(IsRunningParam, _state == State.Chase);
+            _animator.SetBool(IsAttackingParam, _state == State.Attack);
 
             if (_facingDirection != Vector2.zero)
             {
@@ -223,6 +227,7 @@ namespace CIS2991Project.Enemies
         private void Die()
         {
             _state = State.Dead;
+            _body.linearVelocity = Vector2.zero;
 
             var collider = GetComponent<Collider2D>();
             if (collider != null)
@@ -236,7 +241,7 @@ namespace CIS2991Project.Enemies
                 _animator.SetTrigger(DiedTrigger);
             }
 
-            DropLoot();
+            Invoke(nameof(DropLoot), deathAnimationSeconds);
             _playerCharacterSheet?.AddExperience(definition.expReward);
 
             Destroy(gameObject, deathAnimationSeconds);
@@ -249,13 +254,13 @@ namespace CIS2991Project.Enemies
                 return;
             }
 
-            var item = definition.lootTable[Random.Range(0, definition.lootTable.Length)];
-            if (item == null)
+            var drop = definition.lootTable[Random.Range(0, definition.lootTable.Length)];
+            if (drop.item == null)
             {
                 return;
             }
 
-            var loot = new GameObject($"Loot_{item.displayName}");
+            var loot = new GameObject($"Loot_{drop.item.displayName}");
             loot.transform.position = transform.position;
 
             var renderer = loot.AddComponent<SpriteRenderer>();
@@ -263,7 +268,7 @@ namespace CIS2991Project.Enemies
             renderer.sortingOrder = 5;
 
             loot.AddComponent<CircleCollider2D>().isTrigger = true;
-            loot.AddComponent<ConsumablePickup>().Configure(item, 1);
+            loot.AddComponent<ConsumablePickup>().Configure(drop.item, drop.RollAmount(), definition.lootDropSound);
         }
 
         private static int DetermineFacing(Vector2 direction)
@@ -295,7 +300,7 @@ namespace CIS2991Project.Enemies
             return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
         }
 
-        private class EnemyProjectile : MonoBehaviour
+        private class EnemyProjectile : MonoBehaviour, IProjectile
         {
             private int _damage;
             private float _remaining;
@@ -317,7 +322,9 @@ namespace CIS2991Project.Enemies
 
             private void OnTriggerEnter2D(Collider2D other)
             {
-                if (other.GetComponent<EnemyProjectile>() != null || other.GetComponent<Enemy>() != null)
+                // Covers both other enemy projectiles and player projectiles (Projectile also
+                // implements IProjectile) - projectiles shouldn't collide with each other.
+                if (other.GetComponent<IProjectile>() != null || other.GetComponent<Enemy>() != null)
                 {
                     return;
                 }

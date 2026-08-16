@@ -21,12 +21,37 @@ MonoBehaviour:
   maxStackSize: 1
   value: 0
   damage: 5
+  weaponCategory: 0
   ammoType: 2
-  ammoCapacity: 12
+  ammoCapacity: 6
+  meleeRange: 1
+  meleeAttackCooldown: 0.5
+  hitSound: {fileID: 0}
   defense: 0
   healthRestore: 0
   equippedSpriteDown: {fileID: -1516967421, guid: ce7381ac66b146d49ae1059df6373b57, type: 3}
   equippedSpriteUp: {fileID: -743072544, guid: cade09c4d817423429fd31bd79f745d5, type: 3}
   equippedSpriteLeft: {fileID: -738237913, guid: 5ac25381d572dc445b5d613b7fc29e85, type: 3}
   equippedSpriteRight: {fileID: -844567155, guid: 2d6be1303809a8b43b6e8dcec15ef922, type: 3}
+  equippedOffsetDown: {x: 0, y: -0.05}
+  equippedOffsetUp: {x: 0, y: 0.05}
+  equippedOffsetLeft: {x: -0.05, y: 0}
+  equippedOffsetRight: {x: 0.05, y: 0}
+  attackFramesDown:
+  - {fileID: -1516967421, guid: ce7381ac66b146d49ae1059df6373b57, type: 3}
+  - {fileID: 1718719890, guid: ce7381ac66b146d49ae1059df6373b57, type: 3}
+  - {fileID: 19471720, guid: ce7381ac66b146d49ae1059df6373b57, type: 3}
+  attackFramesUp:
+  - {fileID: -743072544, guid: cade09c4d817423429fd31bd79f745d5, type: 3}
+  - {fileID: 1027468143, guid: cade09c4d817423429fd31bd79f745d5, type: 3}
+  - {fileID: 476711857, guid: cade09c4d817423429fd31bd79f745d5, type: 3}
+  attackFramesLeft:
+  - {fileID: -738237913, guid: 5ac25381d572dc445b5d613b7fc29e85, type: 3}
+  - {fileID: 1582759541, guid: 5ac25381d572dc445b5d613b7fc29e85, type: 3}
+  - {fileID: -1941284780, guid: 5ac25381d572dc445b5d613b7fc29e85, type: 3}
+  attackFramesRight:
+  - {fileID: -844567155, guid: 2d6be1303809a8b43b6e8dcec15ef922, type: 3}
+  - {fileID: 1612123723, guid: 2d6be1303809a8b43b6e8dcec15ef922, type: 3}
+  - {fileID: 801961054, guid: 2d6be1303809a8b43b6e8dcec15ef922, type: 3}
+  attackFrameRate: 12
   statModifiers: []

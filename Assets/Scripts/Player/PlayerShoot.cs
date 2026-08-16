@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using CIS2991Project.Core;
 using CIS2991Project.Enemies;
+using CIS2991Project.Levels;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -43,6 +46,9 @@ namespace CIS2991Project.Player
         [SerializeField] private AudioClip reloadCompleteSound;
         [SerializeField] private AudioMixerGroup sfxMixerGroup;
 
+        [Header("Melee — used when the equipped weapon's category is Melee")]
+        [SerializeField] private AudioClip meleeSwingSound;
+
         private Vector2 _lastDirection = Vector2.right;
         private float _cooldown;
 
@@ -54,8 +60,14 @@ namespace CIS2991Project.Player
         private float _reloadTimeRemaining;
         private float _reloadTotalDuration;
 
+        // Items aren't unique instances in this game (a "Makeshift Pistol" reference is shared by every
+        // copy of it), so remembering ammo per weapon *type* here is exactly the right granularity -
+        // this is what keeps switching weapons on the hotbar from refilling whatever you switch back to.
+        private readonly Dictionary<global::Item, int> _savedAmmoByWeapon = new();
+
         public event System.Action<Vector2> Fired;
         public event System.Action<int, int, global::WeaponAmmoType> AmmoChanged;
+        public event System.Action MeleeAttacked;
 
         public int CurrentAmmo => _currentAmmo;
         public int MaxAmmo => _equippedWeapon != null ? Mathf.Max(0, _equippedWeapon.ammoCapacity) : 0;
@@ -95,8 +107,15 @@ namespace CIS2991Project.Player
             if (newWeapon == _equippedWeapon)
                 return;
 
+            // Remember how much ammo is left in the weapon we're switching away from, so switching
+            // back later picks up where it left off instead of refilling.
+            if (_equippedWeapon != null)
+                _savedAmmoByWeapon[_equippedWeapon] = _currentAmmo;
+
             _equippedWeapon = newWeapon;
-            _currentAmmo = MaxAmmo;
+            _currentAmmo = newWeapon != null && _savedAmmoByWeapon.TryGetValue(newWeapon, out var savedAmmo)
+                ? savedAmmo
+                : MaxAmmo;
             _isReloading = false;
             _reloadTimeRemaining = 0f;
             _reloadTotalDuration = 0f;
@@ -126,7 +145,17 @@ namespace CIS2991Project.Player
 
             if (Input.GetKey(KeyCode.Space) && _cooldown <= 0f)
             {
-                if (CanFire())
+                if (_equippedWeapon == null)
+                {
+                    // PlayerInventory auto-equips its fistsItem whenever nothing else is equipped, so
+                    // this only happens if that fallback wasn't configured - nothing to attack with.
+                }
+                else if (IsMeleeMode)
+                {
+                    PerformMeleeAttack();
+                    _cooldown = GetMeleeCooldown();
+                }
+                else if (CanFire())
                 {
                     SpawnProjectile();
                     _cooldown = GetFireCooldown(CurrentAmmoType);
@@ -139,6 +168,8 @@ namespace CIS2991Project.Player
                 }
             }
         }
+
+        private bool IsMeleeMode => _equippedWeapon.weaponCategory == global::WeaponCategory.Melee;
 
         private bool CanFire()
         {
@@ -202,6 +233,51 @@ namespace CIS2991Project.Player
 
             var multiplier = _characterSheet.GetWeaponDamageMultiplier(weaponSkill.Value);
             return Mathf.Max(1, Mathf.RoundToInt(baseDamage * multiplier));
+        }
+
+        private void PerformMeleeAttack()
+        {
+            var range = Mathf.Max(0.05f, _equippedWeapon.meleeRange);
+            var damage = GetMeleeDamage();
+            var strikeCenter = (Vector2)transform.position + _lastDirection * (range * 0.5f);
+
+            var hits = Physics2D.OverlapCircleAll(strikeCenter, range * 0.5f);
+            var hitSomething = false;
+            foreach (var hit in hits)
+            {
+                var enemy = hit.GetComponent<Enemy>();
+                if (enemy != null)
+                {
+                    enemy.TakeHit(_lastDirection, damage);
+                    hitSomething = true;
+                }
+            }
+
+            PlaySfx(meleeSwingSound, GetMuzzlePosition());
+            if (hitSomething)
+                PlaySfx(_equippedWeapon.hitSound, strikeCenter);
+
+            MeleeAttacked?.Invoke();
+        }
+
+        private int GetMeleeDamage()
+        {
+            var baseDamage = Mathf.Max(1, _equippedWeapon.damage);
+            if (_characterSheet == null)
+                return baseDamage;
+
+            var multiplier = _characterSheet.GetWeaponDamageMultiplier(SkillType.Melee);
+            return Mathf.Max(1, Mathf.RoundToInt(baseDamage * multiplier));
+        }
+
+        private float GetMeleeCooldown()
+        {
+            var baseCooldown = Mathf.Max(0.05f, _equippedWeapon.meleeAttackCooldown);
+            if (_characterSheet == null)
+                return baseCooldown;
+
+            // Reuses the "reload speed" multiplier as swing speed - same "faster at higher skill" formula fits both.
+            return baseCooldown * _characterSheet.GetWeaponReloadMultiplier(SkillType.Melee);
         }
 
         private void FinishReload()
@@ -305,7 +381,8 @@ namespace CIS2991Project.Player
             var col = go.AddComponent<CircleCollider2D>();
             col.isTrigger = true;
 
-            go.AddComponent<Projectile>().Initialize(direction, damage, GetProjectileLifetime(CurrentAmmoType));
+            var hitSound = _equippedWeapon != null ? _equippedWeapon.hitSound : null;
+            go.AddComponent<Projectile>().Initialize(direction, damage, GetProjectileLifetime(CurrentAmmoType), hitSound, this);
         }
 
         private float GetProjectileLifetime(global::WeaponAmmoType ammoType)
@@ -397,17 +474,21 @@ namespace CIS2991Project.Player
             return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
         }
 
-        private class Projectile : MonoBehaviour
+        private class Projectile : MonoBehaviour, IProjectile
         {
             private const float Speed = 24f;
 
             private float _remaining;
             private int _damage;
+            private AudioClip _hitSound;
+            private PlayerShoot _owner;
 
-            public void Initialize(Vector2 direction, int damage, float lifetime)
+            public void Initialize(Vector2 direction, int damage, float lifetime, AudioClip hitSound, PlayerShoot owner)
             {
                 _remaining = lifetime;
                 _damage = Mathf.Max(1, damage);
+                _hitSound = hitSound;
+                _owner = owner;
                 GetComponent<Rigidbody2D>().linearVelocity = direction * Speed;
             }
 
@@ -420,21 +501,21 @@ namespace CIS2991Project.Player
 
             private void OnTriggerEnter2D(Collider2D other)
             {
-                if (other.GetComponent<Projectile>() != null)
+                // Covers both other player projectiles and enemy projectiles (EnemyProjectile also
+                // implements IProjectile) - projectiles shouldn't collide with each other.
+                if (other.GetComponent<IProjectile>() != null)
                     return;
 
-                var demoEnemy = other.GetComponent<DemoEnemy>();
-                if (demoEnemy != null)
-                {
-                    demoEnemy.TakeHit(GetComponent<Rigidbody2D>().linearVelocity.normalized, _damage);
-                    Destroy(gameObject);
+                // LevelBounds spans the whole level and the player always stands inside it, so
+                // projectiles spawn already overlapping it - it isn't a wall, ignore it.
+                if (other.GetComponent<LevelBounds>() != null)
                     return;
-                }
 
                 var enemy = other.GetComponent<Enemy>();
                 if (enemy != null)
                 {
                     enemy.TakeHit(GetComponent<Rigidbody2D>().linearVelocity.normalized, _damage);
+                    _owner?.PlaySfx(_hitSound, transform.position);
                     Destroy(gameObject);
                     return;
                 }

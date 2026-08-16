@@ -51,8 +51,10 @@ namespace CIS2991Project.UI
         {
             if (!_isGameOver) return;
 
-            var cx = Screen.width / 2f;
-            var cy = Screen.height / 2f;
+            GuiScale.Begin();
+
+            var cx = GuiScale.ReferenceWidth / 2f;
+            var cy = GuiScale.ReferenceHeight / 2f;
 
             GUI.Box(new Rect(cx - 150f, cy - 100f, 300f, 200f), string.Empty);
             GUI.Label(new Rect(cx - 140f, cy - 80f, 280f, 70f), "Game Over", TitleStyle);

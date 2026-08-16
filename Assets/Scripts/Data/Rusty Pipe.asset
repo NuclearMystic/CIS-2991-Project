@@ -22,7 +22,16 @@ MonoBehaviour:
   stackable: 0
   maxStackSize: 1
   value: 0
-  damage: 0
+  damage: 5
+  weaponCategory: 1
+  ammoType: 0
+  ammoCapacity: 6
+  meleeRange: 1.2
+  meleeAttackCooldown: 0.5
   defense: 0
   healthRestore: 0
+  equippedOffsetDown: {x: -0.02, y: 0}
+  equippedOffsetUp: {x: 0.03, y: 0.02}
+  equippedOffsetLeft: {x: 0.1, y: 0}
+  equippedOffsetRight: {x: -0.1, y: 0}
   statModifiers: []

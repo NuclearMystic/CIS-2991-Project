@@ -1,3 +1,4 @@
+using CIS2991Project.Items;
 using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -43,6 +44,12 @@ namespace CIS2991Project.UI
         [SerializeField, Min(4f)] private float reloadBarHeight = 14f;
         [SerializeField] private float reloadBarWorldOffset = 1.2f;
 
+        [Header("Pickup Popup — floats above the player for a moment when an item is picked up")]
+        [SerializeField] private float pickupPopupWorldOffset = 1.6f;
+        [SerializeField, Min(0f)] private float pickupPopupRiseDistance = 1f;
+        [SerializeField, Min(0.1f)] private float pickupPopupDuration = 2.5f;
+        [SerializeField, Min(6)] private int pickupPopupFontSize = 18;
+
         [Header("Equipment Slots (Weapon / Outfit boxes, bottom-left)")]
         [SerializeField, Min(4f)] private float equipmentBoxSize = 56f;
         [SerializeField, Min(0f)] private float equipmentBoxGap = 8f;
@@ -83,7 +90,10 @@ namespace CIS2991Project.UI
         private int _lastClickId = int.MinValue;
         private double _lastClickTime = -1d;
         private GUIStyle _centeredLabelStyle;
+        private GUIStyle _pickupPopupStyle;
         private int _draggedInventorySlot = -1;
+        private string _pickupPopupText;
+        private float _pickupPopupTimeRemaining;
 
         // Plain GUI.Label has no background box, unlike GUI.Button, so it's safe to draw
         // on top of a slot's background texture without covering it back up.
@@ -97,6 +107,25 @@ namespace CIS2991Project.UI
                 }
 
                 return _centeredLabelStyle;
+            }
+        }
+
+        private GUIStyle PickupPopupStyle
+        {
+            get
+            {
+                if (_pickupPopupStyle == null)
+                {
+                    _pickupPopupStyle = new GUIStyle(GUI.skin.label)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontStyle = FontStyle.Bold,
+                        fontSize = pickupPopupFontSize
+                    };
+                    _pickupPopupStyle.normal.textColor = Color.green;
+                }
+
+                return _pickupPopupStyle;
             }
         }
 
@@ -143,6 +172,19 @@ namespace CIS2991Project.UI
             }
 
             EnsureHud();
+
+            if (playerInventory != null)
+            {
+                playerInventory.ItemPickedUp += HandleItemPickedUp;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (playerInventory != null)
+            {
+                playerInventory.ItemPickedUp -= HandleItemPickedUp;
+            }
         }
 
         private int HeartCount => characterSheet != null ? characterSheet.GetHeartCount() : heartCount;
@@ -150,6 +192,13 @@ namespace CIS2991Project.UI
         private void EnsureHud()
         {
             // IMGUI HUD needs no scene setup; OnGUI draws it every frame.
+        }
+
+        private void HandleItemPickedUp(global::Item item, int amount)
+        {
+            var itemName = GetItemName(item).ToUpperInvariant();
+            _pickupPopupText = $"{itemName} X{amount}";
+            _pickupPopupTimeRemaining = pickupPopupDuration;
         }
 
         private void Update()
@@ -163,10 +212,17 @@ namespace CIS2991Project.UI
             {
                 skillsVisible = !skillsVisible;
             }
+
+            if (_pickupPopupTimeRemaining > 0f)
+            {
+                _pickupPopupTimeRemaining -= Time.deltaTime;
+            }
         }
 
         private void OnGUI()
         {
+            GuiScale.Begin();
+
             var nextY = DrawHearts();
             DrawInventoryToggleButton();
             DrawSkillsToggleButton();
@@ -180,10 +236,18 @@ namespace CIS2991Project.UI
             DrawHotbar();
             DrawEquipmentSlots();
             DrawReloadBar();
+            DrawPickupPopup();
 
-            if (inventoryVisible)
+            var chestOpen = ChestInventory.ActiveChest != null;
+
+            if (inventoryVisible || chestOpen)
             {
                 DrawInventoryHud(nextY);
+            }
+
+            if (chestOpen)
+            {
+                DrawChestHud(nextY);
             }
 
             if (skillsVisible)
@@ -306,13 +370,75 @@ namespace CIS2991Project.UI
                 reloadBarWidth,
                 reloadBarHeight);
 
+            // screenPoint is already a real screen-pixel position from WorldToScreenPoint - draw it
+            // outside the reference-resolution scale so it isn't shifted off the player.
+            var previousMatrix = GUI.matrix;
+            GUI.matrix = Matrix4x4.identity;
+
             DrawSlot(rect, reloadBarBackgroundTexture);
 
             var fillRect = new Rect(rect.x, rect.y, rect.width * playerShoot.ReloadFractionRemaining, rect.height);
             DrawSlot(fillRect, reloadBarFillTexture);
 
             GUI.Label(rect, "Reloading", CenteredLabelStyle);
+
+            GUI.matrix = previousMatrix;
         }
+
+        private void DrawPickupPopup()
+        {
+            if (_pickupPopupTimeRemaining <= 0f || string.IsNullOrEmpty(_pickupPopupText) || playerInventory == null)
+            {
+                return;
+            }
+
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                return;
+            }
+
+            var progress = 1f - Mathf.Clamp01(_pickupPopupTimeRemaining / pickupPopupDuration);
+            var worldPosition = playerInventory.transform.position + Vector3.up * (pickupPopupWorldOffset + progress * pickupPopupRiseDistance);
+            var screenPoint = camera.WorldToScreenPoint(worldPosition);
+            if (screenPoint.z <= 0f)
+            {
+                return;
+            }
+
+            const float width = 320f;
+            const float height = 28f;
+            var rect = new Rect(screenPoint.x - width / 2f, Screen.height - screenPoint.y - height / 2f, width, height);
+
+            // screenPoint is already a real screen-pixel position from WorldToScreenPoint - draw it
+            // outside the reference-resolution scale so it isn't shifted off the player.
+            var previousMatrix = GUI.matrix;
+            GUI.matrix = Matrix4x4.identity;
+
+            // Plain GUI.Label has no outline, so fake one by stamping the text in black a
+            // couple pixels off-center before drawing the green label on top — keeps it
+            // readable over bright backgrounds instead of just relying on the bold green.
+            var shadowStyle = new GUIStyle(PickupPopupStyle);
+            shadowStyle.normal.textColor = Color.black;
+
+            var previousColor = GUI.color;
+            GUI.color = new Color(1f, 1f, 1f, 1f - progress);
+
+            foreach (var offset in ShadowOffsets)
+            {
+                GUI.Label(new Rect(rect.x + offset.x, rect.y + offset.y, rect.width, rect.height), _pickupPopupText, shadowStyle);
+            }
+
+            GUI.Label(rect, _pickupPopupText, PickupPopupStyle);
+
+            GUI.color = previousColor;
+            GUI.matrix = previousMatrix;
+        }
+
+        private static readonly Vector2[] ShadowOffsets =
+        {
+            new(-1f, -1f), new(1f, -1f), new(-1f, 1f), new(1f, 1f)
+        };
 
         private (Texture2D full, Texture2D empty) GetAmmoTextures(global::WeaponAmmoType ammoType)
         {
@@ -331,7 +457,7 @@ namespace CIS2991Project.UI
 
         private void DrawMoneyHud()
         {
-            DrawSlot(new Rect(Screen.width - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
+            DrawSlot(new Rect(GuiScale.ReferenceWidth - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
         }
 
         private void DrawEquipmentSlots()
@@ -343,8 +469,8 @@ namespace CIS2991Project.UI
 
             const float margin = 16f;
 
-            var weaponRect = new Rect(margin, Screen.height - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
-            var outfitRect = new Rect(margin + equipmentBoxSize + equipmentBoxGap, Screen.height - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
+            var weaponRect = new Rect(margin, GuiScale.ReferenceHeight - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
+            var outfitRect = new Rect(margin + equipmentBoxSize + equipmentBoxGap, GuiScale.ReferenceHeight - equipmentBoxSize - margin, equipmentBoxSize, equipmentBoxSize);
 
             GUI.Label(new Rect(weaponRect.x, weaponRect.y - 18f, equipmentBoxSize, 18f), "Weapon");
             GUI.Label(new Rect(outfitRect.x, outfitRect.y - 18f, equipmentBoxSize, 18f), "Outfit");
@@ -400,8 +526,8 @@ namespace CIS2991Project.UI
         {
             const int slotCount = PlayerInventory.HotbarSlotCount;
             var totalWidth = slotCount * hotbarSlotSize + (slotCount - 1) * hotbarSlotGap;
-            var startX = (Screen.width - totalWidth) / 2f;
-            var y = Screen.height - hotbarSlotSize - 24f;
+            var startX = (GuiScale.ReferenceWidth - totalWidth) / 2f;
+            var y = GuiScale.ReferenceHeight - hotbarSlotSize - 24f;
 
             for (var hotbarIndex = 0; hotbarIndex < slotCount; hotbarIndex++)
             {
@@ -481,7 +607,7 @@ namespace CIS2991Project.UI
             }
 
             var skills = (SkillType[])System.Enum.GetValues(typeof(SkillType));
-            var startX = Screen.width - skillsPanelWidth - 16f;
+            var startX = GuiScale.ReferenceWidth - skillsPanelWidth - 16f;
             var height = 28f + skills.Length * skillRowHeight + 8f;
 
             DrawSlot(new Rect(startX, startY, skillsPanelWidth, height), skillsPanelBackgroundTexture);
@@ -577,6 +703,68 @@ namespace CIS2991Project.UI
             if (!string.IsNullOrWhiteSpace(playerInventory.LastMessage))
             {
                 GUI.Label(new Rect(startX + 12f, startY + height - 26f, width - 24f, 20f), playerInventory.LastMessage);
+            }
+        }
+
+        // Mirrors DrawInventoryHud's grid rendering, reading from the currently open ChestInventory
+        // instead of the player's own inventory. Click-to-take only (no drag-and-drop) - clicking a
+        // slot hands its whole stack to the player and clears it from the chest.
+        private void DrawChestHud(float startY)
+        {
+            var chest = ChestInventory.ActiveChest;
+            if (chest == null || playerInventory == null)
+            {
+                return;
+            }
+
+            const int chestColumns = 5;
+            const float margin = 16f;
+            var width = inventoryPanelWidth;
+            var startX = GuiScale.ReferenceWidth - width - margin;
+            var gridStartX = startX + 12f;
+            var gridStartY = startY + inventoryGridTopPadding;
+
+            var slots = chest.Slots;
+            var rowCount = Mathf.Max(1, Mathf.CeilToInt(slots.Count / (float)chestColumns));
+            var height = inventoryGridTopPadding + rowCount * (inventorySlotHeight + inventorySlotGap) + 16f;
+
+            DrawSlot(new Rect(startX, startY, width, height), inventoryBorderTexture);
+            GUI.Label(new Rect(startX + 12f, startY + 4f, width - 24f, 20f), "Chest (click to take)");
+
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                var slot = slots[slotIndex];
+                if (slot.IsEmpty)
+                {
+                    continue;
+                }
+
+                var row = slotIndex / chestColumns;
+                var column = slotIndex % chestColumns;
+                var slotX = gridStartX + column * (inventorySlotWidth + inventorySlotGap);
+                var slotY = gridStartY + row * (inventorySlotHeight + inventorySlotGap);
+                var slotRect = new Rect(slotX, slotY, inventorySlotWidth, inventorySlotHeight);
+                var slotLabel = BuildSlotLabel(slot);
+
+                bool clicked;
+                if (inventorySlotBackgroundTexture != null)
+                {
+                    clicked = GUI.Button(slotRect, string.Empty);
+                    GUI.DrawTexture(slotRect, inventorySlotBackgroundTexture, ScaleMode.ScaleToFit);
+                    if (!string.IsNullOrEmpty(slotLabel))
+                    {
+                        GUI.Label(slotRect, slotLabel, CenteredLabelStyle);
+                    }
+                }
+                else
+                {
+                    clicked = GUI.Button(slotRect, slotLabel);
+                }
+
+                if (clicked && playerInventory.TryAdd(slot.Item, slot.Amount))
+                {
+                    chest.ClearSlot(slotIndex);
+                }
             }
         }
 

@@ -12,6 +12,7 @@ namespace CIS2991Project.Player
         Pistol,
         Rifle,
         Shotgun,
+        Melee,
         Endurance,
         Barter,
         Athletics,
@@ -53,7 +54,7 @@ namespace CIS2991Project.Player
         [SerializeField] private float weaponReloadSpeedPerLevel = 0.005f;
         [SerializeField, Range(0.05f, 1f)] private float minReloadMultiplier = 0.1f;
 
-        [Header("Leveling — 7 skills x 100 max level = 700 points to fully master every skill.")]
+        [Header("Leveling — 8 skills x 100 max level = 800 points to fully master every skill.")]
         [Tooltip("Skill points granted each time the character levels up. At 3/level x 99 level-ups (1->100) " +
                  "that's ~297 points by max level: enough to fully master 2-3 skills, or spread thinner across all 7 " +
                  "- meaningful specialization without letting one playthrough max everything.")]
@@ -84,7 +85,6 @@ namespace CIS2991Project.Player
 
         private void Awake()
         {
-            DontDestroyOnLoad(gameObject);
 
             foreach (SkillType skill in Enum.GetValues(typeof(SkillType)))
             {
