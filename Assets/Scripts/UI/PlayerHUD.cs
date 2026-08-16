@@ -17,6 +17,7 @@ namespace CIS2991Project.UI
         [SerializeField] private KeyCode inventoryToggleKey = KeyCode.I;
         [SerializeField] private KeyCode skillsToggleKey = KeyCode.K;
         [SerializeField] private KeyCode journalToggleKey = KeyCode.J;
+        [SerializeField] private KeyCode allMenusToggleKey = KeyCode.Tab;
 
         [Header("Hearts (Zelda-style) — CurrentHealth/MaxHealth is mapped onto this many hearts")]
         [SerializeField] private Texture2D fullHeartTexture;
@@ -234,6 +235,14 @@ namespace CIS2991Project.UI
                 journalVisible = !journalVisible;
             }
 
+            if (Input.GetKeyDown(allMenusToggleKey))
+            {
+                var anyOpen = inventoryVisible || skillsVisible || journalVisible;
+                inventoryVisible = !anyOpen;
+                skillsVisible = !anyOpen;
+                journalVisible = !anyOpen;
+            }
+
             if (_pickupPopupTimeRemaining > 0f)
             {
                 _pickupPopupTimeRemaining -= Time.deltaTime;
@@ -249,7 +258,7 @@ namespace CIS2991Project.UI
             DrawSkillsToggleButton();
             DrawJournalToggleButton();
 
-            GUI.Label(new Rect(16f, nextY, 460f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Sprint: Shift  Inventory: I  Skills: K  Journal: J");
+            GUI.Label(new Rect(16f, nextY, 520f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Sprint: Shift  Inventory: I  Skills: K  Journal: J  All: Tab");
             nextY += 22f;
 
             nextY = DrawAmmo(nextY);
