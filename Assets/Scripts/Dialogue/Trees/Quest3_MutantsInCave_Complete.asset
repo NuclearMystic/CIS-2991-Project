@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a8b9c0d1e2f4a6b8c0d1e2f4a6b8cdd, type: 3}
+  m_Name: Quest3_MutantsInCave_Complete
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Dialogue.DialogueTree
+  randomBark: 0
+  nodes:
+  - text: So the mutants are really gone?
+    hasChoice: 0
+    nextNodeIndex: 1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: That's a huge relief.
+    hasChoice: 0
+    nextNodeIndex: 2
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Maybe people will finally be able to travel through that area again.
+    hasChoice: 0
+    nextNodeIndex: 3
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Thank you for taking care of it.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0

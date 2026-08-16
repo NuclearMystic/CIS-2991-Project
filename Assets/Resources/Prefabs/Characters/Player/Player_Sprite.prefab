@@ -188,7 +188,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 5
   m_MaskInteraction: 0
   m_Sprite: {fileID: -1347097759, guid: 8103f7e03a25b9c48801c630478c7710, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -678,7 +678,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 6
   m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -702,7 +702,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6714fcfee1b9b2547b493e24fe2516f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.PlayerWeaponVisual
-  downSortingOrder: 3
-  upSortingOrder: 1
-  leftSortingOrder: 3
-  rightSortingOrder: 3
+  downSortingOrder: 7
+  upSortingOrder: 5
+  leftSortingOrder: 7
+  rightSortingOrder: 7
