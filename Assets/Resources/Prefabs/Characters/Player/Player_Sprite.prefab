@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 7885066162786256011}
   - component: {fileID: 2599761279921479484}
   - component: {fileID: 5859089423981942185}
+  - component: {fileID: 2264181796660445003}
   m_Layer: 0
   m_Name: Player_Sprite
   m_TagString: Player
@@ -421,6 +422,7 @@ MonoBehaviour:
   inventoryToggleKey: 105
   skillsToggleKey: 107
   journalToggleKey: 106
+  allMenusToggleKey: 9
   fullHeartTexture: {fileID: 2800000, guid: 2cd519fe145b0394983ac378a41a4b09, type: 3}
   halfHeartTexture: {fileID: 2800000, guid: 4a2a0ff91784fed45b93cf9d3ac04057, type: 3}
   emptyHeartTexture: {fileID: 2800000, guid: d733213917965e44cac7b6e6732a3d82, type: 3}
@@ -606,6 +608,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2264181796660445003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3050831987221406192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f49f2a85fb00e499c1f690a83cd824, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.HotbarInputController
 --- !u!1 &4336243778001066693
 GameObject:
   m_ObjectHideFlags: 0

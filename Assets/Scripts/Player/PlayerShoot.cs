@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using CIS2991Project.Core;
 using CIS2991Project.Enemies;
-using CIS2991Project.Levels;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -9,6 +7,34 @@ namespace CIS2991Project.Player
 {
     public class PlayerShoot : MonoBehaviour
     {
+        // Groups the six per-WeaponAmmoType fields below (item/sprite/lifetime/cooldown/sound/reload)
+        // so every accessor is one dictionary lookup instead of its own switch statement. Built once
+        // in Awake from the existing flat [SerializeField] fields, which stay as they are rather than
+        // being reshaped into per-ammo-type Inspector groups - that would need every value re-entered
+        // by hand in the Editor for no behavioral gain.
+        private readonly struct AmmoProfile
+        {
+            public readonly global::Item Item;
+            public readonly Sprite ProjectileSprite;
+            public readonly float ProjectileLifetime;
+            public readonly float FireCooldown;
+            public readonly AudioClip FireSound;
+            public readonly float ReloadSeconds;
+            public readonly bool ReloadScalesWithMagazineSize;
+
+            public AmmoProfile(global::Item item, Sprite projectileSprite, float projectileLifetime, float fireCooldown,
+                AudioClip fireSound, float reloadSeconds, bool reloadScalesWithMagazineSize)
+            {
+                Item = item;
+                ProjectileSprite = projectileSprite;
+                ProjectileLifetime = projectileLifetime;
+                FireCooldown = fireCooldown;
+                FireSound = fireSound;
+                ReloadSeconds = reloadSeconds;
+                ReloadScalesWithMagazineSize = reloadScalesWithMagazineSize;
+            }
+        }
+
         [Header("Ammo Items — matched against the equipped weapon's ammo type when reloading")]
         [SerializeField] private global::Item pistolAmmoItem;
         [SerializeField] private global::Item shotgunAmmoItem;
@@ -64,6 +90,7 @@ namespace CIS2991Project.Player
         // copy of it), so remembering ammo per weapon *type* here is exactly the right granularity -
         // this is what keeps switching weapons on the hotbar from refilling whatever you switch back to.
         private readonly Dictionary<global::Item, int> _savedAmmoByWeapon = new();
+        private Dictionary<global::WeaponAmmoType, AmmoProfile> _ammoProfiles;
 
         public event System.Action<Vector2> Fired;
         public event System.Action<int, int, global::WeaponAmmoType> AmmoChanged;
@@ -82,7 +109,23 @@ namespace CIS2991Project.Player
         {
             _inventory = GetComponent<PlayerInventory>();
             _characterSheet = GetComponent<CharacterSheet>();
+
+            _ammoProfiles = new Dictionary<global::WeaponAmmoType, AmmoProfile>
+            {
+                [global::WeaponAmmoType.Pistol] = new AmmoProfile(
+                    pistolAmmoItem, pistolProjectileSprite, pistolProjectileLifetime, pistolFireCooldown,
+                    pistolFireSound, pistolReloadSeconds, reloadScalesWithMagazineSize: false),
+                [global::WeaponAmmoType.Shotgun] = new AmmoProfile(
+                    shotgunAmmoItem, shotgunProjectileSprite, shotgunProjectileLifetime, shotgunFireCooldown,
+                    shotgunFireSound, shotgunReloadSeconds, reloadScalesWithMagazineSize: false),
+                [global::WeaponAmmoType.Rifle] = new AmmoProfile(
+                    rifleAmmoItem, rifleProjectileSprite, rifleProjectileLifetime, rifleFireCooldown,
+                    rifleFireSound, rifleReloadSecondsPerBullet, reloadScalesWithMagazineSize: true),
+            };
         }
+
+        private AmmoProfile? GetAmmoProfile(global::WeaponAmmoType ammoType) =>
+            _ammoProfiles.TryGetValue(ammoType, out var profile) ? profile : null;
 
         private void OnEnable()
         {
@@ -204,13 +247,12 @@ namespace CIS2991Project.Player
 
         private float GetReloadDuration()
         {
-            var baseDuration = CurrentAmmoType switch
-            {
-                global::WeaponAmmoType.Pistol => pistolReloadSeconds,
-                global::WeaponAmmoType.Shotgun => shotgunReloadSeconds,
-                global::WeaponAmmoType.Rifle => MaxAmmo * rifleReloadSecondsPerBullet,
-                _ => 0f,
-            };
+            var profile = GetAmmoProfile(CurrentAmmoType);
+            var baseDuration = profile == null
+                ? 0f
+                : profile.Value.ReloadScalesWithMagazineSize
+                    ? profile.Value.ReloadSeconds * MaxAmmo
+                    : profile.Value.ReloadSeconds;
 
             var weaponSkill = GetWeaponSkill(CurrentAmmoType);
             if (!weaponSkill.HasValue || _characterSheet == null)
@@ -307,35 +349,9 @@ namespace CIS2991Project.Player
             AmmoChanged?.Invoke(_currentAmmo, MaxAmmo, CurrentAmmoType);
         }
 
-        private global::Item GetAmmoItem(global::WeaponAmmoType ammoType)
-        {
-            switch (ammoType)
-            {
-                case global::WeaponAmmoType.Pistol:
-                    return pistolAmmoItem;
-                case global::WeaponAmmoType.Shotgun:
-                    return shotgunAmmoItem;
-                case global::WeaponAmmoType.Rifle:
-                    return rifleAmmoItem;
-                default:
-                    return null;
-            }
-        }
+        private global::Item GetAmmoItem(global::WeaponAmmoType ammoType) => GetAmmoProfile(ammoType)?.Item;
 
-        private Sprite GetProjectileSprite(global::WeaponAmmoType ammoType)
-        {
-            switch (ammoType)
-            {
-                case global::WeaponAmmoType.Pistol:
-                    return pistolProjectileSprite;
-                case global::WeaponAmmoType.Shotgun:
-                    return shotgunProjectileSprite;
-                case global::WeaponAmmoType.Rifle:
-                    return rifleProjectileSprite;
-                default:
-                    return null;
-            }
-        }
+        private Sprite GetProjectileSprite(global::WeaponAmmoType ammoType) => GetAmmoProfile(ammoType)?.ProjectileSprite;
 
         private Vector2 GetMuzzlePosition()
         {
@@ -389,30 +405,16 @@ namespace CIS2991Project.Player
             col.isTrigger = true;
 
             var hitSound = _equippedWeapon != null ? _equippedWeapon.hitSound : null;
-            go.AddComponent<Projectile>().Initialize(direction, damage, GetProjectileLifetime(CurrentAmmoType), hitSound, this);
+            go.AddComponent<PlayerProjectile>().Initialize(direction, damage, GetProjectileLifetime(CurrentAmmoType), hitSound, this);
         }
 
-        private float GetProjectileLifetime(global::WeaponAmmoType ammoType)
-        {
-            return ammoType switch
-            {
-                global::WeaponAmmoType.Pistol => pistolProjectileLifetime,
-                global::WeaponAmmoType.Shotgun => shotgunProjectileLifetime,
-                global::WeaponAmmoType.Rifle => rifleProjectileLifetime,
-                _ => pistolProjectileLifetime,
-            };
-        }
+        // Both of these fall back to the pistol's value for WeaponAmmoType.None/unrecognized types,
+        // matching the original per-type switch statements' behavior.
+        private float GetProjectileLifetime(global::WeaponAmmoType ammoType) =>
+            GetAmmoProfile(ammoType)?.ProjectileLifetime ?? pistolProjectileLifetime;
 
-        private float GetFireCooldown(global::WeaponAmmoType ammoType)
-        {
-            return ammoType switch
-            {
-                global::WeaponAmmoType.Pistol => pistolFireCooldown,
-                global::WeaponAmmoType.Shotgun => shotgunFireCooldown,
-                global::WeaponAmmoType.Rifle => rifleFireCooldown,
-                _ => pistolFireCooldown,
-            };
-        }
+        private float GetFireCooldown(global::WeaponAmmoType ammoType) =>
+            GetAmmoProfile(ammoType)?.FireCooldown ?? pistolFireCooldown;
 
         private static Vector2 Rotate(Vector2 vector, float degrees)
         {
@@ -427,7 +429,9 @@ namespace CIS2991Project.Player
             PlaySfx(dryFireSound, GetMuzzlePosition());
         }
 
-        private void PlaySfx(AudioClip clip, Vector2 position)
+        // Internal rather than private - PlayerProjectile (a standalone component, not nested in this
+        // class) calls back into this on hit/impact.
+        internal void PlaySfx(AudioClip clip, Vector2 position)
         {
             if (clip == null)
                 return;
@@ -444,20 +448,7 @@ namespace CIS2991Project.Player
             Object.Destroy(go, clip.length);
         }
 
-        private AudioClip GetFireSound(global::WeaponAmmoType ammoType)
-        {
-            switch (ammoType)
-            {
-                case global::WeaponAmmoType.Pistol:
-                    return pistolFireSound;
-                case global::WeaponAmmoType.Shotgun:
-                    return shotgunFireSound;
-                case global::WeaponAmmoType.Rifle:
-                    return rifleFireSound;
-                default:
-                    return null;
-            }
-        }
+        private AudioClip GetFireSound(global::WeaponAmmoType ammoType) => GetAmmoProfile(ammoType)?.FireSound;
 
         private static Sprite CreateCircleSprite(Color color)
         {
@@ -479,57 +470,6 @@ namespace CIS2991Project.Player
             texture.SetPixels32(pixels);
             texture.Apply();
             return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
-        }
-
-        private class Projectile : MonoBehaviour, IProjectile
-        {
-            private const float Speed = 24f;
-
-            private float _remaining;
-            private int _damage;
-            private AudioClip _hitSound;
-            private PlayerShoot _owner;
-
-            public void Initialize(Vector2 direction, int damage, float lifetime, AudioClip hitSound, PlayerShoot owner)
-            {
-                _remaining = lifetime;
-                _damage = Mathf.Max(1, damage);
-                _hitSound = hitSound;
-                _owner = owner;
-                GetComponent<Rigidbody2D>().linearVelocity = direction * Speed;
-            }
-
-            private void Update()
-            {
-                _remaining -= Time.deltaTime;
-                if (_remaining <= 0f)
-                    Destroy(gameObject);
-            }
-
-            private void OnTriggerEnter2D(Collider2D other)
-            {
-                // Covers both other player projectiles and enemy projectiles (EnemyProjectile also
-                // implements IProjectile) - projectiles shouldn't collide with each other.
-                if (other.GetComponent<IProjectile>() != null)
-                    return;
-
-                // LevelBounds spans the whole level and the player always stands inside it, so
-                // projectiles spawn already overlapping it - it isn't a wall, ignore it.
-                if (other.GetComponent<LevelBounds>() != null)
-                    return;
-
-                var enemy = other.GetComponent<Enemy>();
-                if (enemy != null)
-                {
-                    enemy.TakeHit(GetComponent<Rigidbody2D>().linearVelocity.normalized, _damage);
-                    _owner?.PlaySfx(_hitSound, transform.position);
-                    Destroy(gameObject);
-                    return;
-                }
-
-                if (other.GetComponentInParent<PlayerHealth>() == null)
-                    Destroy(gameObject);
-            }
         }
     }
 }
