@@ -119,60 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1001}
-  - component: {fileID: 1002}
-  m_Layer: 0
-  m_Name: Settlement Scene Layout
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 89f5eb546c9d4b59915d92d2f58b4e3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wall: {fileID: 21300000, guid: f8eac2d6fb6ee8d4989a35dfb8b91e0b, type: 3}
-  entrance: {fileID: 21300000, guid: d900fec0e2dd6584bb02232ffd6c08d2, type: 3}
-  boardedDoor: {fileID: 21300000, guid: 2d0da087689a3a44c9aef4e3a0b5c857, type: 3}
-  cart: {fileID: 21300000, guid: e1ca2800992700c48978b385512e80cd, type: 3}
-  barrel: {fileID: 21300000, guid: dcdbfdd3455135a478cd712b833b60c8, type: 3}
-  bandage: {fileID: 21300000, guid: 9fc1b37b4fc8553409c2ceb72e779fa7, type: 3}
-  ammo: {fileID: 21300000, guid: 88ce6f2b4868aef4ba5e04f342333c25, type: 3}
-  playerSprite: {fileID: 21300000, guid: 8103f7e03a25b9c48801c630478c7710, type: 3}
-  bandageItem: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
-  ammoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
 --- !u!1 &38217600
 GameObject:
   m_ObjectHideFlags: 0
@@ -41152,7 +41098,6 @@ BoxCollider2D:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1001}
   - {fileID: 755094346}
   - {fileID: 38217603}
   - {fileID: 277521186}

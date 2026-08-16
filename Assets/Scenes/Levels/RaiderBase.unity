@@ -119,66 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &2000
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2001}
-  - component: {fileID: 2002}
-  m_Layer: 0
-  m_Name: Raider Base Scene Layout
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &2001
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2000}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c123cb802e4d4071ac2fc45dc74f1c6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  wall: {fileID: 21300000, guid: f8eac2d6fb6ee8d4989a35dfb8b91e0b, type: 3}
-  container: {fileID: 21300000, guid: fade93f35b4237e4fabdc5dd03fb2495, type: 3}
-  barrel: {fileID: 21300000, guid: dcdbfdd3455135a478cd712b833b60c8, type: 3}
-  ammoCrate: {fileID: 21300000, guid: a9f05ea4ac2694648bfd7e65fc31f089, type: 3}
-  pistol: {fileID: 21300000, guid: 291a9dd1c0d24794cb604f4c3454f167, type: 3}
-  bandage: {fileID: 21300000, guid: 9fc1b37b4fc8553409c2ceb72e779fa7, type: 3}
-  playerSprite: {fileID: 21300000, guid: 8103f7e03a25b9c48801c630478c7710, type: 3}
-  bandageItem: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
-  ammoItem: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
-  pistolItem: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
-  tire: {fileID: 21300000, guid: dbd7862e2c1cdfa428780ba46ff33b92, type: 3}
-  vendingMachine: {fileID: 21300000, guid: 3d47f704b9a271a41850a0046a39afc8, type: 3}
-  debris: {fileID: 21300000, guid: 68c44bae66bbcfb469a81bced598a9c5, type: 3}
-  truck: {fileID: 21300000, guid: ba75198c3c00da940b22ed07e006a1d7, type: 3}
-  backgroundTileSet: {fileID: 21300000, guid: 5349a6cd8e288b440a34e918f2644228, type: 3}
-  buildingTileSet: {fileID: 21300000, guid: aa9fd6cf91632c544990a2f99ed8a571, type: 3}
 --- !u!1 &86303903
 GameObject:
   m_ObjectHideFlags: 0
@@ -978,6 +918,19 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &421172208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 744547006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4660f5667aac11846ba34e6d4611eecd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jobDefinition: {fileID: 11400000, guid: 4833d0e05f2066344b2bf304f7424254, type: 2}
 --- !u!1 &434223247
 GameObject:
   m_ObjectHideFlags: 0
@@ -1679,19 +1632,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &421172208
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 744547006}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4660f5667aac11846ba34e6d4611eecd, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  jobDefinition: {fileID: 11400000, guid: 4833d0e05f2066344b2bf304f7424254, type: 2}
 --- !u!4 &744547007
 Transform:
   m_ObjectHideFlags: 0
@@ -68931,7 +68871,6 @@ Tilemap:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 2001}
   - {fileID: 108285272}
   - {fileID: 1246177252}
   - {fileID: 132806636}

@@ -134,9 +134,7 @@ namespace CIS2991Project.Items
                 return;
 
             var sprite = _isOpen ? openSprite : closedSprite;
-            // Fallback so the chest is visible/testable before closedSprite/openSprite are set -
-            // same runtime-generated-solid-sprite pattern already used elsewhere in this project
-            // (e.g. SettlementSceneLayout.Solid).
+            // Fallback so the chest is visible/testable before closedSprite/openSprite are set.
             _renderer.sprite = sprite != null ? sprite : Fallback(_isOpen ? Color.yellow : new Color(0.45f, 0.28f, 0.1f));
         }
 

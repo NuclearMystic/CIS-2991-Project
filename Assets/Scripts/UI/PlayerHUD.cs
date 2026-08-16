@@ -188,8 +188,6 @@ namespace CIS2991Project.UI
                 characterSheet = Object.FindAnyObjectByType<CharacterSheet>();
             }
 
-            EnsureHud();
-
             if (playerInventory != null)
             {
                 playerInventory.ItemPickedUp += HandleItemPickedUp;
@@ -205,11 +203,6 @@ namespace CIS2991Project.UI
         }
 
         private int HeartCount => characterSheet != null ? characterSheet.GetHeartCount() : heartCount;
-
-        private void EnsureHud()
-        {
-            // IMGUI HUD needs no scene setup; OnGUI draws it every frame.
-        }
 
         private void HandleItemPickedUp(global::Item item, int amount)
         {
