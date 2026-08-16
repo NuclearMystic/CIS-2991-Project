@@ -1,3 +1,4 @@
+using CIS2991Project.Core;
 using UnityEngine;
 
 namespace CIS2991Project.Player
@@ -5,6 +6,24 @@ namespace CIS2991Project.Player
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class PlayerWeaponVisual : MonoBehaviour
     {
+        // Bundles the four per-direction values (idle sprite, attack frames, offset, sorting order) so
+        // LateUpdate needs one switch instead of four separate ones to look them up.
+        private readonly struct DirectionalVisual
+        {
+            public readonly Sprite IdleSprite;
+            public readonly Sprite[] AttackFrames;
+            public readonly Vector2 Offset;
+            public readonly int SortingOrder;
+
+            public DirectionalVisual(Sprite idleSprite, Sprite[] attackFrames, Vector2 offset, int sortingOrder)
+            {
+                IdleSprite = idleSprite;
+                AttackFrames = attackFrames;
+                Offset = offset;
+                SortingOrder = sortingOrder;
+            }
+        }
+
         [Header("Sorting order per direction")]
         [SerializeField] private int downSortingOrder = 3;
         [SerializeField] private int upSortingOrder = 1;
@@ -72,30 +91,30 @@ namespace CIS2991Project.Player
                 return;
             }
 
-            var direction = _animator.GetInteger("Direction");
+            var direction = (Direction)_animator.GetInteger("Direction");
+            var visual = GetDirectionalVisual(weapon, direction);
             _renderer.sprite = _isAttacking
-                ? AdvanceAttackPlayback(weapon, direction)
-                : GetDirectionalSprite(weapon, direction);
+                ? AdvanceAttackPlayback(visual.AttackFrames, visual.IdleSprite, weapon.attackFrameRate)
+                : visual.IdleSprite;
 
             _renderer.enabled = _renderer.sprite != null;
-            _renderer.sortingOrder = GetSortingOrder(direction);
-            transform.localPosition = _basePosition + (Vector3)GetOffset(weapon, direction);
+            _renderer.sortingOrder = visual.SortingOrder;
+            transform.localPosition = _basePosition + (Vector3)visual.Offset;
         }
 
         // Steps through the equipped weapon's attack frames for the given direction, falling back to
         // the idle sprite once the sequence finishes (or immediately, if this weapon has no frames set).
-        private Sprite AdvanceAttackPlayback(global::Item weapon, int direction)
+        private Sprite AdvanceAttackPlayback(Sprite[] frames, Sprite idleSprite, float attackFrameRate)
         {
-            var frames = GetAttackFrames(weapon, direction);
             if (frames == null || frames.Length == 0)
             {
                 _isAttacking = false;
-                return GetDirectionalSprite(weapon, direction);
+                return idleSprite;
             }
 
             var frame = frames[Mathf.Min(_attackFrameIndex, frames.Length - 1)];
 
-            var secondsPerFrame = 1f / Mathf.Max(1f, weapon.attackFrameRate);
+            var secondsPerFrame = 1f / Mathf.Max(1f, attackFrameRate);
             _attackFrameTimer += Time.deltaTime;
             if (_attackFrameTimer >= secondsPerFrame)
             {
@@ -108,47 +127,14 @@ namespace CIS2991Project.Player
             return frame;
         }
 
-        private static Sprite GetDirectionalSprite(global::Item weapon, int direction)
+        private DirectionalVisual GetDirectionalVisual(global::Item weapon, Direction direction)
         {
             return direction switch
             {
-                1 => weapon.equippedSpriteUp,
-                2 => weapon.equippedSpriteLeft,
-                3 => weapon.equippedSpriteRight,
-                _ => weapon.equippedSpriteDown,
-            };
-        }
-
-        private static Sprite[] GetAttackFrames(global::Item weapon, int direction)
-        {
-            return direction switch
-            {
-                1 => weapon.attackFramesUp,
-                2 => weapon.attackFramesLeft,
-                3 => weapon.attackFramesRight,
-                _ => weapon.attackFramesDown,
-            };
-        }
-
-        private static Vector2 GetOffset(global::Item weapon, int direction)
-        {
-            return direction switch
-            {
-                1 => weapon.equippedOffsetUp,
-                2 => weapon.equippedOffsetLeft,
-                3 => weapon.equippedOffsetRight,
-                _ => weapon.equippedOffsetDown,
-            };
-        }
-
-        private int GetSortingOrder(int direction)
-        {
-            return direction switch
-            {
-                1 => upSortingOrder,
-                2 => leftSortingOrder,
-                3 => rightSortingOrder,
-                _ => downSortingOrder,
+                Direction.Up => new DirectionalVisual(weapon.equippedSpriteUp, weapon.attackFramesUp, weapon.equippedOffsetUp, upSortingOrder),
+                Direction.Left => new DirectionalVisual(weapon.equippedSpriteLeft, weapon.attackFramesLeft, weapon.equippedOffsetLeft, leftSortingOrder),
+                Direction.Right => new DirectionalVisual(weapon.equippedSpriteRight, weapon.attackFramesRight, weapon.equippedOffsetRight, rightSortingOrder),
+                _ => new DirectionalVisual(weapon.equippedSpriteDown, weapon.attackFramesDown, weapon.equippedOffsetDown, downSortingOrder),
             };
         }
     }

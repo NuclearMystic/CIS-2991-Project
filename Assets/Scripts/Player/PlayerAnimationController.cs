@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CIS2991Project.Core;
 using UnityEngine;
 
 namespace CIS2991Project.Player
@@ -23,8 +24,6 @@ namespace CIS2991Project.Player
             public AnimationClip right;
         }
 
-        private enum FacingDirection { Down, Up, Left, Right }
-
         [Header("Must match the clips already wired into the base controller's Idle states")]
         [SerializeField] private DirectionalClips unarmedIdle;
         [SerializeField] private DirectionalClips armedIdle;
@@ -39,7 +38,7 @@ namespace CIS2991Project.Player
         private PlayerInventory _inventory;
         private PlayerWeaponVisual _weaponVisual;
         private readonly List<KeyValuePair<AnimationClip, AnimationClip>> _overrideBuffer = new();
-        private FacingDirection _facing = FacingDirection.Down;
+        private Direction _facing = Direction.Down;
         private bool _isDead;
         private bool _equipmentArmed;
         private bool? _appliedArmedPose;
@@ -143,11 +142,11 @@ namespace CIS2991Project.Player
             _overrideController.ApplyOverrides(_overrideBuffer);
         }
 
-        private static FacingDirection DetermineFacing(Vector2 input)
+        private static Direction DetermineFacing(Vector2 input)
         {
             return Mathf.Abs(input.y) > Mathf.Abs(input.x)
-                ? (input.y > 0f ? FacingDirection.Up : FacingDirection.Down)
-                : (input.x < 0f ? FacingDirection.Left : FacingDirection.Right);
+                ? (input.y > 0f ? Direction.Up : Direction.Down)
+                : (input.x < 0f ? Direction.Left : Direction.Right);
         }
     }
 }

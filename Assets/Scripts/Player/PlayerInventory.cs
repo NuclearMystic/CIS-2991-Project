@@ -118,17 +118,6 @@ namespace CIS2991Project.Player
             SetEquippedWeapon(equippedWeapon);
         }
 
-        private void Update()
-        {
-            for (var hotbarIndex = 0; hotbarIndex < HotbarSlotCount; hotbarIndex++)
-            {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + hotbarIndex))
-                {
-                    TryUseHotbarSlot(hotbarIndex);
-                }
-            }
-        }
-
         private void GrantStartingItems()
         {
             foreach (var starterItem in startingItems)
