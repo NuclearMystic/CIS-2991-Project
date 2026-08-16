@@ -329,18 +329,17 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   fistsItem: {fileID: 11400000, guid: 7a3d4e6f9b1c4a2d8e0f6b3c5a7d9e1f, type: 2}
+  currency: 60
   startingItems:
-  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
-    amount: 99
-  - item: {fileID: 11400000, guid: 747fb2adcb4e0b44ea73a264e1f5410c, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 8c7064863d7307f4389a362488ec27f1, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
-    amount: 99
-  - item: {fileID: 11400000, guid: b2604b72b3a806a4197b064542430bd4, type: 2}
-    amount: 99
   - item: {fileID: 11400000, guid: 4ce0451a27c46864085348d98013ee63, type: 2}
+    amount: 5
+  - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
+    amount: 5
+  - item: {fileID: 11400000, guid: 44dcd2a2c6db01242b242d9a81896ca1, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 6e6e301f45e063b4c8ae804b6c321acb, type: 2}
     amount: 1
 --- !u!114 &5337185273854832097
 MonoBehaviour:
@@ -421,6 +420,7 @@ MonoBehaviour:
   characterSheet: {fileID: 5036190077612624874}
   inventoryToggleKey: 105
   skillsToggleKey: 107
+  journalToggleKey: 106
   fullHeartTexture: {fileID: 2800000, guid: 2cd519fe145b0394983ac378a41a4b09, type: 3}
   halfHeartTexture: {fileID: 2800000, guid: 4a2a0ff91784fed45b93cf9d3ac04057, type: 3}
   emptyHeartTexture: {fileID: 2800000, guid: d733213917965e44cac7b6e6732a3d82, type: 3}
@@ -476,6 +476,14 @@ MonoBehaviour:
   skillsPanelBackgroundTexture: {fileID: 2800000, guid: 380a69f091ed5eb44ab87f9c6da2164c, type: 3}
   skillsPanelWidth: 320
   skillRowHeight: 26
+  journalPanelBackgroundTexture: {fileID: 0}
+  journalPanelWidth: 460
+  journalPanelHeight: 340
+  journalRowHeight: 46
+  jobTrackerRowBackgroundTexture: {fileID: 0}
+  jobTrackerWidth: 220
+  jobTrackerRowHeight: 26
+  jobTrackerRowGap: 2
 --- !u!114 &7885066162786256011
 MonoBehaviour:
   m_ObjectHideFlags: 0

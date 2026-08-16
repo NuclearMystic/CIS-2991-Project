@@ -1,5 +1,7 @@
+using System.Collections;
 using CIS2991Project.Core;
 using CIS2991Project.Items;
+using CIS2991Project.Jobs;
 using CIS2991Project.Player;
 using UnityEngine;
 
@@ -39,10 +41,19 @@ namespace CIS2991Project.Enemies
 
         [SerializeField, Min(0f)] private float deathAnimationSeconds = 1f;
 
+        [Header("Hit Feedback — quick red flash + shake when damage is confirmed")]
+        [SerializeField] private Color hitFlashColor = Color.red;
+        [SerializeField, Min(0f)] private float hitFlashDuration = 0.15f;
+        [SerializeField, Min(0f)] private float hitShakeMagnitude = 0.06f;
+
         private Rigidbody2D _body;
         private Animator _animator;
+        private SpriteRenderer _spriteRenderer;
         private PlayerHealth _player;
         private CharacterSheet _playerCharacterSheet;
+        private Color _originalColor;
+        private Vector3 _hitShakeOffset = Vector3.zero;
+        private Coroutine _hitFeedbackCoroutine;
 
         private State _state = State.Patrol;
         private Vector2 _homePosition;
@@ -61,6 +72,12 @@ namespace CIS2991Project.Enemies
             _body.freezeRotation = true;
 
             _animator = GetComponent<Animator>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
+            if (_spriteRenderer != null)
+            {
+                _originalColor = _spriteRenderer.color;
+            }
+
             _currentHealth = definition != null ? definition.maxHealth : 1;
         }
 
@@ -217,6 +234,8 @@ namespace CIS2991Project.Enemies
                 return;
             }
 
+            PlayHitFeedback();
+
             _currentHealth -= Mathf.Max(1, damage);
             if (_currentHealth <= 0)
             {
@@ -224,10 +243,53 @@ namespace CIS2991Project.Enemies
             }
         }
 
+        private void PlayHitFeedback()
+        {
+            if (_spriteRenderer == null)
+            {
+                return;
+            }
+
+            if (_hitFeedbackCoroutine != null)
+            {
+                StopCoroutine(_hitFeedbackCoroutine);
+                transform.position -= _hitShakeOffset;
+                _hitShakeOffset = Vector3.zero;
+            }
+
+            _hitFeedbackCoroutine = StartCoroutine(HitFeedbackRoutine());
+        }
+
+        // Shakes as an additive offset that's undone and reapplied each frame, rather than driving
+        // transform.position directly - the same transform is also moved by physics every FixedUpdate
+        // (via _body.linearVelocity in UpdatePatrol/UpdateChase), so a naive shake would fight that
+        // and either drift the enemy off its real position or snap back to a stale one once it ends.
+        private IEnumerator HitFeedbackRoutine()
+        {
+            _spriteRenderer.color = hitFlashColor;
+
+            var elapsed = 0f;
+            while (elapsed < hitFlashDuration)
+            {
+                transform.position -= _hitShakeOffset;
+                _hitShakeOffset = (Vector3)Random.insideUnitCircle * hitShakeMagnitude;
+                transform.position += _hitShakeOffset;
+
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            transform.position -= _hitShakeOffset;
+            _hitShakeOffset = Vector3.zero;
+            _spriteRenderer.color = _originalColor;
+            _hitFeedbackCoroutine = null;
+        }
+
         private void Die()
         {
             _state = State.Dead;
             _body.linearVelocity = Vector2.zero;
+            JobManager.ReportKill(definition.displayName);
 
             var collider = GetComponent<Collider2D>();
             if (collider != null)
