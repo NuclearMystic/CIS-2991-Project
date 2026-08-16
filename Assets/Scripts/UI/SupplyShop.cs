@@ -47,47 +47,18 @@ namespace CIS2991Project.UI
 
         private PlayerInventory playerInventory;
         private bool isOpen;
-        private bool pausedByShop;
-        private float timeScaleBeforeOpen = 1f;
         private string statusMessage;
         private GUIStyle centeredLabelStyle;
         private GUIStyle titleLabelStyle;
 
         public static bool IsAnyShopOpen => activeShop != null && activeShop.isOpen;
 
-        private GUIStyle CenteredLabelStyle
-        {
-            get
-            {
-                if (centeredLabelStyle == null)
-                {
-                    centeredLabelStyle = new GUIStyle(GUI.skin.label)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        wordWrap = true
-                    };
-                }
+        // Same base style as every other IMGUI panel, but this one also wraps long item descriptions.
+        private GUIStyle CenteredLabelStyle => GuiDrawUtils.GetOrCreate(ref centeredLabelStyle,
+            () => new GUIStyle(GuiDrawUtils.CenteredLabelStyle) { wordWrap = true });
 
-                return centeredLabelStyle;
-            }
-        }
-
-        private GUIStyle TitleLabelStyle
-        {
-            get
-            {
-                if (titleLabelStyle == null)
-                {
-                    titleLabelStyle = new GUIStyle(CenteredLabelStyle)
-                    {
-                        fontSize = 24,
-                        fontStyle = FontStyle.Bold
-                    };
-                }
-
-                return titleLabelStyle;
-            }
-        }
+        private GUIStyle TitleLabelStyle => GuiDrawUtils.GetOrCreate(ref titleLabelStyle,
+            () => new GUIStyle(CenteredLabelStyle) { fontSize = 24, fontStyle = FontStyle.Bold });
 
         public void Open(PlayerInventory inventory)
         {
@@ -107,12 +78,7 @@ namespace CIS2991Project.UI
             activeShop = this;
             statusMessage = "Defeat enemies to earn Caps, then restock here.";
 
-            if (!pausedByShop)
-            {
-                timeScaleBeforeOpen = Time.timeScale;
-                Time.timeScale = 0f;
-                pausedByShop = true;
-            }
+            PauseGate.Request(this);
         }
 
         public void Close()
@@ -128,11 +94,7 @@ namespace CIS2991Project.UI
                 activeShop = null;
             }
 
-            if (pausedByShop)
-            {
-                Time.timeScale = timeScaleBeforeOpen;
-                pausedByShop = false;
-            }
+            PauseGate.Release(this);
         }
 
         public static void CloseActiveShop()
@@ -166,6 +128,7 @@ namespace CIS2991Project.UI
                 return;
             }
 
+            GuiScale.Begin();
             DrawShop();
         }
 
@@ -179,18 +142,18 @@ namespace CIS2991Project.UI
 
             var rowCount = Mathf.Max(stock != null ? stock.Length : 0, 1);
             var desiredHeight = titleHeight + rowCount * rowHeight + footerHeight + outerPadding * 2f;
-            var width = Mathf.Min(panelWidth, Screen.width - outerPadding * 2f);
-            var height = Mathf.Min(desiredHeight, Screen.height - outerPadding * 2f);
-            var panelRect = new Rect((Screen.width - width) * .5f, (Screen.height - height) * .5f, width, height);
+            var width = Mathf.Min(panelWidth, GuiScale.ReferenceWidth - outerPadding * 2f);
+            var height = Mathf.Min(desiredHeight, GuiScale.ReferenceHeight - outerPadding * 2f);
+            var panelRect = new Rect((GuiScale.ReferenceWidth - width) * .5f, (GuiScale.ReferenceHeight - height) * .5f, width, height);
 
-            DrawFrame(panelRect, panelGraphic);
+            GuiDrawUtils.DrawSlot(panelRect, panelGraphic);
 
             var titleRect = new Rect(panelRect.x + outerPadding, panelRect.y + outerPadding, panelRect.width - outerPadding * 2f, titleHeight);
-            DrawFrame(titleRect, titleGraphic);
+            GuiDrawUtils.DrawSlot(titleRect, titleGraphic);
             GUI.Label(titleRect, shopTitle, TitleLabelStyle);
 
             var currencyRect = new Rect(titleRect.x + 12f, titleRect.y + 8f, 160f, 28f);
-            DrawFrame(currencyRect, currencyGraphic);
+            GuiDrawUtils.DrawSlot(currencyRect, currencyGraphic);
             GUI.Label(currencyRect, $"{currencyName}: {playerInventory.Currency}", CenteredLabelStyle);
 
             var closeRect = new Rect(titleRect.xMax - 88f, titleRect.y + 8f, 76f, 30f);
@@ -220,7 +183,7 @@ namespace CIS2991Project.UI
 
         private void DrawStockRow(Rect rowRect, StockEntry entry)
         {
-            DrawFrame(rowRect, itemSlotGraphic);
+            GuiDrawUtils.DrawSlot(rowRect, itemSlotGraphic);
 
             if (entry == null || entry.item == null)
             {
@@ -234,7 +197,7 @@ namespace CIS2991Project.UI
             var purchaseAmount = Mathf.Max(1, entry.amountPerPurchase);
             var price = GetPrice(entry);
             var remainingLabel = entry.quantity > 0 ? $"Stock: {entry.quantity}" : "Stock: Unlimited";
-            var itemName = string.IsNullOrWhiteSpace(entry.item.displayName) ? entry.item.name : entry.item.displayName;
+            var itemName = GuiDrawUtils.GetItemName(entry.item);
             var itemInfoRect = new Rect(iconRect.xMax + 10f, rowRect.y + 7f, rowRect.width - 260f, 24f);
             var stockInfoRect = new Rect(itemInfoRect.x, rowRect.y + 32f, itemInfoRect.width, 22f);
             GUI.Label(itemInfoRect, purchaseAmount > 1 ? $"{itemName} x{purchaseAmount}" : itemName);
@@ -282,25 +245,13 @@ namespace CIS2991Project.UI
                 entry.quantity -= purchaseAmount;
             }
 
-            var itemName = string.IsNullOrWhiteSpace(entry.item.displayName) ? entry.item.name : entry.item.displayName;
+            var itemName = GuiDrawUtils.GetItemName(entry.item);
             statusMessage = $"Purchased {itemName}{(purchaseAmount > 1 ? $" x{purchaseAmount}" : string.Empty)}.";
         }
 
         private int GetPrice(StockEntry entry)
         {
             return entry.price > 0 ? entry.price : Mathf.Max(0, entry.item.value);
-        }
-
-        private static void DrawFrame(Rect rect, Texture2D graphic)
-        {
-            if (graphic != null)
-            {
-                GUI.DrawTexture(rect, graphic, ScaleMode.ScaleToFit);
-            }
-            else
-            {
-                GUI.Box(rect, GUIContent.none);
-            }
         }
 
         private bool DrawButton(Rect rect, string label, Texture2D graphic)
@@ -323,14 +274,7 @@ namespace CIS2991Project.UI
             }
             else if (entry.item.icon != null)
             {
-                var texture = entry.item.icon.texture;
-                var textureRect = entry.item.icon.textureRect;
-                var uv = new Rect(
-                    textureRect.x / texture.width,
-                    textureRect.y / texture.height,
-                    textureRect.width / texture.width,
-                    textureRect.height / texture.height);
-                GUI.DrawTextureWithTexCoords(rect, texture, uv);
+                GuiDrawUtils.DrawSprite(rect, entry.item.icon);
             }
             else
             {

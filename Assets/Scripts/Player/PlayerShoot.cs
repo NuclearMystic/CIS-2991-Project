@@ -124,6 +124,13 @@ namespace CIS2991Project.Player
 
         private void Update()
         {
+            // Without this, aiming/firing/reload input still reacts every frame while paused (only
+            // Time.deltaTime-driven progress, like _cooldown counting down, is actually frozen).
+            if (Time.timeScale == 0f)
+            {
+                return;
+            }
+
             var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             if (input != Vector2.zero && !Input.GetButton("Fire2"))
                 _lastDirection = input.normalized;

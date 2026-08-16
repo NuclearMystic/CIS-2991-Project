@@ -160,6 +160,9 @@ MonoBehaviour:
   patrolRadius: 3
   patrolPauseSeconds: 1.5
   deathAnimationSeconds: 1
+  hitFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  hitFlashDuration: 0.15
+  hitShakeMagnitude: 0.06
 --- !u!61 &2179025227302914684
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -194,7 +197,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.16824418, y: -0.25390264}
+  m_Offset: {x: 0.009396687, y: -0.25390267}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -204,5 +207,5 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.1211525, y: 1.4704387}
+  m_Size: {x: 0.75910306, y: 1.4704387}
   m_EdgeRadius: 0
