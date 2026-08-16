@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a8b9c0d1e2f4a6b8c0d1e2f4a6b8cdd, type: 3}
+  m_Name: NPC4_Scavenger_Barks
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Dialogue.DialogueTree
+  randomBark: 1
+  nodes:
+  - text: There's still a lot of useful stuff to be found if you know where to look.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: People don't dare go in the old buildings.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Just don't get greedy.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: I've lost more friends to bad decisions than to monsters.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Clear the room before you start grabbing everything.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: You never know what you're going to get.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0

@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a8b9c0d1e2f4a6b8c0d1e2f4a6b8cdd, type: 3}
+  m_Name: Quest1_ClearSettlement_Offer
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Dialogue.DialogueTree
+  randomBark: 0
+  nodes:
+  - text: We've got a big problem with zombies walking around the settlement.
+    hasChoice: 0
+    nextNodeIndex: 1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: There's more of them every night,
+    hasChoice: 0
+    nextNodeIndex: 2
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: They're bringing it too close to our homes now, and people are scared to leave the settlement.
+    hasChoice: 0
+    nextNodeIndex: 3
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Can you help us clear out the zombies around the settlement?
+    hasChoice: 0
+    nextNodeIndex: 4
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: We'll make sure you're rewarded for helping keep everyone safe.
+    hasChoice: 1
+    nextNodeIndex: 0
+    yesNextNodeIndex: 5
+    noNextNodeIndex: 8
+  - text: Oh, thank you. We really appreciate it.
+    hasChoice: 0
+    nextNodeIndex: 6
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Just be careful out there. There are more of them out there than you know.
+    hasChoice: 0
+    nextNodeIndex: 7
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Return when you have secured the place.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Oh... well, it was worth a shot.
+    hasChoice: 0
+    nextNodeIndex: 9
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: I guess we'll have to handle them ourselves.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0

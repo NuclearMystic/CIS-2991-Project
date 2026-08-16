@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Zombie
   maxHealth: 10
   expReward: 15
-  patrolSpeed: 1
-  chaseSpeed: 2
+  patrolSpeed: 0.25
+  chaseSpeed: 0.5
   sightRange: 6
   attackRange: 1
   attackType: 0

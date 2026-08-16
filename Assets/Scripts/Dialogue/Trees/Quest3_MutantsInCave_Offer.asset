@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a8b9c0d1e2f4a6b8c0d1e2f4a6b8cdd, type: 3}
+  m_Name: Quest3_MutantsInCave_Offer
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Dialogue.DialogueTree
+  randomBark: 0
+  nodes:
+  - text: There was a strange phenomenon to the south east.
+    hasChoice: 0
+    nextNodeIndex: 1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: People say they've been hearing sounds out of an ancient cave.
+    hasChoice: 0
+    nextNodeIndex: 2
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: At first, we figured it was just animals.
+    hasChoice: 0
+    nextNodeIndex: 3
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Then one of the scavengers returned with wounds that were definitely not made by an animal.
+    hasChoice: 0
+    nextNodeIndex: 4
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: We believe mutants have seized the cave.
+    hasChoice: 0
+    nextNodeIndex: 5
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Are you up for going down there and seeing what's going on?
+    hasChoice: 1
+    nextNodeIndex: 0
+    yesNextNodeIndex: 6
+    noNextNodeIndex: 10
+  - text: Thank you. I don't think anyone else would have dared go near that place.
+    hasChoice: 0
+    nextNodeIndex: 7
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Head south-east then east until you reach a cave.
+    hasChoice: 0
+    nextNodeIndex: 8
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Whatever is down there, don't take it easy.
+    hasChoice: 0
+    nextNodeIndex: 9
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Come back when you've cleared out those mutants.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Can't say I blame you.
+    hasChoice: 0
+    nextNodeIndex: 11
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Whatever is in that cave has scared everyone around here.
+    hasChoice: 0
+    nextNodeIndex: 12
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Maybe we'll find someone brave enough to deal with it.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0

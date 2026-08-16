@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a8b9c0d1e2f4a6b8c0d1e2f4a6b8cdd, type: 3}
+  m_Name: Quest2_RaidersShippingYard_Offer
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Dialogue.DialogueTree
+  randomBark: 0
+  nodes:
+  - text: Have you heard about the things at the former shipping yard?
+    hasChoice: 0
+    nextNodeIndex: 1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: A band of raiders took over a couple of days ago.
+    hasChoice: 0
+    nextNodeIndex: 2
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: They were pilfering supplies from anyone who came too near.
+    hasChoice: 0
+    nextNodeIndex: 3
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: The shipping yard is just west of here, and it's turning into a menace to the community.
+    hasChoice: 0
+    nextNodeIndex: 4
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: We need someone to go in there and run them out.
+    hasChoice: 0
+    nextNodeIndex: 5
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Do you have a mind to deal with the raiders?
+    hasChoice: 1
+    nextNodeIndex: 0
+    yesNextNodeIndex: 6
+    noNextNodeIndex: 10
+  - text: Good. I was hoping you would say that.
+    hasChoice: 0
+    nextNodeIndex: 7
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Keep your eyes peeled. Raiders are no-fair fighters.
+    hasChoice: 0
+    nextNodeIndex: 8
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Go out to the old shipping yard west and take care of them.
+    hasChoice: 0
+    nextNodeIndex: 9
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Return when the work is completed.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: I know. The Raiders are not precisely a walk in the park.
+    hasChoice: 0
+    nextNodeIndex: 11
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Maybe someone else will be willing to help.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0

@@ -17,10 +17,10 @@ MonoBehaviour:
   expReward: 25
   patrolSpeed: 2
   chaseSpeed: 4
-  sightRange: 10
-  attackRange: 10
+  sightRange: 8
+  attackRange: 8
   attackType: 1
-  attackDamage: 1
+  attackDamage: 2
   attackCooldown: 1
   projectileSprite: {fileID: 21300000, guid: 726569dee2ad4334681b1910784cd3ae, type: 3}
   projectileSpeed: 8

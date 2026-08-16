@@ -1,4 +1,4 @@
-using CIS2991Project.Player;
+using CIS2991Project.Dialogue;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -139,11 +139,41 @@ namespace CIS2991Project.Managers
             var body = npc.AddComponent<BoxCollider2D>();
             body.isTrigger = true;
 
-            var dialogue = npc.AddComponent<DemoNpcDialogue>();
-            dialogue.Configure(
-                "Survivor",
-                "You made it to camp. Keep your supplies close out there."
-            );
+            var dialogue = npc.AddComponent<NpcDialogue>();
+            dialogue.Configure("Survivor", CreateDemoDialogueTree());
+        }
+
+        // Proves out branching (a line, then a Yes/No job offer, then a different response per
+        // answer) without needing a persisted DialogueTree asset - matches this file's existing
+        // fully-code-built convention (see CreateSolidSprite etc.) rather than introducing one.
+        private static DialogueTree CreateDemoDialogueTree()
+        {
+            var tree = ScriptableObject.CreateInstance<DialogueTree>();
+
+            tree.nodes.Add(new DialogueNode
+            {
+                text = "You made it to camp. Keep your supplies close out there.",
+                nextNodeIndex = 1
+            });
+            tree.nodes.Add(new DialogueNode
+            {
+                text = "I could use an extra pair of hands around here. Interested in some work?",
+                hasChoice = true,
+                yesNextNodeIndex = 2,
+                noNextNodeIndex = 3
+            });
+            tree.nodes.Add(new DialogueNode
+            {
+                text = "Good to hear. Come find me again once the job board's up and running.",
+                nextNodeIndex = -1
+            });
+            tree.nodes.Add(new DialogueNode
+            {
+                text = "Fair enough. Door's always open if you change your mind.",
+                nextNodeIndex = -1
+            });
+
+            return tree;
         }
 
         private Sprite CreateSolidSprite(Color color)
@@ -160,104 +190,6 @@ namespace CIS2991Project.Managers
             texture.SetPixels32(pixels);
             texture.Apply();
             return Sprite.Create(texture, new Rect(0f, 0f, 16f, 16f), new Vector2(0.5f, 0.5f), 16f);
-        }
-
-        private class DemoNpcDialogue : MonoBehaviour
-        {
-            private string npcName = "NPC";
-            private string dialogueLine = "Hello.";
-            private bool playerInRange;
-            private bool dialogueOpen;
-
-            public void Configure(string displayName, string line)
-            {
-                npcName = displayName;
-                dialogueLine = line;
-            }
-
-            private void Reset()
-            {
-                GetComponent<Collider2D>().isTrigger = true;
-            }
-
-            private void OnTriggerEnter2D(Collider2D other)
-            {
-                if (other.GetComponentInParent<PlayerHealth>() != null)
-                {
-                    playerInRange = true;
-                }
-            }
-
-            private void OnTriggerExit2D(Collider2D other)
-            {
-                if (other.GetComponentInParent<PlayerHealth>() != null)
-                {
-                    playerInRange = false;
-                    dialogueOpen = false;
-                }
-            }
-
-            private void Update()
-            {
-                if (playerInRange && Input.GetKeyDown(KeyCode.E))
-                {
-                    dialogueOpen = !dialogueOpen;
-                }
-
-                if (dialogueOpen && Input.GetKeyDown(KeyCode.Escape))
-                {
-                    dialogueOpen = false;
-                }
-            }
-
-            private void OnGUI()
-            {
-                if (!playerInRange || Camera.main == null)
-                {
-                    return;
-                }
-
-                // Anchor UI to the NPC's position on screen so it floats above their head
-                // instead of sitting in a fixed screen corner (where it overlapped the inventory HUD).
-                var screenPoint = Camera.main.WorldToScreenPoint(transform.position);
-                if (screenPoint.z < 0f)
-                {
-                    return;
-                }
-
-                var anchorX = screenPoint.x;
-                var anchorY = Screen.height - screenPoint.y;
-                const float headClearance = 60f;
-
-                const float promptWidth = 280f;
-                const float promptHeight = 70f;
-                var promptRect = new Rect(
-                    Mathf.Clamp(anchorX - promptWidth / 2f, 0f, Screen.width - promptWidth),
-                    anchorY - headClearance - promptHeight,
-                    promptWidth,
-                    promptHeight);
-
-                GUI.Box(promptRect, string.Empty);
-                GUI.Label(new Rect(promptRect.x + 12f, promptRect.y + 12f, promptRect.width - 24f, 20f), $"Press E to talk to {npcName}");
-
-                if (!dialogueOpen)
-                {
-                    return;
-                }
-
-                const float dialogueWidth = 360f;
-                const float dialogueHeight = 110f;
-                const float gapAbovePrompt = 8f;
-                var dialogueRect = new Rect(
-                    Mathf.Clamp(anchorX - dialogueWidth / 2f, 0f, Screen.width - dialogueWidth),
-                    promptRect.y - gapAbovePrompt - dialogueHeight,
-                    dialogueWidth,
-                    dialogueHeight);
-
-                GUI.Box(dialogueRect, npcName);
-                GUI.Label(new Rect(dialogueRect.x + 12f, dialogueRect.y + 28f, dialogueRect.width - 24f, 60f), dialogueLine);
-                GUI.Label(new Rect(dialogueRect.x + 12f, dialogueRect.y + 84f, dialogueRect.width - 24f, 20f), "Press Esc to close");
-            }
         }
     }
 }

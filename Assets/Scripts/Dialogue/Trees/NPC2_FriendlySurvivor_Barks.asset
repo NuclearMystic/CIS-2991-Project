@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a8b9c0d1e2f4a6b8c0d1e2f4a6b8cdd, type: 3}
+  m_Name: NPC2_FriendlySurvivor_Barks
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Dialogue.DialogueTree
+  randomBark: 1
+  nodes:
+  - text: Hi, nice to meet you.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: I don't think I've ever seen you around here before.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Welcome to the colony.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: You can always come round here.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Need something?
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Good luck out there.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Take care on the roads.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
+  - text: Beyond the settlement, it's risky.
+    hasChoice: 0
+    nextNodeIndex: -1
+    yesNextNodeIndex: 0
+    noNextNodeIndex: 0
