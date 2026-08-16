@@ -1,4 +1,5 @@
 using CIS2991Project.Items;
+using CIS2991Project.Jobs;
 using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,7 @@ namespace CIS2991Project.UI
         [SerializeField] private CharacterSheet characterSheet;
         [SerializeField] private KeyCode inventoryToggleKey = KeyCode.I;
         [SerializeField] private KeyCode skillsToggleKey = KeyCode.K;
+        [SerializeField] private KeyCode journalToggleKey = KeyCode.J;
 
         [Header("Hearts (Zelda-style) — CurrentHealth/MaxHealth is mapped onto this many hearts")]
         [SerializeField] private Texture2D fullHeartTexture;
@@ -80,12 +82,26 @@ namespace CIS2991Project.UI
         [SerializeField, Min(4f)] private float skillsPanelWidth = 320f;
         [SerializeField, Min(4f)] private float skillRowHeight = 26f;
 
+        [Header("Job Journal — Active/Completed jobs, opened with Journal toggle key")]
+        [SerializeField] private Texture2D journalPanelBackgroundTexture;
+        [SerializeField, Min(4f)] private float journalPanelWidth = 460f;
+        [SerializeField, Min(4f)] private float journalPanelHeight = 340f;
+        [SerializeField, Min(4f)] private float journalRowHeight = 46f;
+
+        [Header("Job Tracker — always-visible kill-count readout for active jobs")]
+        [SerializeField] private Texture2D jobTrackerRowBackgroundTexture;
+        [SerializeField, Min(4f)] private float jobTrackerWidth = 220f;
+        [SerializeField, Min(4f)] private float jobTrackerRowHeight = 26f;
+        [SerializeField, Min(0f)] private float jobTrackerRowGap = 2f;
+
         private const double DoubleClickSeconds = 0.3;
         private const int WeaponBoxClickId = -100;
         private const int OutfitBoxClickId = -200;
 
         private bool inventoryVisible;
         private bool skillsVisible;
+        private bool journalVisible;
+        private int journalTab;
         private int selectedInventorySlot = -1;
         private int _lastClickId = int.MinValue;
         private double _lastClickTime = -1d;
@@ -213,6 +229,11 @@ namespace CIS2991Project.UI
                 skillsVisible = !skillsVisible;
             }
 
+            if (Input.GetKeyDown(journalToggleKey))
+            {
+                journalVisible = !journalVisible;
+            }
+
             if (_pickupPopupTimeRemaining > 0f)
             {
                 _pickupPopupTimeRemaining -= Time.deltaTime;
@@ -226,13 +247,15 @@ namespace CIS2991Project.UI
             var nextY = DrawHearts();
             DrawInventoryToggleButton();
             DrawSkillsToggleButton();
+            DrawJournalToggleButton();
 
-            GUI.Label(new Rect(16f, nextY, 460f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Sprint: Shift  Inventory: I  Skills: K");
+            GUI.Label(new Rect(16f, nextY, 460f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Sprint: Shift  Inventory: I  Skills: K  Journal: J");
             nextY += 22f;
 
             nextY = DrawAmmo(nextY);
 
             DrawMoneyHud();
+            DrawJobTracker();
             DrawHotbar();
             DrawEquipmentSlots();
             DrawReloadBar();
@@ -253,6 +276,11 @@ namespace CIS2991Project.UI
             if (skillsVisible)
             {
                 DrawSkillsHud(nextY);
+            }
+
+            if (journalVisible)
+            {
+                DrawJournalHud();
             }
 
             DrawDraggedItemPreview();
@@ -460,6 +488,26 @@ namespace CIS2991Project.UI
             DrawSlot(new Rect(GuiScale.ReferenceWidth - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
         }
 
+        private void DrawJobTracker()
+        {
+            var activeJobs = JobManager.ActiveJobs;
+            if (activeJobs.Count == 0)
+            {
+                return;
+            }
+
+            var x = GuiScale.ReferenceWidth - jobTrackerWidth - 16f;
+            var y = 16f + moneyHeight + 8f;
+
+            foreach (var job in activeJobs)
+            {
+                var rect = new Rect(x, y, jobTrackerWidth, jobTrackerRowHeight);
+                DrawSlot(rect, jobTrackerRowBackgroundTexture);
+                GUI.Label(rect, $"{job.killTargetTag}s: {JobManager.GetProgress(job)}/{job.killTargetCount}", CenteredLabelStyle);
+                y += jobTrackerRowHeight + jobTrackerRowGap;
+            }
+        }
+
         private void DrawEquipmentSlots()
         {
             if (playerInventory == null)
@@ -596,6 +644,104 @@ namespace CIS2991Project.UI
             if (GUI.Button(rect, label))
             {
                 skillsVisible = !skillsVisible;
+            }
+        }
+
+        private void DrawJournalToggleButton()
+        {
+            var heartsRowWidth = Mathf.Min(HeartCount, heartsPerRow) * (heartSize + heartSpacing);
+            var bagX = 16f + heartsRowWidth + 12f;
+            var rect = new Rect(bagX + (bagButtonWidth + 8f) * 2f, 16f, bagButtonWidth, bagButtonHeight);
+
+            var activeCount = JobManager.ActiveJobs.Count;
+            var label = activeCount > 0 ? $"Journal ({activeCount})" : "Journal";
+
+            if (GUI.Button(rect, label))
+            {
+                journalVisible = !journalVisible;
+            }
+        }
+
+        private void DrawJournalHud()
+        {
+            var panelX = (GuiScale.ReferenceWidth - journalPanelWidth) / 2f;
+            var panelY = (GuiScale.ReferenceHeight - journalPanelHeight) / 2f;
+
+            DrawSlot(new Rect(panelX, panelY, journalPanelWidth, journalPanelHeight), journalPanelBackgroundTexture);
+            GUI.Label(new Rect(panelX, panelY + 8f, journalPanelWidth, 28f), "Job Journal", CenteredLabelStyle);
+
+            const float tabWidth = 140f;
+            const float tabHeight = 28f;
+            var tabY = panelY + 40f;
+            var activeTabRect = new Rect(panelX + journalPanelWidth / 2f - tabWidth - 4f, tabY, tabWidth, tabHeight);
+            var completedTabRect = new Rect(panelX + journalPanelWidth / 2f + 4f, tabY, tabWidth, tabHeight);
+
+            var previousEnabled = GUI.enabled;
+            GUI.enabled = journalTab != 0;
+            if (GUI.Button(activeTabRect, "Active"))
+            {
+                journalTab = 0;
+            }
+            GUI.enabled = journalTab != 1;
+            if (GUI.Button(completedTabRect, "Completed"))
+            {
+                journalTab = 1;
+            }
+            GUI.enabled = previousEnabled;
+
+            var listX = panelX + 16f;
+            var listY = tabY + tabHeight + 12f;
+            var listWidth = journalPanelWidth - 32f;
+
+            if (journalTab == 0)
+            {
+                DrawJournalActiveTab(listX, listY, listWidth);
+            }
+            else
+            {
+                DrawJournalCompletedTab(listX, listY, listWidth);
+            }
+
+            var closeRect = new Rect(panelX + journalPanelWidth - 76f, panelY + 8f, 60f, 24f);
+            if (GUI.Button(closeRect, "Close"))
+            {
+                journalVisible = false;
+            }
+        }
+
+        private void DrawJournalActiveTab(float x, float y, float width)
+        {
+            var activeJobs = JobManager.ActiveJobs;
+            if (activeJobs.Count == 0)
+            {
+                GUI.Label(new Rect(x, y, width, journalRowHeight), "No active jobs.");
+                return;
+            }
+
+            var rowY = y;
+            foreach (var job in activeJobs)
+            {
+                GUI.Label(new Rect(x, rowY, width, 20f), job.jobName);
+                var objective = $"Kill {job.killTargetTag}s: {JobManager.GetProgress(job)}/{job.killTargetCount}";
+                GUI.Label(new Rect(x, rowY + 20f, width, 20f), objective);
+                rowY += journalRowHeight;
+            }
+        }
+
+        private void DrawJournalCompletedTab(float x, float y, float width)
+        {
+            var finishedJobs = JobManager.FinishedJobs;
+            if (finishedJobs.Count == 0)
+            {
+                GUI.Label(new Rect(x, y, width, journalRowHeight), "No jobs completed yet.");
+                return;
+            }
+
+            var rowY = y;
+            foreach (var job in finishedJobs)
+            {
+                GUI.Label(new Rect(x, rowY, width, 20f), $"{job.jobName}  —  Complete");
+                rowY += journalRowHeight;
             }
         }
 

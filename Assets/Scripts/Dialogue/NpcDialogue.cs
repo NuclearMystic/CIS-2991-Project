@@ -25,6 +25,10 @@ namespace CIS2991Project.Dialogue
         // offer) without this script knowing anything about quests.
         public event Action<int> NodeReached;
 
+        // Fired right before Open() picks a start node. Lets a job-giver swap dialogueTree (via
+        // Configure) based on current job state before the player sees anything.
+        public event Action BeforeOpen;
+
         private bool _playerInRange;
         private bool _isOpen;
         private int _currentNodeIndex;
@@ -36,6 +40,13 @@ namespace CIS2991Project.Dialogue
         public void Configure(string displayName, DialogueTree tree)
         {
             npcName = displayName;
+            dialogueTree = tree;
+        }
+
+        // For a job-giver swapping which tree plays (Offer/InProgress/Complete) without touching
+        // the NPC's already-authored display name.
+        public void SetDialogueTree(DialogueTree tree)
+        {
             dialogueTree = tree;
         }
 
@@ -93,6 +104,8 @@ namespace CIS2991Project.Dialogue
 
         private void Open()
         {
+            BeforeOpen?.Invoke();
+
             if (dialogueTree == null || dialogueTree.nodes.Count == 0)
                 return;
 
