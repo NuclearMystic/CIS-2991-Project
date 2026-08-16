@@ -40,6 +40,15 @@ namespace CIS2991Project.Player
 
         private void Update()
         {
+            // FixedUpdate already stops moving the body while paused (Time.timeScale == 0 halts
+            // physics), but Update() itself keeps running every frame regardless - without this guard
+            // the footstep SFX (timed off Time.deltaTime, which reads 0 while paused) retriggers once
+            // per key press since releasing the key resets its timer to 0.
+            if (Time.timeScale == 0f)
+            {
+                return;
+            }
+
             movementInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
             _isSprinting = Input.GetKey(sprintKey) && (_playerShoot == null || !_playerShoot.IsReloading);
 

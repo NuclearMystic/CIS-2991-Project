@@ -74,6 +74,12 @@ namespace CIS2991Project.Player
             if (_isDead)
                 return;
 
+            // Without this, facing direction (and therefore the equipped weapon's sprite, which reads
+            // this Animator's "Direction" param) keeps updating from raw WASD input every frame while
+            // paused.
+            if (Time.timeScale == 0f)
+                return;
+
             var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             var isMoving = input != Vector2.zero;
             if (isMoving && !Input.GetButton("Fire2"))

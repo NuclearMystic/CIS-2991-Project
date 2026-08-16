@@ -17,22 +17,12 @@ namespace CIS2991Project.UI
 
         private GUIStyle _titleStyle;
 
-        private GUIStyle TitleStyle
+        private GUIStyle TitleStyle => GuiDrawUtils.GetOrCreate(ref _titleStyle, () => new GUIStyle(GUI.skin.label)
         {
-            get
-            {
-                if (_titleStyle == null)
-                {
-                    _titleStyle = new GUIStyle(GUI.skin.label)
-                    {
-                        fontSize = 24,
-                        fontStyle = FontStyle.Bold,
-                        alignment = TextAnchor.MiddleCenter
-                    };
-                }
-                return _titleStyle;
-            }
-        }
+            fontSize = 24,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.MiddleCenter
+        });
 
         private void Update()
         {
@@ -44,13 +34,28 @@ namespace CIS2991Project.UI
 
         private void OnDestroy()
         {
-            Time.timeScale = 1f;
+            if (_isPaused)
+            {
+                PauseGate.Release(this);
+            }
         }
 
         private void SetPaused(bool paused)
         {
+            if (paused == _isPaused)
+            {
+                return;
+            }
+
             _isPaused = paused;
-            Time.timeScale = paused ? 0f : 1f;
+            if (paused)
+            {
+                PauseGate.Request(this);
+            }
+            else
+            {
+                PauseGate.Release(this);
+            }
         }
 
         private void OnGUI()
@@ -94,7 +99,11 @@ namespace CIS2991Project.UI
 
             if (GUI.Button(new Rect(buttonX, currentY, ButtonWidth, ButtonHeight), "Main Menu"))
             {
-                Time.timeScale = 1f;
+                // Leaving gameplay entirely - deactivate the whole persistent Player rig (see
+                // GameOverController for the same pattern and why Destroy() isn't used here) so the
+                // next game starts completely fresh instead of carrying over stale state.
+                transform.root.gameObject.SetActive(false);
+                PauseGate.ResetAll();
                 SceneManager.LoadScene(mainMenuSceneName);
             }
 
