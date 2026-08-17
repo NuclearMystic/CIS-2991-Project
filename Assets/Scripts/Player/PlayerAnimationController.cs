@@ -43,6 +43,16 @@ namespace CIS2991Project.Player
         private bool _equipmentArmed;
         private bool? _appliedArmedPose;
 
+        public Direction Facing => _facing;
+
+        // Sets facing directly and pushes it to the Animator immediately - used by SaveSystem when
+        // loading a save.
+        public void LoadState(Direction savedFacing)
+        {
+            _facing = savedFacing;
+            _animator.SetInteger("Direction", (int)_facing);
+        }
+
         private void Awake()
         {
             _animator = GetComponent<Animator>();

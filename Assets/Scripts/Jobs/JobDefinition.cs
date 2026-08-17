@@ -8,6 +8,10 @@ namespace CIS2991Project.Jobs
     [CreateAssetMenu(fileName = "NewJob", menuName = "Afterfall/Job")]
     public class JobDefinition : ScriptableObject
     {
+        [Tooltip("Unique id, never shown to the player. Used by save/load, same convention as Item.id. " +
+                 "Lowercase, no spaces, no duplicates.")]
+        public string id;
+
         public string jobName;
         public string killTargetTag;
         public int killTargetCount;

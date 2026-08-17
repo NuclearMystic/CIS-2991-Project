@@ -38,7 +38,7 @@ namespace CIS2991Project.Enemies
             var player = other.GetComponentInParent<PlayerHealth>();
             if (player != null)
             {
-                player.TakeDamage(_damage);
+                player.TakeCombatDamage(_damage);
             }
 
             Destroy(gameObject);

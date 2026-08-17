@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
   m_Name: Nail Bat
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 
+  id: 11
   displayName: Nail Bat
   description: A bat with nails in it.
   icon: {fileID: 21300000, guid: 19880bfe84d0701459db5c8ab5dd721f, type: 3}

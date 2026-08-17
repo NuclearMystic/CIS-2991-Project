@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
   m_Name: Plot Device
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 
+  id: 12
   displayName: Plot Device
   description: 'An unknown object tied to the main story.
 

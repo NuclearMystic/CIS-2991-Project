@@ -1,3 +1,4 @@
+using CIS2991Project.Managers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -21,10 +22,10 @@ namespace CIS2991Project.UI
         // Settings Menu
         private VisualElement settingsContainer;
         private Button settingsBackButton;
-
-        // Load Menu
-        private VisualElement loadContainer;
-        private Button loadBackButton;
+        private Slider masterSlider;
+        private Slider musicSlider;
+        private Slider ambianceSlider;
+        private Slider sfxSlider;
 
         private void Awake()
         {
@@ -46,12 +47,10 @@ namespace CIS2991Project.UI
             // ===========================
             settingsContainer = root.Q<VisualElement>("SettingsContainer");
             settingsBackButton = root.Q<Button>("BackButton");
-
-            // ===========================
-            // Load Menu
-            // ===========================
-            loadContainer = root.Q<VisualElement>("LoadContainer");
-            loadBackButton = root.Q<Button>("LoadBackButton");
+            masterSlider = root.Q<Slider>("MasterSlider");
+            musicSlider = root.Q<Slider>("MusicSlider");
+            ambianceSlider = root.Q<Slider>("AmbianceSlider");
+            sfxSlider = root.Q<Slider>("SFXSlider");
 
             // ===========================
             // Hide Popups on Startup
@@ -59,8 +58,10 @@ namespace CIS2991Project.UI
             if (settingsContainer != null)
                 settingsContainer.style.display = DisplayStyle.None;
 
-            if (loadContainer != null)
-                loadContainer.style.display = DisplayStyle.None;
+            InitializeVolumeSlider(masterSlider, () => AudioManager.MasterVolume, v => AudioManager.MasterVolume = v);
+            InitializeVolumeSlider(musicSlider, () => AudioManager.MusicVolume, v => AudioManager.MusicVolume = v);
+            InitializeVolumeSlider(ambianceSlider, () => AudioManager.AmbienceVolume, v => AudioManager.AmbienceVolume = v);
+            InitializeVolumeSlider(sfxSlider, () => AudioManager.SfxVolume, v => AudioManager.SfxVolume = v);
 
             // ===========================
             // Register Button Events
@@ -89,11 +90,6 @@ namespace CIS2991Project.UI
                 settingsBackButton.clicked += CloseSettings;
             else
                 Debug.LogError("Settings BackButton not found.");
-
-            if (loadBackButton != null)
-                loadBackButton.clicked += CloseLoad;
-            else
-                Debug.LogError("Load BackButton not found.");
         }
 
         // ===========================
@@ -119,19 +115,25 @@ namespace CIS2991Project.UI
                 settingsContainer.style.display = DisplayStyle.None;
         }
 
+        // Sliders are authored 0-100 (see MainMenu.uxml), AudioManager works in 0-1 - converts both
+        // ways and keeps the slider's on-screen position in sync with whatever was loaded from
+        // PlayerPrefs last session.
+        private static void InitializeVolumeSlider(Slider slider, System.Func<float> getVolume, System.Action<float> setVolume)
+        {
+            if (slider == null)
+                return;
+
+            slider.SetValueWithoutNotify(getVolume() * 100f);
+            slider.RegisterValueChangedCallback(evt => setVolume(evt.newValue / 100f));
+        }
+
         // ===========================
-        // LOAD MENU
+        // LOAD MENU - shared with the in-game pause menu's Save/Load, see SaveLoadPanelController.
         // ===========================
         private void OpenLoad()
         {
-            if (loadContainer != null)
-                loadContainer.style.display = DisplayStyle.Flex;
-        }
-
-        private void CloseLoad()
-        {
-            if (loadContainer != null)
-                loadContainer.style.display = DisplayStyle.None;
+            if (SaveLoadPanelController.Instance != null)
+                SaveLoadPanelController.Instance.Open(SaveLoadPanelController.PanelMode.Load);
         }
 
         // ===========================

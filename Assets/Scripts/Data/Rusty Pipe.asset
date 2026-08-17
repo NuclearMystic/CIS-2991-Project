@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48b11b23e05f0d04e8f5960545e5b606, type: 3}
   m_Name: Rusty Pipe
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  id: 
+  id: 13
   displayName: Rusty Pipe
   description: 'A worn metal pipe found in abandoned buildings.
 

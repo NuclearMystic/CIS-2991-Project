@@ -1,6 +1,7 @@
 using CIS2991Project.Core;
 using CIS2991Project.Jobs;
 using CIS2991Project.Player;
+using CIS2991Project.UI;
 using UnityEngine;
 
 namespace CIS2991Project.Enemies
@@ -50,6 +51,7 @@ namespace CIS2991Project.Enemies
         private PlayerHealth _player;
         private CharacterSheet _playerCharacterSheet;
         private EnemyHitFeedback _hitFeedback;
+        private DamageNumberHud _damageNumberHud;
 
         private State _state = State.Patrol;
         private Vector2 _homePosition;
@@ -70,6 +72,7 @@ namespace CIS2991Project.Enemies
             _animator = GetComponent<Animator>();
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _hitFeedback = new EnemyHitFeedback(this, _spriteRenderer, hitFlashColor, hitFlashDuration, hitShakeMagnitude);
+            _damageNumberHud = new DamageNumberHud(worldOffset: 0.8f, riseDistance: 0.8f, duration: 1f, fontSize: 18, horizontalScatter: 14f);
 
             _currentHealth = definition != null ? definition.maxHealth : 1;
         }
@@ -86,6 +89,10 @@ namespace CIS2991Project.Enemies
 
         private void Update()
         {
+            // Keeps ticking (and OnGUI keeps drawing) through death so the killing blow's number
+            // finishes its rise-and-fade during the death animation instead of vanishing instantly.
+            _damageNumberHud.Tick(Time.deltaTime);
+
             if (_state == State.Dead || definition == null || _player == null)
             {
                 return;
@@ -171,7 +178,7 @@ namespace CIS2991Project.Enemies
             }
             else
             {
-                _player.TakeDamage(definition.attackDamage);
+                _player.TakeCombatDamage(definition.attackDamage);
             }
         }
 
@@ -229,11 +236,19 @@ namespace CIS2991Project.Enemies
 
             _hitFeedback.Play();
 
-            _currentHealth -= Mathf.Max(1, damage);
+            var appliedDamage = Mathf.Max(1, damage);
+            _currentHealth -= appliedDamage;
+            _damageNumberHud.ShowDamage(appliedDamage);
+
             if (_currentHealth <= 0)
             {
                 Die();
             }
+        }
+
+        private void OnGUI()
+        {
+            _damageNumberHud.Draw(transform);
         }
 
         private void Die()

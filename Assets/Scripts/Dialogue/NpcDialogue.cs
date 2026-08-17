@@ -1,5 +1,6 @@
 using System;
 using CIS2991Project.Core;
+using CIS2991Project.UI;
 using UnityEngine;
 
 namespace CIS2991Project.Dialogue
@@ -32,6 +33,39 @@ namespace CIS2991Project.Dialogue
         private int _currentNodeIndex;
 
         private DialogueNode CurrentNode => dialogueTree.nodes[_currentNodeIndex];
+
+        // Boxes/text/buttons are drawn at real screen-pixel size (see the OnGUI comment on why
+        // GuiScale isn't used here), so on a high-resolution display the original 1x sizing read as
+        // tiny - these are 3x the original box/font/button dimensions.
+        private GUIStyle _nameStyle;
+        private GUIStyle _bodyStyle;
+        private GUIStyle _promptStyle;
+        private GUIStyle _buttonStyle;
+
+        private GUIStyle NameStyle => GuiDrawUtils.GetOrCreate(ref _nameStyle, () => new GUIStyle(GUI.skin.label)
+        {
+            fontSize = 30,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.UpperCenter
+        });
+
+        private GUIStyle BodyStyle => GuiDrawUtils.GetOrCreate(ref _bodyStyle, () => new GUIStyle(GUI.skin.label)
+        {
+            fontSize = 30,
+            wordWrap = true
+        });
+
+        private GUIStyle PromptStyle => GuiDrawUtils.GetOrCreate(ref _promptStyle, () => new GUIStyle(GUI.skin.label)
+        {
+            fontSize = 30,
+            alignment = TextAnchor.MiddleCenter,
+            wordWrap = true
+        });
+
+        private GUIStyle ButtonStyle => GuiDrawUtils.GetOrCreate(ref _buttonStyle, () => new GUIStyle(GUI.skin.button)
+        {
+            fontSize = 30
+        });
 
         // For code-built NPCs (no scene/prefab Inspector to drag references into) - e.g.
         // DemoMapBootstrapper. Inspector-authored NPCs can just set the serialized fields directly.
@@ -127,8 +161,9 @@ namespace CIS2991Project.Dialogue
             var anchorY = Screen.height - screenPoint.y;
             const float headClearance = 60f;
 
-            const float promptWidth = 280f;
-            const float promptHeight = 40f;
+            // 3x the original box/font/button sizes - see the field comment above.
+            const float promptWidth = 840f;
+            const float promptHeight = 120f;
             var promptRect = new Rect(
                 Mathf.Clamp(anchorX - promptWidth / 2f, 0f, Screen.width - promptWidth),
                 anchorY - headClearance - promptHeight,
@@ -138,34 +173,35 @@ namespace CIS2991Project.Dialogue
             if (!IsOpen)
             {
                 GUI.Box(promptRect, string.Empty);
-                GUI.Label(new Rect(promptRect.x + 12f, promptRect.y + 10f, promptRect.width - 24f, 20f), $"Press E to talk to {npcName}");
+                GUI.Label(new Rect(promptRect.x + 36f, promptRect.y + 30f, promptRect.width - 72f, 60f), $"Press E to talk to {npcName}", PromptStyle);
                 return;
             }
 
             var node = CurrentNode;
-            const float dialogueWidth = 380f;
-            const float dialogueHeight = 150f;
+            const float dialogueWidth = 1140f;
+            const float dialogueHeight = 450f;
             var dialogueRect = new Rect(
                 Mathf.Clamp(anchorX - dialogueWidth / 2f, 0f, Screen.width - dialogueWidth),
                 anchorY - headClearance - dialogueHeight,
                 dialogueWidth,
                 dialogueHeight);
 
-            GUI.Box(dialogueRect, npcName);
-            GUI.Label(new Rect(dialogueRect.x + 12f, dialogueRect.y + 28f, dialogueRect.width - 24f, 80f), node.text);
+            GUI.Box(dialogueRect, string.Empty);
+            GUI.Label(new Rect(dialogueRect.x, dialogueRect.y + 8f, dialogueRect.width, 44f), npcName, NameStyle);
+            GUI.Label(new Rect(dialogueRect.x + 36f, dialogueRect.y + 84f, dialogueRect.width - 72f, 240f), node.text, BodyStyle);
 
             if (node.hasChoice)
             {
-                var buttonY = dialogueRect.y + dialogueRect.height - 36f;
-                if (GUI.Button(new Rect(dialogueRect.x + 12f, buttonY, 80f, 26f), "Yes"))
+                var buttonY = dialogueRect.y + dialogueRect.height - 108f;
+                if (GUI.Button(new Rect(dialogueRect.x + 36f, buttonY, 240f, 78f), "Yes", ButtonStyle))
                     Advance(node.yesNextNodeIndex);
 
-                if (GUI.Button(new Rect(dialogueRect.x + dialogueRect.width - 92f, buttonY, 80f, 26f), "No"))
+                if (GUI.Button(new Rect(dialogueRect.x + dialogueRect.width - 276f, buttonY, 240f, 78f), "No", ButtonStyle))
                     Advance(node.noNextNodeIndex);
             }
             else
             {
-                GUI.Label(new Rect(dialogueRect.x + 12f, dialogueRect.y + dialogueRect.height - 26f, dialogueRect.width - 24f, 20f), "Press E to continue");
+                GUI.Label(new Rect(dialogueRect.x + 36f, dialogueRect.y + dialogueRect.height - 78f, dialogueRect.width - 72f, 60f), "Press E to continue", PromptStyle);
             }
         }
     }

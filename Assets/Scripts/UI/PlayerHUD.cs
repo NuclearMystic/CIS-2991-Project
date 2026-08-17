@@ -16,6 +16,7 @@ namespace CIS2991Project.UI
         [SerializeField] private PlayerInventory playerInventory;
         [SerializeField] private PlayerShoot playerShoot;
         [SerializeField] private CharacterSheet characterSheet;
+        [SerializeField] private SurvivalStats survivalStats;
         [SerializeField] private KeyCode inventoryToggleKey = KeyCode.I;
         [SerializeField] private KeyCode skillsToggleKey = KeyCode.K;
         [SerializeField] private KeyCode journalToggleKey = KeyCode.J;
@@ -55,6 +56,14 @@ namespace CIS2991Project.UI
         [SerializeField, Min(0.1f)] private float pickupPopupDuration = 2.5f;
         [SerializeField, Min(6)] private int pickupPopupFontSize = 18;
 
+        [Header("Damage Numbers — floats above the player when they take damage or are healed")]
+        [SerializeField] private float damageNumberWorldOffset = 1.6f;
+        [SerializeField, Min(0f)] private float damageNumberRiseDistance = 1f;
+        [SerializeField, Min(0.1f)] private float damageNumberDuration = 1f;
+        [SerializeField, Min(6)] private int damageNumberFontSize = 20;
+        [Tooltip("Random horizontal spread (screen pixels) so numbers from back-to-back hits don't stack exactly on top of each other.")]
+        [SerializeField, Min(0f)] private float damageNumberHorizontalScatter = 18f;
+
         [Header("Equipment Slots (Weapon / Outfit boxes, bottom-left)")]
         [SerializeField, Min(4f)] private float equipmentBoxSize = 56f;
         [SerializeField, Min(0f)] private float equipmentBoxGap = 8f;
@@ -74,8 +83,10 @@ namespace CIS2991Project.UI
 
         [Header("Assign your own art here — slots render as plain boxes until then")]
         [SerializeField] private Texture2D moneyTexture;
-        [SerializeField, Min(4f)] private float moneyWidth = 150f;
-        [SerializeField, Min(4f)] private float moneyHeight = 32f;
+        [SerializeField] private string currencyName = "Caps";
+        [SerializeField, Min(4f)] private float moneyWidth = 190f;
+        [SerializeField, Min(4f)] private float moneyHeight = 44f;
+        [SerializeField, Min(6)] private int moneyFontSize = 26;
         [SerializeField] private Texture2D[] hotbarSlotTextures = new Texture2D[PlayerInventory.HotbarSlotCount];
         [SerializeField, Min(4f)] private float hotbarSlotSize = 64f;
         [SerializeField, Min(0f)] private float hotbarSlotGap = 8f;
@@ -97,6 +108,33 @@ namespace CIS2991Project.UI
         [SerializeField, Min(4f)] private float jobTrackerRowHeight = 26f;
         [SerializeField, Min(0f)] private float jobTrackerRowGap = 2f;
 
+        [Header("Survival — Hunger/Thirst/Radiation meters and vision haze. Fill color is used unless " +
+                "you assign your own fill art, which takes priority.")]
+        [SerializeField] private Texture2D hungerBarBackgroundTexture;
+        [SerializeField] private Texture2D hungerBarFillTexture;
+        [SerializeField] private Color hungerBarFillColor = new(0.1f, 0.35f, 0.1f);
+        [SerializeField] private Texture2D thirstBarBackgroundTexture;
+        [SerializeField] private Texture2D thirstBarFillTexture;
+        [SerializeField] private Color thirstBarFillColor = new(0.15f, 0.4f, 0.85f);
+        [Tooltip("Placeholder only - radiation isn't wired to any real system yet, this just displays radiationPlaceholderValue.")]
+        [SerializeField] private Texture2D radiationBarBackgroundTexture;
+        [SerializeField] private Texture2D radiationBarFillTexture;
+        [SerializeField] private Color radiationBarFillColor = new(0.8f, 0.15f, 0.15f);
+        [SerializeField, Range(0f, 100f)] private float radiationPlaceholderValue = 10f;
+        [SerializeField, Min(4f)] private float survivalBarWidth = 160f;
+        [SerializeField, Min(4f)] private float survivalBarHeight = 18f;
+        [SerializeField, Min(0f)] private float survivalBarGap = 4f;
+        [Tooltip("Tint of the full-screen haze overlay that intensifies as hunger/thirst drop.")]
+        [SerializeField] private Color survivalHazeColor = new(0.6f, 0.75f, 0.5f);
+        [Tooltip("Haze opacity at maximum severity (both meters empty). 0 disables the overlay entirely.")]
+        [SerializeField, Range(0f, 1f)] private float survivalMaxHazeAlpha = 0.35f;
+
+        [Header("Empty-Meter Pulse — flashes red on Hunger/Thirst once that bar hits 0")]
+        [SerializeField] private Color emptyMeterPulseColor = new(1f, 0.15f, 0.15f);
+        [Tooltip("Higher = faster flashing.")]
+        [SerializeField, Min(0.1f)] private float emptyMeterPulseSpeed = 4f;
+        [SerializeField, Range(0f, 1f)] private float emptyMeterPulseMaxAlpha = 0.6f;
+
         private bool inventoryVisible;
         private bool skillsVisible;
         private bool journalVisible;
@@ -111,6 +149,8 @@ namespace CIS2991Project.UI
         private SkillsPanel _skillsPanel;
         private JournalPanel _journalPanel;
         private JobTrackerHud _jobTrackerHud;
+        private SurvivalHud _survivalHud;
+        private DamageNumberHud _damageNumberHud;
 
         private void Awake()
         {
@@ -154,9 +194,25 @@ namespace CIS2991Project.UI
                 characterSheet = Object.FindAnyObjectByType<CharacterSheet>();
             }
 
+            if (survivalStats == null)
+            {
+                survivalStats = GetComponentInParent<SurvivalStats>();
+            }
+
+            if (survivalStats == null)
+            {
+                survivalStats = Object.FindAnyObjectByType<SurvivalStats>();
+            }
+
             if (playerInventory != null)
             {
                 playerInventory.ItemPickedUp += HandleItemPickedUp;
+            }
+
+            if (playerHealth != null)
+            {
+                playerHealth.DamageTaken += HandleDamageTaken;
+                playerHealth.Healed += HandleHealed;
             }
 
             BuildPanels();
@@ -196,6 +252,13 @@ namespace CIS2991Project.UI
                 duration: pickupPopupDuration,
                 fontSize: pickupPopupFontSize);
 
+            _damageNumberHud = new DamageNumberHud(
+                worldOffset: damageNumberWorldOffset,
+                riseDistance: damageNumberRiseDistance,
+                duration: damageNumberDuration,
+                fontSize: damageNumberFontSize,
+                horizontalScatter: damageNumberHorizontalScatter);
+
             _equipmentHud = new EquipmentHud(_doubleClickTracker, equipmentBoxSize, equipmentBoxGap);
 
             _hotbarHud = new HotbarHud(_dragState, hotbarSlotTextures, hotbarSlotSize, hotbarSlotGap);
@@ -217,6 +280,26 @@ namespace CIS2991Project.UI
             _journalPanel = new JournalPanel(journalPanelBackgroundTexture, journalPanelWidth, journalPanelHeight, journalRowHeight);
 
             _jobTrackerHud = new JobTrackerHud(jobTrackerRowBackgroundTexture, jobTrackerWidth, jobTrackerRowHeight, jobTrackerRowGap, moneyHeight);
+
+            _survivalHud = new SurvivalHud(
+                hungerBackgroundTexture: hungerBarBackgroundTexture,
+                hungerFillTexture: hungerBarFillTexture,
+                hungerFillColor: hungerBarFillColor,
+                thirstBackgroundTexture: thirstBarBackgroundTexture,
+                thirstFillTexture: thirstBarFillTexture,
+                thirstFillColor: thirstBarFillColor,
+                radiationBackgroundTexture: radiationBarBackgroundTexture,
+                radiationFillTexture: radiationBarFillTexture,
+                radiationFillColor: radiationBarFillColor,
+                radiationPlaceholderValue: radiationPlaceholderValue,
+                barWidth: survivalBarWidth,
+                barHeight: survivalBarHeight,
+                barGap: survivalBarGap,
+                hazeColor: survivalHazeColor,
+                maxHazeAlpha: survivalMaxHazeAlpha,
+                emptyPulseColor: emptyMeterPulseColor,
+                emptyPulseSpeed: emptyMeterPulseSpeed,
+                emptyPulseMaxAlpha: emptyMeterPulseMaxAlpha);
         }
 
         private void OnDestroy()
@@ -225,11 +308,27 @@ namespace CIS2991Project.UI
             {
                 playerInventory.ItemPickedUp -= HandleItemPickedUp;
             }
+
+            if (playerHealth != null)
+            {
+                playerHealth.DamageTaken -= HandleDamageTaken;
+                playerHealth.Healed -= HandleHealed;
+            }
         }
 
         private void HandleItemPickedUp(global::Item item, int amount)
         {
             _pickupPopupHud.Show(item, amount);
+        }
+
+        private void HandleDamageTaken(int amount)
+        {
+            _damageNumberHud.ShowDamage(amount);
+        }
+
+        private void HandleHealed(int amount)
+        {
+            _damageNumberHud.ShowHeal(amount);
         }
 
         private void Update()
@@ -258,6 +357,7 @@ namespace CIS2991Project.UI
             }
 
             _pickupPopupHud.Tick(Time.deltaTime);
+            _damageNumberHud.Tick(Time.deltaTime);
         }
 
         private void OnGUI()
@@ -269,6 +369,8 @@ namespace CIS2991Project.UI
             DrawSkillsToggleButton();
             DrawJournalToggleButton();
 
+            nextY = _survivalHud.Draw(survivalStats, 16f, nextY);
+
             GUI.Label(new Rect(16f, nextY, 520f, 22f), $"{SceneManager.GetActiveScene().name}  |  Move: WASD/Arrows  Shoot: Space  Sprint: Shift  Inventory: I  Skills: K  Journal: J  All: Tab");
             nextY += 22f;
 
@@ -277,9 +379,10 @@ namespace CIS2991Project.UI
             DrawMoneyHud();
             _jobTrackerHud.Draw();
             _hotbarHud.Draw(playerInventory);
-            _equipmentHud.Draw(playerInventory);
+            _equipmentHud.Draw(playerInventory, playerShoot);
             _vitalsHud.DrawReloadBar(playerShoot);
             _pickupPopupHud.Draw(playerInventory);
+            _damageNumberHud.Draw(playerHealth != null ? playerHealth.transform : null);
 
             var chestOpen = ChestInventory.ActiveChest != null;
 
@@ -305,15 +408,29 @@ namespace CIS2991Project.UI
 
             _inventoryPanel.DrawDraggedPreview(playerInventory);
 
+            _survivalHud.DrawHazeOverlay(survivalStats);
+
             if (Event.current.type == EventType.MouseUp)
             {
                 _dragState.SlotIndex = -1;
             }
         }
 
+        private GUIStyle _moneyLabelStyle;
+
+        private GUIStyle MoneyLabelStyle => GuiDrawUtils.GetOrCreate(ref _moneyLabelStyle, () => new GUIStyle(GuiDrawUtils.CenteredLabelStyle)
+        {
+            fontSize = moneyFontSize,
+            fontStyle = FontStyle.Bold
+        });
+
         private void DrawMoneyHud()
         {
-            GuiDrawUtils.DrawSlot(new Rect(GuiScale.ReferenceWidth - moneyWidth - 16f, 16f, moneyWidth, moneyHeight), moneyTexture);
+            var rect = new Rect(GuiScale.ReferenceWidth - moneyWidth - 16f, 16f, moneyWidth, moneyHeight);
+            GuiDrawUtils.DrawSlot(rect, moneyTexture);
+
+            var amount = playerInventory != null ? playerInventory.Currency : 0;
+            GUI.Label(rect, $"{amount} {currencyName}", MoneyLabelStyle);
         }
 
         private void DrawInventoryToggleButton()

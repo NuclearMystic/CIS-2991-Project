@@ -48,6 +48,7 @@ namespace CIS2991Project.DungeonGen
 
             var spawnPosition = playerRoom.PlayerSpawnPosition;
             player.transform.position = new Vector3(spawnPosition.x, spawnPosition.y, player.transform.position.z);
+            Debug.Log($"[SaveDebug] CaveDungeonBootstrapper.PositionPlayer: moved player to generated spawn room {spawnPosition} - this runs after any load, so a saved position inside a cave dungeon is always overridden by the newly generated layout.");
         }
     }
 }

@@ -69,6 +69,7 @@ namespace CIS2991Project.Player
         [SerializeField, Min(0)] private int unspentSkillPoints;
 
         private readonly Dictionary<SkillType, int> _skillLevels = new Dictionary<SkillType, int>();
+        private SurvivalStats _survivalStats;
 
         public event Action<SkillType, int> SkillChanged;
         public event Action<int> LevelChanged;
@@ -83,8 +84,27 @@ namespace CIS2991Project.Player
         public bool IsMaxLevel => characterLevel >= MaxCharacterLevel;
         public int ExperienceToNextLevel => IsMaxLevel ? 0 : Mathf.RoundToInt(GetExperienceRequirement(characterLevel));
 
+        private bool _skillLevelsInitialized;
+
         private void Awake()
         {
+            _survivalStats = GetComponent<SurvivalStats>();
+            EnsureSkillLevelsInitialized();
+        }
+
+        // Unity doesn't guarantee Awake() order between components on the same GameObject - other
+        // components (e.g. PlayerHealth, reading GetHeartCount() for its own Awake) can query skill
+        // levels before this component's own Awake has run. Called at the top of every read/write
+        // entry point below so _skillLevels is always populated by the time it's needed, regardless
+        // of ordering.
+        private void EnsureSkillLevelsInitialized()
+        {
+            if (_skillLevelsInitialized)
+            {
+                return;
+            }
+
+            _skillLevelsInitialized = true;
 
             foreach (SkillType skill in Enum.GetValues(typeof(SkillType)))
             {
@@ -99,11 +119,13 @@ namespace CIS2991Project.Player
 
         public int GetLevel(SkillType skill)
         {
+            EnsureSkillLevelsInitialized();
             return _skillLevels.TryGetValue(skill, out var level) ? level : MinSkillLevel;
         }
 
         public void SetLevel(SkillType skill, int level)
         {
+            EnsureSkillLevelsInitialized();
             var clamped = Mathf.Clamp(level, MinSkillLevel, MaxSkillLevel);
             if (_skillLevels.TryGetValue(skill, out var current) && current == clamped)
             {
@@ -119,6 +141,35 @@ namespace CIS2991Project.Player
             SetLevel(skill, GetLevel(skill) + amount);
         }
 
+        // Restores previously-saved progression in one shot rather than replaying it level-by-level -
+        // used by SaveSystem when loading a save. Fires the normal change events once at the end so
+        // dependent systems (PlayerHealth's Endurance-driven max HP, the Skills panel, etc.) refresh.
+        public void LoadState(int savedLevel, int savedExperience, int savedSkillPoints, string savedPreviousScene, IReadOnlyDictionary<SkillType, int> savedSkillLevels)
+        {
+            EnsureSkillLevelsInitialized();
+            characterLevel = Mathf.Clamp(savedLevel, 1, MaxCharacterLevel);
+            experience = Mathf.Max(0, savedExperience);
+            unspentSkillPoints = Mathf.Max(0, savedSkillPoints);
+            PreviousScene = savedPreviousScene;
+
+            if (savedSkillLevels != null)
+            {
+                foreach (var pair in savedSkillLevels)
+                {
+                    _skillLevels[pair.Key] = Mathf.Clamp(pair.Value, MinSkillLevel, MaxSkillLevel);
+                }
+            }
+
+            LevelChanged?.Invoke(characterLevel);
+            ExperienceChanged?.Invoke(experience, ExperienceToNextLevel);
+            SkillPointsChanged?.Invoke(unspentSkillPoints);
+
+            foreach (SkillType skill in Enum.GetValues(typeof(SkillType)))
+            {
+                SkillChanged?.Invoke(skill, GetLevel(skill));
+            }
+        }
+
         public float GetNormalized(SkillType skill)
         {
             return GetLevel(skill) / (float)MaxSkillLevel;
@@ -131,17 +182,24 @@ namespace CIS2991Project.Player
 
         public float GetMoveSpeedMultiplier()
         {
-            return 1f + GetLevel(SkillType.Athletics) * athleticsSpeedPerLevel;
+            return 1f + GetLevel(SkillType.Athletics) * athleticsSpeedPerLevel * GetSkillEffectivenessMultiplier();
         }
 
         public float GetWeaponDamageMultiplier(SkillType weaponSkill)
         {
-            return 1f + GetLevel(weaponSkill) * weaponDamagePerLevel;
+            return 1f + GetLevel(weaponSkill) * weaponDamagePerLevel * GetSkillEffectivenessMultiplier();
         }
 
         public float GetWeaponReloadMultiplier(SkillType weaponSkill)
         {
-            return Mathf.Max(1f - GetLevel(weaponSkill) * weaponReloadSpeedPerLevel, minReloadMultiplier);
+            return Mathf.Max(1f - GetLevel(weaponSkill) * weaponReloadSpeedPerLevel * GetSkillEffectivenessMultiplier(), minReloadMultiplier);
+        }
+
+        // Starving/dehydrated (SurvivalStats) cuts how much benefit skill levels actually provide,
+        // without touching the stored levels themselves (those still show correctly in the Skills UI).
+        private float GetSkillEffectivenessMultiplier()
+        {
+            return _survivalStats != null ? _survivalStats.SkillEffectivenessMultiplier : 1f;
         }
 
         public void AddExperience(int amount)

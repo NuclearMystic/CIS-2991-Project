@@ -90,6 +90,7 @@ namespace CIS2991Project.Player
         [SerializeField] private List<StarterItem> startingItems = new();
 
         private PlayerHealth playerHealth;
+        private SurvivalStats survivalStats;
         private string lastMessage;
 
         public event Action InventoryChanged;
@@ -114,6 +115,7 @@ namespace CIS2991Project.Player
             EnsureSlotCount();
             EnsureHotbarCount();
             playerHealth = GetComponent<PlayerHealth>();
+            survivalStats = GetComponent<SurvivalStats>();
             GrantStartingItems();
             SetEquippedWeapon(equippedWeapon);
         }
@@ -376,6 +378,26 @@ namespace CIS2991Project.Player
                 targetHealth.Heal(item.healthRestore);
             }
 
+            if (item.hungerRestore > 0)
+            {
+                if (survivalStats == null)
+                {
+                    return false;
+                }
+
+                survivalStats.RestoreHunger(item.hungerRestore);
+            }
+
+            if (item.thirstRestore > 0)
+            {
+                if (survivalStats == null)
+                {
+                    return false;
+                }
+
+                survivalStats.RestoreThirst(item.thirstRestore);
+            }
+
             slot.Remove(1);
             InventoryChanged?.Invoke();
             return true;
@@ -624,6 +646,47 @@ namespace CIS2991Project.Player
             return item != null &&
                    (item.itemType == global::ItemType.Weapon ||
                     item.itemType == global::ItemType.Armor);
+        }
+
+        // Wipes and replaces the whole inventory in one shot - used by SaveSystem when loading a
+        // save. savedSlots is positional (index N here becomes slot N), matching how it was built.
+        public void LoadState(IReadOnlyList<(global::Item item, int amount)> savedSlots, global::Item savedEquippedWeapon,
+            global::Item savedEquippedArmor, IReadOnlyList<global::Item> savedHotbarItems, int savedCurrency)
+        {
+            EnsureSlotCount();
+            for (var slotIndex = 0; slotIndex < slots.Count; slotIndex++)
+            {
+                slots[slotIndex].Clear();
+            }
+
+            if (savedSlots != null)
+            {
+                for (var slotIndex = 0; slotIndex < savedSlots.Count && slotIndex < slots.Count; slotIndex++)
+                {
+                    var (item, amount) = savedSlots[slotIndex];
+                    if (item != null && amount > 0)
+                    {
+                        slots[slotIndex].Set(item, amount);
+                    }
+                }
+            }
+
+            SetEquippedWeapon(savedEquippedWeapon);
+            equippedArmor = savedEquippedArmor;
+
+            EnsureHotbarCount();
+            for (var hotbarIndex = 0; hotbarIndex < hotbarItems.Length; hotbarIndex++)
+            {
+                hotbarItems[hotbarIndex] = savedHotbarItems != null && hotbarIndex < savedHotbarItems.Count
+                    ? savedHotbarItems[hotbarIndex]
+                    : null;
+            }
+
+            currency = Mathf.Max(0, savedCurrency);
+
+            InventoryChanged?.Invoke();
+            EquipmentChanged?.Invoke();
+            HotbarChanged?.Invoke();
         }
 
         private int CountOccupiedSlots()

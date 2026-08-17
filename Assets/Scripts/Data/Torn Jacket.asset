@@ -23,7 +23,7 @@ MonoBehaviour:
   damage: 0
   ammoType: 0
   ammoCapacity: 6
-  defense: 0
+  defense: 5
   healthRestore: 0
   equippedSpriteDown: {fileID: 0}
   equippedSpriteUp: {fileID: 0}
