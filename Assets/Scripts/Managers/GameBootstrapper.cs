@@ -48,7 +48,7 @@ namespace CIS2991Project.Managers
             var existingPlayer = Object.FindAnyObjectByType<PlayerHealth>();
             if (existingPlayer != null)
             {
-                // Player carried over from the previous scene via CharacterSheet's DontDestroyOnLoad -
+                // Player carried over from the previous scene via GameManager's DontDestroyOnLoad -
                 // keep its inventory/stats and just drop it at the new scene's spawn point.
                 var characterSheet = existingPlayer.GetComponent<CharacterSheet>();
                 existingPlayer.transform.position = FindSpawnPoint(characterSheet);
