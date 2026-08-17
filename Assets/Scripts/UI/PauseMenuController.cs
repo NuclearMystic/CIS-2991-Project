@@ -1,3 +1,4 @@
+using CIS2991Project.Jobs;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -104,6 +105,7 @@ namespace CIS2991Project.UI
                 // next game starts completely fresh instead of carrying over stale state.
                 transform.root.gameObject.SetActive(false);
                 PauseGate.ResetAll();
+                JobManager.ResetAll();
                 SceneManager.LoadScene(mainMenuSceneName);
             }
 

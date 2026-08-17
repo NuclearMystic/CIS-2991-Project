@@ -1,3 +1,4 @@
+using CIS2991Project.Jobs;
 using CIS2991Project.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -66,6 +67,7 @@ namespace CIS2991Project.UI
                 // next time a gameplay scene loads, since FindAnyObjectByType skips inactive objects.
                 transform.root.gameObject.SetActive(false);
                 PauseGate.ResetAll();
+                JobManager.ResetAll();
                 SceneManager.LoadScene(MainMenuSceneName);
             }
         }

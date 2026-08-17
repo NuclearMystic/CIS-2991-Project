@@ -724,7 +724,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6714fcfee1b9b2547b493e24fe2516f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.PlayerWeaponVisual
-  downSortingOrder: 7
-  upSortingOrder: 5
-  leftSortingOrder: 7
-  rightSortingOrder: 7
+  downSortingOrder: 6
+  upSortingOrder: 4
+  leftSortingOrder: 6
+  rightSortingOrder: 6

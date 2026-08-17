@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CIS2991Project.Core;
 using CIS2991Project.Player;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace CIS2991Project.Items
     // of duplicating that data shape.
     [RequireComponent(typeof(Collider2D))]
     [RequireComponent(typeof(SpriteRenderer))]
-    public sealed class ChestInventory : MonoBehaviour
+    public sealed class ChestInventory : RangeInteractable<ChestInventory>
     {
         [SerializeField] private List<global::ItemDrop> contents = new();
         [Tooltip("How many items (picked from Contents, with replacement) this chest holds - a " +
@@ -22,12 +23,10 @@ namespace CIS2991Project.Items
 
         // PlayerHUD reads this each frame to decide whether to draw the chest panel - avoids
         // needing to discover procedurally-spawned chest instances individually.
-        public static ChestInventory ActiveChest { get; private set; }
+        public static ChestInventory ActiveChest => Active;
 
         private readonly List<PlayerInventory.InventorySlot> slots = new();
         private SpriteRenderer _renderer;
-        private bool _playerInRange;
-        private bool _isOpen;
 
         public IReadOnlyList<PlayerInventory.InventorySlot> Slots => slots;
 
@@ -68,34 +67,12 @@ namespace CIS2991Project.Items
             }
         }
 
-        private void OnDisable()
-        {
-            if (ActiveChest == this)
-                Close();
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.GetComponentInParent<PlayerInventory>() != null)
-                _playerInRange = true;
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            if (other.GetComponentInParent<PlayerInventory>() == null)
-                return;
-
-            _playerInRange = false;
-            if (ActiveChest == this)
-                Close();
-        }
-
         private void Update()
         {
-            if (!_playerInRange || !Input.GetKeyDown(interactKey))
+            if (!PlayerInRange || !Input.GetKeyDown(interactKey))
                 return;
 
-            if (ActiveChest == this)
+            if (IsOpen)
                 Close();
             else
                 Open();
@@ -103,19 +80,13 @@ namespace CIS2991Project.Items
 
         private void Open()
         {
-            if (ActiveChest != null && ActiveChest != this)
-                ActiveChest.Close();
-
-            _isOpen = true;
-            ActiveChest = this;
+            BecomeActive();
             UpdateSprite();
         }
 
-        public void Close()
+        public override void Close()
         {
-            _isOpen = false;
-            if (ActiveChest == this)
-                ActiveChest = null;
+            base.Close();
             UpdateSprite();
         }
 
@@ -133,17 +104,9 @@ namespace CIS2991Project.Items
             if (_renderer == null)
                 return;
 
-            var sprite = _isOpen ? openSprite : closedSprite;
+            var sprite = IsOpen ? openSprite : closedSprite;
             // Fallback so the chest is visible/testable before closedSprite/openSprite are set.
-            _renderer.sprite = sprite != null ? sprite : Fallback(_isOpen ? Color.yellow : new Color(0.45f, 0.28f, 0.1f));
-        }
-
-        private static Sprite Fallback(Color color)
-        {
-            var texture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
-            texture.SetPixel(0, 0, color);
-            texture.Apply();
-            return Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1);
+            _renderer.sprite = sprite != null ? sprite : RuntimeSpriteUtils.CreateSolidSprite(IsOpen ? Color.yellow : new Color(0.45f, 0.28f, 0.1f));
         }
     }
 }

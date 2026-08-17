@@ -70,5 +70,16 @@ namespace CIS2991Project.Jobs
                 JobCompleted?.Invoke(job);
             }
         }
+
+        // This static state is deliberately never cleared by a scene load (that's the whole point -
+        // see the class comment), but that means it also survives death, so a fresh playthrough would
+        // otherwise start with every job from the last one already "completed" (e.g. JobSpawnGate
+        // permanently hiding an enemy group). Called when leaving gameplay entirely, from the same
+        // "Return to Main Menu" handlers that reset PauseGate and deactivate the Player rig.
+        public static void ResetAll()
+        {
+            ActiveProgress.Clear();
+            CompletedJobs.Clear();
+        }
     }
 }
