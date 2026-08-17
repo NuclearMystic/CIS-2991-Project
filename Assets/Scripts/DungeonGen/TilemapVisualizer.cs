@@ -14,6 +14,38 @@ namespace CIS2991Project.DungeonGen
             wallInnerCornerDownLeft, wallInnerCornerDownRight, wallInnerCornerUpLeft, wallInnerCornerUpRight,
             wallDiagonalCornerDownRight, wallDiagonalCornerDownLeft, wallDiagonalCornerUpRight, wallDiagonalCornerUpLeft;
 
+        // Built once from the fields above so PaintSingleBasicWall/PaintSingleCornerWall share one
+        // "first matching set wins" lookup instead of each having its own near-identical if/else
+        // chain. Order matters - preserves the original chains' exact priority.
+        private (HashSet<int> set, TileBase tile)[] _basicWallRules;
+        private (HashSet<int> set, TileBase tile)[] _cornerWallRules;
+
+        private void Awake()
+        {
+            _basicWallRules = new (HashSet<int>, TileBase)[]
+            {
+                (WallTypesHelper.wallTop, wallTop),
+                (WallTypesHelper.wallSideRight, wallSideRight),
+                (WallTypesHelper.wallSideLeft, wallSiderLeft),
+                (WallTypesHelper.wallBottm, wallBottom),
+                (WallTypesHelper.wallFull, wallFull),
+            };
+
+            _cornerWallRules = new (HashSet<int>, TileBase)[]
+            {
+                (WallTypesHelper.wallInnerCornerDownLeft, wallInnerCornerDownLeft),
+                (WallTypesHelper.wallInnerCornerDownRight, wallInnerCornerDownRight),
+                (WallTypesHelper.wallInnerCornerUpRight, wallInnerCornerUpRight),
+                (WallTypesHelper.wallInnerCornerUpLeft, wallInnerCornerUpLeft),
+                (WallTypesHelper.wallDiagonalCornerDownLeft, wallDiagonalCornerDownLeft),
+                (WallTypesHelper.wallDiagonalCornerDownRight, wallDiagonalCornerDownRight),
+                (WallTypesHelper.wallDiagonalCornerUpRight, wallDiagonalCornerUpRight),
+                (WallTypesHelper.wallDiagonalCornerUpLeft, wallDiagonalCornerUpLeft),
+                (WallTypesHelper.wallFullEightDirections, wallFull),
+                (WallTypesHelper.wallBottmEightDirections, wallBottom),
+            };
+        }
+
         public void PaintFloorTiles(IEnumerable<Vector2Int> floorPositions)
         {
             PaintTiles(floorPositions, floorTilemap, floorTile);
@@ -29,31 +61,27 @@ namespace CIS2991Project.DungeonGen
 
         internal void PaintSingleBasicWall(Vector2Int position, string binaryType)
         {
-            int typeAsInt = Convert.ToInt32(binaryType, 2);
-            TileBase tile = null;
-            if (WallTypesHelper.wallTop.Contains(typeAsInt))
-            {
-                tile = wallTop;
-            }
-            else if (WallTypesHelper.wallSideRight.Contains(typeAsInt))
-            {
-                tile = wallSideRight;
-            }
-            else if (WallTypesHelper.wallSideLeft.Contains(typeAsInt))
-            {
-                tile = wallSiderLeft;
-            }
-            else if (WallTypesHelper.wallBottm.Contains(typeAsInt))
-            {
-                tile = wallBottom;
-            }
-            else if (WallTypesHelper.wallFull.Contains(typeAsInt))
-            {
-                tile = wallFull;
-            }
-
+            var tile = ResolveTile(_basicWallRules, Convert.ToInt32(binaryType, 2));
             if (tile != null)
                 PaintSingleTile(wallTilemap, tile, position);
+        }
+
+        internal void PaintSingleCornerWall(Vector2Int position, string binaryType)
+        {
+            var tile = ResolveTile(_cornerWallRules, Convert.ToInt32(binaryType, 2));
+            if (tile != null)
+                PaintSingleTile(wallTilemap, tile, position);
+        }
+
+        private static TileBase ResolveTile((HashSet<int> set, TileBase tile)[] rules, int typeAsInt)
+        {
+            foreach (var rule in rules)
+            {
+                if (rule.set.Contains(typeAsInt))
+                    return rule.tile;
+            }
+
+            return null;
         }
 
         private void PaintSingleTile(Tilemap tilemap, TileBase tile, Vector2Int position)
@@ -66,56 +94,6 @@ namespace CIS2991Project.DungeonGen
         {
             floorTilemap.ClearAllTiles();
             wallTilemap.ClearAllTiles();
-        }
-
-        internal void PaintSingleCornerWall(Vector2Int position, string binaryType)
-        {
-            int typeASInt = Convert.ToInt32(binaryType, 2);
-            TileBase tile = null;
-
-            if (WallTypesHelper.wallInnerCornerDownLeft.Contains(typeASInt))
-            {
-                tile = wallInnerCornerDownLeft;
-            }
-            else if (WallTypesHelper.wallInnerCornerDownRight.Contains(typeASInt))
-            {
-                tile = wallInnerCornerDownRight;
-            }
-            else if (WallTypesHelper.wallInnerCornerUpRight.Contains(typeASInt))
-            {
-                tile = wallInnerCornerUpRight;
-            }
-            else if (WallTypesHelper.wallInnerCornerUpLeft.Contains(typeASInt))
-            {
-                tile = wallInnerCornerUpLeft;
-            }
-            else if (WallTypesHelper.wallDiagonalCornerDownLeft.Contains(typeASInt))
-            {
-                tile = wallDiagonalCornerDownLeft;
-            }
-            else if (WallTypesHelper.wallDiagonalCornerDownRight.Contains(typeASInt))
-            {
-                tile = wallDiagonalCornerDownRight;
-            }
-            else if (WallTypesHelper.wallDiagonalCornerUpRight.Contains(typeASInt))
-            {
-                tile = wallDiagonalCornerUpRight;
-            }
-            else if (WallTypesHelper.wallDiagonalCornerUpLeft.Contains(typeASInt))
-            {
-                tile = wallDiagonalCornerUpLeft;
-            }
-            else if (WallTypesHelper.wallFullEightDirections.Contains(typeASInt))
-            {
-                tile = wallFull;
-            }
-            else if (WallTypesHelper.wallBottmEightDirections.Contains(typeASInt))
-            {
-                tile = wallBottom;
-            }
-
-            if (tile != null)
-                PaintSingleTile(wallTilemap, tile, position);
         }
     }
 }

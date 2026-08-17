@@ -8,6 +8,12 @@ namespace CIS2991Project.DungeonGen
     // prefabs; wiring it here in code instead, since a hand-authored UnityEvent<DungeonData>
     // persistent call in scene YAML isn't something that can be verified without a Unity Editor to
     // test in - AddListener achieves the exact same runtime behavior and is easy to read/verify.
+    //
+    // Deliberately not following GameBootstrapper's pattern (dynamically-created, singleton-guarded,
+    // DontDestroyOnLoad): this component's whole job is wiring together THIS scene's own generator,
+    // room-content-generator, and player-room references, which only makes sense placed directly in
+    // the CaveDungeon scene with those Inspector slots filled in - there's nothing here that should
+    // (or could) survive into a different scene.
     public sealed class CaveDungeonBootstrapper : MonoBehaviour
     {
         [SerializeField] private CorridorFirstDungeonGenerator generator;

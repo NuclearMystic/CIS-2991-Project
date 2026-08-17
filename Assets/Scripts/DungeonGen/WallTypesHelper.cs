@@ -119,7 +119,6 @@ namespace CIS2991Project.DungeonGen
         {
             0b1101,
             0b0101,
-            0b1101,
             0b1001,
             0b1111,
             0b0111
@@ -148,8 +147,6 @@ namespace CIS2991Project.DungeonGen
             0b11010011,
             0b11110101,
             0b11010111,
-            0b11010111,
-            0b11110101,
             0b01110101,
             0b01010111,
             0b01100101,
