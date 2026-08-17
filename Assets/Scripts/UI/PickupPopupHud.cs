@@ -6,11 +6,6 @@ namespace CIS2991Project.UI
     // Floats a "ITEM NAME xN" popup above the player for a moment when an item is picked up.
     public sealed class PickupPopupHud
     {
-        private static readonly Vector2[] ShadowOffsets =
-        {
-            new(-1f, -1f), new(1f, -1f), new(-1f, 1f), new(1f, 1f)
-        };
-
         private readonly float _worldOffset;
         private readonly float _riseDistance;
         private readonly float _duration;
@@ -85,21 +80,10 @@ namespace CIS2991Project.UI
             var previousMatrix = GUI.matrix;
             GUI.matrix = Matrix4x4.identity;
 
-            // Plain GUI.Label has no outline, so fake one by stamping the text in black a
-            // couple pixels off-center before drawing the green label on top - keeps it
-            // readable over bright backgrounds instead of just relying on the bold green.
-            var shadowStyle = new GUIStyle(Style);
-            shadowStyle.normal.textColor = Color.black;
-
             var previousColor = GUI.color;
             GUI.color = new Color(1f, 1f, 1f, 1f - progress);
 
-            foreach (var offset in ShadowOffsets)
-            {
-                GUI.Label(new Rect(rect.x + offset.x, rect.y + offset.y, rect.width, rect.height), _text, shadowStyle);
-            }
-
-            GUI.Label(rect, _text, Style);
+            GuiDrawUtils.DrawLabelWithShadow(rect, _text, Style);
 
             GUI.color = previousColor;
             GUI.matrix = previousMatrix;

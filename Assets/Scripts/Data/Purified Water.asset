@@ -29,6 +29,8 @@ MonoBehaviour:
   hitSound: {fileID: 0}
   defense: 0
   healthRestore: 0
+  hungerRestore: 0
+  thirstRestore: 40
   equippedSpriteDown: {fileID: 0}
   equippedSpriteUp: {fileID: 0}
   equippedSpriteLeft: {fileID: 0}

@@ -27,7 +27,7 @@ MonoBehaviour:
   meleeRange: 1
   meleeAttackCooldown: 0.5
   hitSound: {fileID: 0}
-  defense: 1
+  defense: 10
   healthRestore: 0
   equippedSpriteDown: {fileID: 0}
   equippedSpriteUp: {fileID: 0}

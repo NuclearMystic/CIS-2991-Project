@@ -81,5 +81,34 @@ namespace CIS2991Project.Jobs
             ActiveProgress.Clear();
             CompletedJobs.Clear();
         }
+
+        // Replaces all job state in one shot - used by SaveSystem when loading a save.
+        public static void LoadState(IEnumerable<(JobDefinition job, int progress)> activeJobs, IEnumerable<JobDefinition> completedJobs)
+        {
+            ActiveProgress.Clear();
+            CompletedJobs.Clear();
+
+            if (activeJobs != null)
+            {
+                foreach (var (job, progress) in activeJobs)
+                {
+                    if (job != null)
+                    {
+                        ActiveProgress[job] = progress > 0 ? progress : 0;
+                    }
+                }
+            }
+
+            if (completedJobs != null)
+            {
+                foreach (var job in completedJobs)
+                {
+                    if (job != null)
+                    {
+                        CompletedJobs.Add(job);
+                    }
+                }
+            }
+        }
     }
 }

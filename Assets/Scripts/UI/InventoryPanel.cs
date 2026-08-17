@@ -169,6 +169,7 @@ namespace CIS2991Project.UI
             {
                 var clicked = GUI.Button(slotRect, string.Empty);
                 GUI.DrawTexture(slotRect, _slotBackgroundTexture, ScaleMode.ScaleToFit);
+                DrawItemIcon(slotRect, slot);
                 if (!string.IsNullOrEmpty(slotLabel))
                 {
                     GUI.Label(slotRect, slotLabel, GuiDrawUtils.CenteredLabelStyle);
@@ -176,7 +177,27 @@ namespace CIS2991Project.UI
                 return clicked;
             }
 
-            return GUI.Button(slotRect, slotLabel);
+            var fallbackClicked = GUI.Button(slotRect, string.Empty);
+            DrawItemIcon(slotRect, slot);
+            if (!string.IsNullOrEmpty(slotLabel))
+            {
+                GUI.Label(slotRect, slotLabel, GuiDrawUtils.CenteredLabelStyle);
+            }
+            return fallbackClicked;
+        }
+
+        // Small icon on the left edge of the slot so it doesn't sit directly under the name/amount
+        // text drawn on top of the whole rect right after this.
+        private static void DrawItemIcon(Rect slotRect, PlayerInventory.InventorySlot slot)
+        {
+            if (slot.IsEmpty || slot.Item.icon == null)
+            {
+                return;
+            }
+
+            var iconSize = slotRect.height - 6f;
+            var iconRect = new Rect(slotRect.x + 3f, slotRect.y + 3f, iconSize, iconSize);
+            GuiDrawUtils.DrawSprite(iconRect, slot.Item.icon);
         }
 
         private void DrawSelectedItemPanel(PlayerInventory playerInventory, PlayerHealth playerHealth, float startX, float startY, float width)

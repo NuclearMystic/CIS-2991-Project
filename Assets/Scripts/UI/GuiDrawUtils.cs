@@ -52,5 +52,27 @@ namespace CIS2991Project.UI
 
             return string.IsNullOrWhiteSpace(item.displayName) ? item.name : item.displayName;
         }
+
+        private static readonly Vector2[] ShadowOffsets =
+        {
+            new(-1f, -1f), new(1f, -1f), new(-1f, 1f), new(1f, 1f)
+        };
+
+        // Plain GUI.Label has no outline, so fake one by stamping the text in black a couple pixels
+        // off-center in each direction before drawing the real text on top - keeps it readable over
+        // bright backgrounds. Set GUI.color's alpha before calling this for a fade-in/out effect;
+        // both the shadow and the main text pick it up.
+        public static void DrawLabelWithShadow(Rect rect, string text, GUIStyle style)
+        {
+            var shadowStyle = new GUIStyle(style);
+            shadowStyle.normal.textColor = Color.black;
+
+            foreach (var offset in ShadowOffsets)
+            {
+                GUI.Label(new Rect(rect.x + offset.x, rect.y + offset.y, rect.width, rect.height), text, shadowStyle);
+            }
+
+            GUI.Label(rect, text, style);
+        }
     }
 }

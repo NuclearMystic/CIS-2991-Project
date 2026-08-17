@@ -186,3 +186,48 @@
     justify-content: center;
     padding-left: 20px;
 }
+
+/* Save/Load slot picker (Assets/UI Toolkit/SaveLoadPanel.uxml) - clickable rows with a screenshot
+   thumbnail + name/timestamp, reusing .load-slot above for the outer box. */
+.save-slot
+{
+    flex-direction: row;
+    align-items: center;
+    padding-right: 15px;
+}
+
+.save-slot:hover
+{
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+}
+
+.save-slot-icon
+{
+    width: 96px;
+    height: 54px;
+    background-color: rgb(40, 40, 40);
+    margin-right: 15px;
+    flex-shrink: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.save-slot-info
+{
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.save-slot-name
+{
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+}
+
+.save-slot-timestamp
+{
+    font-size: 14px;
+    color: rgb(180, 180, 180);
+}

@@ -19,8 +19,13 @@ namespace CIS2991Project.Enemies
             var loot = new GameObject($"Loot_{drop.item.displayName}");
             loot.transform.position = position;
 
+            // Prefer the dropped item's own icon so different items look different on the ground,
+            // falling back to the enemy's shared lootSprite (and then a placeholder) for items that
+            // don't have their own art yet.
             var renderer = loot.AddComponent<SpriteRenderer>();
-            renderer.sprite = definition.lootSprite != null ? definition.lootSprite : RuntimeSpriteUtils.CreateCircleSprite(Color.yellow);
+            renderer.sprite = drop.item.icon != null ? drop.item.icon
+                : definition.lootSprite != null ? definition.lootSprite
+                : RuntimeSpriteUtils.CreateCircleSprite(Color.yellow);
             renderer.sortingOrder = 5;
 
             loot.AddComponent<CircleCollider2D>().isTrigger = true;

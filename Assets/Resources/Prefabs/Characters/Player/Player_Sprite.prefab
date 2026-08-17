@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 2599761279921479484}
   - component: {fileID: 5859089423981942185}
   - component: {fileID: 2264181796660445003}
+  - component: {fileID: 7807468348136669343}
   m_Layer: 0
   m_Name: Player_Sprite
   m_TagString: Player
@@ -333,7 +334,7 @@ MonoBehaviour:
   currency: 60
   startingItems:
   - item: {fileID: 11400000, guid: 4ce0451a27c46864085348d98013ee63, type: 2}
-    amount: 5
+    amount: 1
   - item: {fileID: 11400000, guid: 8459fbc188b89c749aa46f26c28c6e17, type: 2}
     amount: 25
   - item: {fileID: 11400000, guid: 417a2b0ab6337e444bba265bddcac5d5, type: 2}
@@ -419,6 +420,7 @@ MonoBehaviour:
   playerInventory: {fileID: 7110417629392717382}
   playerShoot: {fileID: 5337185273854832097}
   characterSheet: {fileID: 5036190077612624874}
+  survivalStats: {fileID: 0}
   inventoryToggleKey: 105
   skillsToggleKey: 107
   journalToggleKey: 106
@@ -448,6 +450,11 @@ MonoBehaviour:
   pickupPopupRiseDistance: 1
   pickupPopupDuration: 2.5
   pickupPopupFontSize: 18
+  damageNumberWorldOffset: 1.6
+  damageNumberRiseDistance: 1
+  damageNumberDuration: 1
+  damageNumberFontSize: 20
+  damageNumberHorizontalScatter: 18
   equipmentBoxSize: 100
   equipmentBoxGap: 8
   bagIconTexture: {fileID: 2800000, guid: da69cbf9a7230c147a2346d01b9a6cfe, type: 3}
@@ -462,8 +469,10 @@ MonoBehaviour:
   inventorySlotGap: 4
   inventoryGridTopPadding: 60
   moneyTexture: {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
-  moneyWidth: 150
-  moneyHeight: 32
+  currencyName: Caps
+  moneyWidth: 190
+  moneyHeight: 44
+  moneyFontSize: 26
   hotbarSlotTextures:
   - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
   - {fileID: 2800000, guid: dc98acc5f0961c04d8f9d86d5e6307f1, type: 3}
@@ -486,6 +495,24 @@ MonoBehaviour:
   jobTrackerWidth: 220
   jobTrackerRowHeight: 26
   jobTrackerRowGap: 2
+  hungerBarBackgroundTexture: {fileID: 0}
+  hungerBarFillTexture: {fileID: 0}
+  hungerBarFillColor: {r: 0.1, g: 0.35, b: 0.1, a: 1}
+  thirstBarBackgroundTexture: {fileID: 0}
+  thirstBarFillTexture: {fileID: 0}
+  thirstBarFillColor: {r: 0.15, g: 0.4, b: 0.85, a: 1}
+  radiationBarBackgroundTexture: {fileID: 0}
+  radiationBarFillTexture: {fileID: 0}
+  radiationBarFillColor: {r: 0.8, g: 0.15, b: 0.15, a: 1}
+  radiationPlaceholderValue: 10
+  survivalBarWidth: 160
+  survivalBarHeight: 18
+  survivalBarGap: 4
+  survivalHazeColor: {r: 0.6, g: 0.75, b: 0.5, a: 1}
+  survivalMaxHazeAlpha: 0.35
+  emptyMeterPulseColor: {r: 1, g: 0.15, b: 0.15, a: 1}
+  emptyMeterPulseSpeed: 4
+  emptyMeterPulseMaxAlpha: 0.6
 --- !u!114 &7885066162786256011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -620,6 +647,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f49f2a85fb00e499c1f690a83cd824, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.HotbarInputController
+--- !u!114 &7807468348136669343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3050831987221406192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 047022cbf47c81a458f8749c6c92b609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CIS2991Project.Player.SurvivalStats
+  hungerDepletionSeconds: 900
+  thirstDepletionSeconds: 720
+  maxSpeedPenaltyFraction: 0.5
+  drainAmountPerTick: 1
+  drainIntervalSeconds: 10
+  skillDebuffPerEmptyMeter: 0.25
+  debugDrainHungerKey: 116
+  debugDrainThirstKey: 103
+  debugDrainPerSecond: 25
 --- !u!1 &4336243778001066693
 GameObject:
   m_ObjectHideFlags: 0

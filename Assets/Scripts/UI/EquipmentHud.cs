@@ -20,7 +20,7 @@ namespace CIS2991Project.UI
             _boxGap = boxGap;
         }
 
-        public void Draw(PlayerInventory playerInventory)
+        public void Draw(PlayerInventory playerInventory, PlayerShoot playerShoot)
         {
             if (playerInventory == null)
             {
@@ -40,6 +40,8 @@ namespace CIS2991Project.UI
                 playerInventory.TryUnequipWeapon();
             }
 
+            DrawAmmoCount(weaponRect, playerShoot);
+
             if (DrawEquipmentSlot(outfitRect, playerInventory.EquippedArmor) && _doubleClickTracker.RegisterClick(OutfitBoxClickId))
             {
                 playerInventory.TryUnequipArmor();
@@ -54,6 +56,27 @@ namespace CIS2991Project.UI
                 GuiDrawUtils.DrawSprite(rect, item.icon);
             }
             return clicked;
+        }
+
+        // Total rounds held in the bag (PlayerShoot.ReserveAmmo) - not the magazine's current/max -
+        // overlaid on the bottom edge of the weapon box. Only shown for weapons that actually use ammo
+        // (melee weapons report WeaponAmmoType.None).
+        private static void DrawAmmoCount(Rect weaponRect, PlayerShoot playerShoot)
+        {
+            if (playerShoot == null || playerShoot.CurrentAmmoType == global::WeaponAmmoType.None)
+            {
+                return;
+            }
+
+            const float labelHeight = 18f;
+            var labelRect = new Rect(weaponRect.x, weaponRect.yMax - labelHeight, weaponRect.width, labelHeight);
+
+            var previousColor = GUI.color;
+            GUI.color = new Color(0f, 0f, 0f, 0.55f);
+            GUI.DrawTexture(labelRect, Texture2D.whiteTexture);
+            GUI.color = previousColor;
+
+            GUI.Label(labelRect, playerShoot.ReserveAmmo.ToString(), GuiDrawUtils.CenteredLabelStyle);
         }
     }
 }

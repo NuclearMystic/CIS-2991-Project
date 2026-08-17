@@ -100,6 +100,11 @@ namespace CIS2991Project.Player
         public int CurrentAmmo => _currentAmmo;
         public int MaxAmmo => _equippedWeapon != null ? Mathf.Max(0, _equippedWeapon.ammoCapacity) : 0;
         public global::WeaponAmmoType CurrentAmmoType => _equippedWeapon != null ? _equippedWeapon.ammoType : global::WeaponAmmoType.None;
+
+        // Total rounds of the equipped weapon's ammo type sitting in the bag - not counting whatever's
+        // already loaded in the magazine (CurrentAmmo). Used by the HUD's "how much do I have left
+        // overall" readout, as opposed to the "how much is in this magazine" one.
+        public int ReserveAmmo => _inventory != null ? _inventory.GetItemCount(GetAmmoItem(CurrentAmmoType)) : 0;
         public bool IsReloading => _isReloading;
         public float ReloadTimeRemaining => _isReloading ? _reloadTimeRemaining : 0f;
         public float ReloadFractionRemaining => _isReloading && _reloadTotalDuration > 0f
@@ -347,6 +352,18 @@ namespace CIS2991Project.Player
 
             _inventory.TryRemove(ammoItem, amountToLoad);
             _currentAmmo += amountToLoad;
+            AmmoChanged?.Invoke(_currentAmmo, MaxAmmo, CurrentAmmoType);
+        }
+
+        // Sets the currently-equipped weapon's magazine directly - used by SaveSystem when loading a
+        // save. Call after PlayerInventory.LoadState, since re-equipping a weapon there refills ammo
+        // via HandleEquipmentChanged - this should override that with the saved amount instead.
+        public void LoadState(int savedCurrentAmmo)
+        {
+            _currentAmmo = Mathf.Clamp(savedCurrentAmmo, 0, MaxAmmo);
+            _isReloading = false;
+            _reloadTimeRemaining = 0f;
+            _reloadTotalDuration = 0f;
             AmmoChanged?.Invoke(_currentAmmo, MaxAmmo, CurrentAmmoType);
         }
 

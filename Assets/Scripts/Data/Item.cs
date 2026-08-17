@@ -107,12 +107,19 @@ public class Item : ScriptableObject
              "or a projectile impacts one. Not played on a swing/shot that misses.")]
     public AudioClip hitSound;
 
-    [Tooltip("Armor: damage reduction.")]
+    [Tooltip("Armor: flat percent reduction applied to incoming damage while equipped " +
+             "(10 = -10% damage taken). See PlayerHealth.TakeDamage.")]
     public int defense;
 
     [Tooltip("Consumables: health restored on use. " +
-             "(hunger/thirst/radiation restores can be added here later.)")]
+             "(radiation restore can be added here later.)")]
     public int healthRestore;
+
+    [Tooltip("Consumables: hunger restored on use (0-100 scale, same as the hunger meter).")]
+    public int hungerRestore;
+
+    [Tooltip("Consumables: thirst restored on use (0-100 scale, same as the thirst meter).")]
+    public int thirstRestore;
 
     [Tooltip("Weapons: sprite drawn over the player when this weapon is equipped, facing down.")]
     public Sprite equippedSpriteDown;

@@ -20,6 +20,7 @@ namespace CIS2991Project.Player
         private AudioSource _audioSource;
         private CharacterSheet _characterSheet;
         private PlayerShoot _playerShoot;
+        private SurvivalStats _survivalStats;
         private Vector2 movementInput;
         private bool _isSprinting;
         private float _footstepTimeRemaining;
@@ -31,6 +32,7 @@ namespace CIS2991Project.Player
             body.freezeRotation = true;
             _characterSheet = GetComponent<CharacterSheet>();
             _playerShoot = GetComponent<PlayerShoot>();
+            _survivalStats = GetComponent<SurvivalStats>();
 
             _audioSource = GetComponent<AudioSource>();
             _audioSource.playOnAwake = false;
@@ -75,7 +77,7 @@ namespace CIS2991Project.Player
 
         private void FixedUpdate()
         {
-            var speed = moveSpeed * GetAthleticsMultiplier();
+            var speed = moveSpeed * GetAthleticsMultiplier() * GetSurvivalSpeedMultiplier();
             if (_isSprinting)
                 speed *= sprintMultiplier;
 
@@ -85,6 +87,11 @@ namespace CIS2991Project.Player
         private float GetAthleticsMultiplier()
         {
             return _characterSheet != null ? _characterSheet.GetMoveSpeedMultiplier() : 1f;
+        }
+
+        private float GetSurvivalSpeedMultiplier()
+        {
+            return _survivalStats != null ? _survivalStats.SpeedMultiplier : 1f;
         }
     }
 }
