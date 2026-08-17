@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CIS2991Project.Core;
 using CIS2991Project.Enemies;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -393,7 +394,7 @@ namespace CIS2991Project.Player
             var projectileVisual = GetProjectileSprite(CurrentAmmoType);
 
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = projectileVisual != null ? projectileVisual : CreateCircleSprite(Color.white);
+            sr.sprite = projectileVisual != null ? projectileVisual : RuntimeSpriteUtils.CreateCircleSprite(Color.white);
             sr.sortingOrder = 2;
             go.transform.localScale = projectileVisual != null ? Vector3.one : new Vector3(0.3f, 0.3f, 1f);
 
@@ -449,27 +450,5 @@ namespace CIS2991Project.Player
         }
 
         private AudioClip GetFireSound(global::WeaponAmmoType ammoType) => GetAmmoProfile(ammoType)?.FireSound;
-
-        private static Sprite CreateCircleSprite(Color color)
-        {
-            const int size = 16;
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            var pixels = new Color32[size * size];
-            var center = (size - 1) / 2f;
-            var radius = size / 2f - 0.5f;
-
-            for (var i = 0; i < pixels.Length; i++)
-            {
-                float x = i % size;
-                float y = i / size;
-                pixels[i] = Vector2.Distance(new Vector2(x, y), new Vector2(center, center)) <= radius
-                    ? (Color32)color
-                    : new Color32(0, 0, 0, 0);
-            }
-
-            texture.SetPixels32(pixels);
-            texture.Apply();
-            return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
-        }
     }
 }

@@ -1,5 +1,5 @@
 using System;
-using CIS2991Project.Player;
+using CIS2991Project.Core;
 using UnityEngine;
 
 namespace CIS2991Project.Dialogue
@@ -10,7 +10,7 @@ namespace CIS2991Project.Dialogue
     // same floating-above-the-head anchoring (proven to avoid overlapping the corner HUD panels),
     // now driven by a DialogueTree asset instead of one hardcoded line.
     [RequireComponent(typeof(Collider2D))]
-    public sealed class NpcDialogue : MonoBehaviour
+    public sealed class NpcDialogue : RangeInteractable<NpcDialogue>
     {
         [SerializeField] private string npcName = "NPC";
         [SerializeField] private DialogueTree dialogueTree;
@@ -18,7 +18,7 @@ namespace CIS2991Project.Dialogue
 
         // Only one NPC's dialogue box on screen at a time - opening one closes any other that's
         // open, same pattern as ChestInventory.ActiveChest.
-        public static NpcDialogue ActiveDialogue { get; private set; }
+        public static NpcDialogue ActiveDialogue => Active;
 
         // Fired every time a node is displayed (including node 0 on open). Lets a future quest-giver
         // component react to "the player reached this specific line" (e.g. the Yes branch of a job
@@ -29,8 +29,6 @@ namespace CIS2991Project.Dialogue
         // Configure) based on current job state before the player sees anything.
         public event Action BeforeOpen;
 
-        private bool _playerInRange;
-        private bool _isOpen;
         private int _currentNodeIndex;
 
         private DialogueNode CurrentNode => dialogueTree.nodes[_currentNodeIndex];
@@ -60,34 +58,12 @@ namespace CIS2991Project.Dialogue
             GetComponent<Collider2D>().isTrigger = true;
         }
 
-        private void OnDisable()
-        {
-            if (ActiveDialogue == this)
-                Close();
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.GetComponentInParent<PlayerHealth>() != null)
-                _playerInRange = true;
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            if (other.GetComponentInParent<PlayerHealth>() == null)
-                return;
-
-            _playerInRange = false;
-            if (ActiveDialogue == this)
-                Close();
-        }
-
         private void Update()
         {
-            if (!_playerInRange)
+            if (!PlayerInRange)
                 return;
 
-            if (_isOpen && Input.GetKeyDown(KeyCode.Escape))
+            if (IsOpen && Input.GetKeyDown(KeyCode.Escape))
             {
                 Close();
                 return;
@@ -96,7 +72,7 @@ namespace CIS2991Project.Dialogue
             if (!Input.GetKeyDown(interactKey))
                 return;
 
-            if (!_isOpen)
+            if (!IsOpen)
                 Open();
             else if (!CurrentNode.hasChoice)
                 Advance(CurrentNode.nextNodeIndex);
@@ -109,23 +85,12 @@ namespace CIS2991Project.Dialogue
             if (dialogueTree == null || dialogueTree.nodes.Count == 0)
                 return;
 
-            if (ActiveDialogue != null && ActiveDialogue != this)
-                ActiveDialogue.Close();
-
-            ActiveDialogue = this;
-            _isOpen = true;
+            BecomeActive();
 
             var startIndex = dialogueTree.randomBark
                 ? UnityEngine.Random.Range(0, dialogueTree.nodes.Count)
                 : 0;
             GoToNode(startIndex);
-        }
-
-        public void Close()
-        {
-            _isOpen = false;
-            if (ActiveDialogue == this)
-                ActiveDialogue = null;
         }
 
         private void Advance(int nextIndex)
@@ -151,7 +116,7 @@ namespace CIS2991Project.Dialogue
             // WorldToScreenPoint call, so scaling it the way PlayerHUD's fixed-corner panels are
             // scaled would double-apply and drift the box away from the NPC - same reasoning
             // PlayerHUD's reload bar/pickup popup already follow.
-            if (!_playerInRange || Camera.main == null)
+            if (!PlayerInRange || Camera.main == null)
                 return;
 
             var screenPoint = Camera.main.WorldToScreenPoint(transform.position);
@@ -170,7 +135,7 @@ namespace CIS2991Project.Dialogue
                 promptWidth,
                 promptHeight);
 
-            if (!_isOpen)
+            if (!IsOpen)
             {
                 GUI.Box(promptRect, string.Empty);
                 GUI.Label(new Rect(promptRect.x + 12f, promptRect.y + 10f, promptRect.width - 24f, 20f), $"Press E to talk to {npcName}");

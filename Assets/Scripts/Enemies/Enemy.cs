@@ -1,6 +1,4 @@
-using System.Collections;
 using CIS2991Project.Core;
-using CIS2991Project.Items;
 using CIS2991Project.Jobs;
 using CIS2991Project.Player;
 using UnityEngine;
@@ -51,9 +49,7 @@ namespace CIS2991Project.Enemies
         private SpriteRenderer _spriteRenderer;
         private PlayerHealth _player;
         private CharacterSheet _playerCharacterSheet;
-        private Color _originalColor;
-        private Vector3 _hitShakeOffset = Vector3.zero;
-        private Coroutine _hitFeedbackCoroutine;
+        private EnemyHitFeedback _hitFeedback;
 
         private State _state = State.Patrol;
         private Vector2 _homePosition;
@@ -73,10 +69,7 @@ namespace CIS2991Project.Enemies
 
             _animator = GetComponent<Animator>();
             _spriteRenderer = GetComponent<SpriteRenderer>();
-            if (_spriteRenderer != null)
-            {
-                _originalColor = _spriteRenderer.color;
-            }
+            _hitFeedback = new EnemyHitFeedback(this, _spriteRenderer, hitFlashColor, hitFlashDuration, hitShakeMagnitude);
 
             _currentHealth = definition != null ? definition.maxHealth : 1;
         }
@@ -191,7 +184,7 @@ namespace CIS2991Project.Enemies
             go.transform.position = muzzlePosition + direction * 0.5f;
 
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = definition.projectileSprite != null ? definition.projectileSprite : CreateFallbackSprite(Color.red);
+            sr.sprite = definition.projectileSprite != null ? definition.projectileSprite : RuntimeSpriteUtils.CreateCircleSprite(Color.red);
             sr.sortingOrder = 6;
             if (definition.projectileSprite == null)
             {
@@ -223,7 +216,7 @@ namespace CIS2991Project.Enemies
 
             if (_facingDirection != Vector2.zero)
             {
-                _animator.SetInteger(DirectionParam, DetermineFacing(_facingDirection));
+                _animator.SetInteger(DirectionParam, (int)DetermineFacing(_facingDirection));
             }
         }
 
@@ -234,55 +227,13 @@ namespace CIS2991Project.Enemies
                 return;
             }
 
-            PlayHitFeedback();
+            _hitFeedback.Play();
 
             _currentHealth -= Mathf.Max(1, damage);
             if (_currentHealth <= 0)
             {
                 Die();
             }
-        }
-
-        private void PlayHitFeedback()
-        {
-            if (_spriteRenderer == null)
-            {
-                return;
-            }
-
-            if (_hitFeedbackCoroutine != null)
-            {
-                StopCoroutine(_hitFeedbackCoroutine);
-                transform.position -= _hitShakeOffset;
-                _hitShakeOffset = Vector3.zero;
-            }
-
-            _hitFeedbackCoroutine = StartCoroutine(HitFeedbackRoutine());
-        }
-
-        // Shakes as an additive offset that's undone and reapplied each frame, rather than driving
-        // transform.position directly - the same transform is also moved by physics every FixedUpdate
-        // (via _body.linearVelocity in UpdatePatrol/UpdateChase), so a naive shake would fight that
-        // and either drift the enemy off its real position or snap back to a stale one once it ends.
-        private IEnumerator HitFeedbackRoutine()
-        {
-            _spriteRenderer.color = hitFlashColor;
-
-            var elapsed = 0f;
-            while (elapsed < hitFlashDuration)
-            {
-                transform.position -= _hitShakeOffset;
-                _hitShakeOffset = (Vector3)Random.insideUnitCircle * hitShakeMagnitude;
-                transform.position += _hitShakeOffset;
-
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            transform.position -= _hitShakeOffset;
-            _hitShakeOffset = Vector3.zero;
-            _spriteRenderer.color = _originalColor;
-            _hitFeedbackCoroutine = null;
         }
 
         private void Die()
@@ -309,96 +260,18 @@ namespace CIS2991Project.Enemies
             Destroy(gameObject, deathAnimationSeconds);
         }
 
+        // Invoke() needs this as a same-instance named method - the actual loot logic lives in
+        // EnemyLoot.Spawn, shared with anything else that wants to roll a loot table.
         private void DropLoot()
         {
-            if (definition.lootTable == null || definition.lootTable.Length == 0)
-            {
-                return;
-            }
-
-            var drop = definition.lootTable[Random.Range(0, definition.lootTable.Length)];
-            if (drop.item == null)
-            {
-                return;
-            }
-
-            var loot = new GameObject($"Loot_{drop.item.displayName}");
-            loot.transform.position = transform.position;
-
-            var renderer = loot.AddComponent<SpriteRenderer>();
-            renderer.sprite = definition.lootSprite != null ? definition.lootSprite : CreateFallbackSprite(Color.yellow);
-            renderer.sortingOrder = 5;
-
-            loot.AddComponent<CircleCollider2D>().isTrigger = true;
-            loot.AddComponent<ConsumablePickup>().Configure(drop.item, drop.RollAmount(), definition.lootDropSound);
+            EnemyLoot.Spawn(definition, transform.position);
         }
 
-        private static int DetermineFacing(Vector2 direction)
+        private static Direction DetermineFacing(Vector2 direction)
         {
             return Mathf.Abs(direction.y) > Mathf.Abs(direction.x)
-                ? (direction.y > 0f ? 1 : 0)
-                : (direction.x < 0f ? 2 : 3);
-        }
-
-        private static Sprite CreateFallbackSprite(Color color)
-        {
-            const int size = 16;
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-            var pixels = new Color32[size * size];
-            var center = (size - 1) / 2f;
-            var radius = size / 2f - 0.5f;
-
-            for (var i = 0; i < pixels.Length; i++)
-            {
-                float x = i % size;
-                float y = i / size;
-                pixels[i] = Vector2.Distance(new Vector2(x, y), new Vector2(center, center)) <= radius
-                    ? (Color32)color
-                    : new Color32(0, 0, 0, 0);
-            }
-
-            texture.SetPixels32(pixels);
-            texture.Apply();
-            return Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
-        }
-
-        private class EnemyProjectile : MonoBehaviour, IProjectile
-        {
-            private int _damage;
-            private float _remaining;
-
-            public void Initialize(int damage, float lifetime)
-            {
-                _damage = Mathf.Max(1, damage);
-                _remaining = lifetime;
-            }
-
-            private void Update()
-            {
-                _remaining -= Time.deltaTime;
-                if (_remaining <= 0f)
-                {
-                    Destroy(gameObject);
-                }
-            }
-
-            private void OnTriggerEnter2D(Collider2D other)
-            {
-                // Covers both other enemy projectiles and player projectiles (Projectile also
-                // implements IProjectile) - projectiles shouldn't collide with each other.
-                if (other.GetComponent<IProjectile>() != null || other.GetComponent<Enemy>() != null)
-                {
-                    return;
-                }
-
-                var player = other.GetComponentInParent<PlayerHealth>();
-                if (player != null)
-                {
-                    player.TakeDamage(_damage);
-                }
-
-                Destroy(gameObject);
-            }
+                ? (direction.y > 0f ? Direction.Up : Direction.Down)
+                : (direction.x < 0f ? Direction.Left : Direction.Right);
         }
     }
 }
